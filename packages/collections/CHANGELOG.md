@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0
+
+`defaultHash` now agrees with `deepEq`: two equal values have one hash. MINOR: before 1.0.0 a change of behavior that a caller can see raises MINOR.
+
+### Changed
+
+- The hash of each object changes, so the order of a hash map or a hash set with object keys changes. The hash of a primitive does not change.
+- The hash reads 16 levels of an object. Two values that differ only below that depth have one hash.
+
+### Fixed
+
+- The hash of an object came from `JSON.stringify`, so equal values had different hashes when their keys had another order, and a `Map` or a `Set` of any content hashed as `{}`. A hash map then did not find an equal key, or all such keys shared one bucket.
+- A dense graph made a very long string, and it failed with `RangeError` after about 90 seconds in one local run. It now ends.
+
 ## 0.2.0
 
 `deepEq` now has a stated meaning, and it is an equivalence. Its doc comment gives each rule. MINOR: before 1.0.0 a change of behavior that a caller can see raises MINOR.

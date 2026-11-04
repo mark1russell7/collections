@@ -350,20 +350,6 @@ export function safeMap<K, V>(): Middleware<
 }
 
 /**
- * Helper to match on Result type.
- * Note: The match method is already built into Ok and Err constructors
- * in effects.ts, so no runtime augmentation is needed.
- */
-declare module "../core/effects.js" {
-  interface Ok<T> {
-    match<U>(cases: { Ok: (value: T) => U; Err: (error: never) => U }): U;
-  }
-  interface Err<E> {
-    match<U>(cases: { Ok: (value: never) => U; Err: (error: E) => U }): U;
-  }
-}
-
-/**
  * Generic safe middleware that works with any collection.
  */
 export function safe<C extends object>(): Middleware<C> {

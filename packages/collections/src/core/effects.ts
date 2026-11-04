@@ -110,6 +110,8 @@ export const toNullable = <T>(opt: Option<T>): T | undefined =>
 export interface Ok<T> {
   readonly _tag: "Ok";
   readonly value: T;
+  /** This method calls the `Ok` case with the value. */
+  match<U>(cases: { Ok: (value: T) => U; Err: (error: never) => U }): U;
 }
 
 /**
@@ -118,6 +120,8 @@ export interface Ok<T> {
 export interface Err<E> {
   readonly _tag: "Err";
   readonly error: E;
+  /** This method calls the `Err` case with the error. */
+  match<U>(cases: { Ok: (value: never) => U; Err: (error: E) => U }): U;
 }
 
 /**

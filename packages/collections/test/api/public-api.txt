@@ -364,7 +364,6 @@ unwrapResult: build/index.d.ts#unwrapResult
 window: build/index.d.ts#window
 workerPool: build/index.d.ts#workerPool
 zip: build/index.d.ts#zip
-ambient: build/index.d.ts#declare module "../core/effects.js"
 
 ## ./dag (build/dag/index.d.ts): 17 names
 
@@ -899,6 +898,10 @@ export interface EqualityProvider<T> {
 export interface Err<E> {
   readonly _tag: "Err";
   readonly error: E;
+  match<U>(cases: {
+    Ok: (value: never) => U;
+    Err: (error: E) => U;
+  }): U;
 }
 export declare const Err: <E>(error: E) => Err<E>;
 
@@ -1333,6 +1336,10 @@ export declare const None: None;
 export interface Ok<T> {
   readonly _tag: "Ok";
   readonly value: T;
+  match<U>(cases: {
+    Ok: (value: T) => U;
+    Err: (error: never) => U;
+  }): U;
 }
 export declare const Ok: <T>(value: T) => Ok<T>;
 
@@ -2014,22 +2021,6 @@ export declare const createEmitter: <E extends EventMap>() => Emitter<E>;
 
 ### build/index.d.ts#dateCompare
 export declare const dateCompare: Compare<Date>;
-
-### build/index.d.ts#declare module "../core/effects.js"
-declare module "../core/effects.js" {
-  interface Ok<T> {
-    match<U>(cases: {
-      Ok: (value: T) => U;
-      Err: (error: never) => U;
-    }): U;
-  }
-  interface Err<E> {
-    match<U>(cases: {
-      Ok: (value: never) => U;
-      Err: (error: E) => U;
-    }): U;
-  }
-}
 
 ### build/index.d.ts#deepEq
 export declare const deepEq: Eq<any>;

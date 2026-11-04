@@ -1,8 +1,8 @@
 /**
  * Bounded behavior - Enforces capacity limits on collections.
  *
- * Wraps collections to prevent them from exceeding a maximum size.
- * Provides various overflow policies to handle full collections.
+ * This module wraps collections to prevent them from exceeding a maximum size.
+ * This module gives various overflow policies to handle full collections.
  *
  * @example
  * const list = compose(
@@ -43,7 +43,7 @@ export interface BoundedOptions<T> {
 
   /**
    * Optional callback invoked when overflow occurs.
-   * Called before the policy is applied.
+   * The behavior calls this function before it applies the policy.
    */
   onOverflow?: OverflowHandler<T>;
 }
@@ -58,10 +58,10 @@ export interface BoundedCollection {
 }
 
 /**
- * Creates a bounded List middleware.
+ * This function makes a bounded List middleware.
  *
  * Intercepts add operations to enforce capacity limits.
- * Supports multiple overflow policies.
+ * This function supports multiple overflow policies.
  */
 export function boundedList<T>(
   options: BoundedOptions<T>
@@ -230,7 +230,7 @@ export function boundedList<T>(
 }
 
 /**
- * Creates a bounded Queue middleware.
+ * This function makes a bounded Queue middleware.
  */
 export function boundedQueue<T>(
   options: BoundedOptions<T>
@@ -301,7 +301,7 @@ export function boundedQueue<T>(
 }
 
 /**
- * Creates a bounded Deque middleware.
+ * This function makes a bounded Deque middleware.
  */
 export function boundedDeque<T>(
   options: BoundedOptions<T>
@@ -376,7 +376,7 @@ export function boundedDeque<T>(
 }
 
 /**
- * Creates a bounded Map middleware.
+ * This function makes a bounded Map middleware.
  */
 export function boundedMap<K, V>(
   options: Omit<BoundedOptions<V>, "onOverflow"> & {

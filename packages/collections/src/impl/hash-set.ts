@@ -1,7 +1,7 @@
 /**
  * HashSet implementation - A set backed by a HashMap.
  *
- * Provides O(1) average case for add, remove, and contains operations.
+ * This module gives O(1) average case for add, remove, and contains operations.
  * Elements are unique based on custom equality and hash functions.
  * Mirrors java.util.HashSet.
  *
@@ -24,7 +24,7 @@ import { defaultEq, defaultHash } from "../utils/defaults.js";
 const PRESENT = Symbol("PRESENT");
 
 /**
- * Options for creating a HashSet.
+ * Options for making a HashSet.
  */
 export interface HashSetOptions<T> {
   /**
@@ -55,8 +55,8 @@ export interface HashSetOptions<T> {
 /**
  * HashSet<T> - Hash table implementation of the Set interface.
  *
- * Backed by a HashMap where values are a dummy constant.
- * Provides constant-time performance for basic operations.
+ * A HashMap holds the elements. Its values are a dummy constant.
+ * This class gives constant-time performance for basic operations.
  *
  * Not thread-safe. Use synchronized() behavior for concurrent access.
  */
@@ -183,8 +183,8 @@ export class HashSet<T> implements Set<T> {
   // ========================================================================
 
   /**
-   * Returns a new set that is the union of this set and the other set.
-   * Contains all elements from both sets.
+   * This method gives a new set that is the union of this set and the other set.
+   * The new set contains all elements from both sets.
    */
   union(other: Iterable<T>): HashSet<T> {
     const result = this.clone();
@@ -193,8 +193,8 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns a new set that is the intersection of this set and the other set.
-   * Contains only elements present in both sets.
+   * This method gives a new set that is the intersection of this set and the other set.
+   * The new set contains only elements present in both sets.
    */
   intersection(other: Iterable<T>): HashSet<T> {
     const result = new HashSet<T>({ eq: this._eq });
@@ -210,8 +210,8 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns a new set that is the difference of this set and the other set.
-   * Contains elements in this set but not in the other set.
+   * This method gives a new set that is the difference of this set and the other set.
+   * The new set contains elements in this set but not in the other set.
    */
   difference(other: Iterable<T>): HashSet<T> {
     const result = this.clone();
@@ -220,8 +220,8 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns a new set that is the symmetric difference of this set and the other set.
-   * Contains elements in either set but not in both.
+   * This method gives a new set that is the symmetric difference of this set and the other set.
+   * The new set contains elements in either set but not in both.
    */
   symmetricDifference(other: Iterable<T>): HashSet<T> {
     const result = this.union(other);
@@ -231,7 +231,7 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns true if this set is a subset of the other set.
+   * This method gives true if this set is a subset of the other set.
    * All elements in this set are also in the other set.
    */
   isSubsetOf(other: Iterable<T>): boolean {
@@ -247,7 +247,7 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns true if this set is a superset of the other set.
+   * This method gives true if this set is a superset of the other set.
    * All elements in the other set are also in this set.
    */
   isSupersetOf(other: Iterable<T>): boolean {
@@ -260,7 +260,7 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns true if this set and the other set have no elements in common.
+   * This method gives true if this set and the other set have no elements in common.
    */
   isDisjointFrom(other: Iterable<T>): boolean {
     for (const element of other) {
@@ -297,7 +297,7 @@ export class HashSet<T> implements Set<T> {
   // ========================================================================
 
   /**
-   * Creates a shallow copy of this set.
+   * This method makes a shallow copy of this set.
    */
   clone(): HashSet<T> {
     const clone = new HashSet<T>({ eq: this._eq });
@@ -306,14 +306,14 @@ export class HashSet<T> implements Set<T> {
   }
 
   /**
-   * Returns statistics about the underlying hash table.
+   * This method gives statistics about the underlying hash table.
    */
   getStats(): ReturnType<HashMap<T, symbol>["getStats"]> {
     return this._map.getStats();
   }
 
   /**
-   * Returns a string representation for debugging.
+   * This method gives a string representation for debugging.
    */
   toString(): string {
     return `HashSet{${this.toArray().join(", ")}}`;
@@ -321,7 +321,7 @@ export class HashSet<T> implements Set<T> {
 }
 
 /**
- * Factory function to create a HashSet.
+ * Factory function to make a HashSet.
  *
  * @example
  * const set = hashSet<number>()

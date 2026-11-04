@@ -1,8 +1,8 @@
 /**
  * Evented behavior - Emits typed events on collection mutations.
  *
- * Wraps collections to emit events whenever elements are added, removed,
- * or the collection is cleared. Enables reactive programming patterns.
+ * This module wraps collections to emit events whenever elements are added, removed,
+ * or the collection is cleared. This module enables reactive programming patterns.
  *
  * @example
  * const list = compose(
@@ -102,9 +102,9 @@ export interface CollectionEvents<T> {
 // ============================================================================
 
 /**
- * Creates an evented List middleware.
+ * This function makes an evented List middleware.
  *
- * Emits events for add, remove, set, clear, sort, and reverse operations.
+ * This function emits events for add, remove, set, clear, sort, and reverse operations.
  */
 export function eventedList<T>(): Middleware<
   List<T>,
@@ -213,7 +213,7 @@ export function eventedList<T>(): Middleware<
 }
 
 /**
- * Creates an evented Queue middleware.
+ * This function makes an evented Queue middleware.
  */
 export function eventedQueue<T>(): Middleware<
   Queue<T>,
@@ -271,7 +271,7 @@ export function eventedQueue<T>(): Middleware<
 }
 
 /**
- * Creates an evented Deque middleware.
+ * This function makes an evented Deque middleware.
  */
 export function eventedDeque<T>(): Middleware<
   Deque<T>,
@@ -352,7 +352,7 @@ export function eventedDeque<T>(): Middleware<
 }
 
 /**
- * Creates an evented Map middleware.
+ * This function makes an evented Map middleware.
  */
 export function eventedMap<K, V>(): Middleware<
   MapLike<K, V>,

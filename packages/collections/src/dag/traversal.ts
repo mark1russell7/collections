@@ -1,7 +1,7 @@
 /**
  * DAG Traversal using Kahn's Algorithm
  *
- * Implements topological sort with level assignment for parallel execution.
+ * This module implements topological sort with level assignment for parallel execution.
  * Level 0 = leaves (no dependencies), higher levels depend on lower levels.
  */
 

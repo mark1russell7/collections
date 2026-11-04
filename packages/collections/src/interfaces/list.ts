@@ -1,8 +1,8 @@
 /**
  * List interfaces that mirror Java's List interface.
  *
- * Lists are ordered collections that allow duplicate elements
- * and provide positional (indexed) access to elements.
+ * Lists are ordered collections that can hold duplicate elements
+ * and give positional (indexed) access to elements.
  */
 
 import type { Collection, ReadonlyCollection } from "./collection.js";
@@ -16,16 +16,16 @@ import type { Compare } from "../core/traits.js";
  */
 export interface ReadonlyList<T> extends ReadonlyCollection<T> {
   /**
-   * Returns the element at the specified position.
+   * This method gives the element at the specified position.
    *
-   * @param index The index of the element to return (0-based)
+   * @param index The index of the element to give (0-based)
    * @returns The element at the specified position
    * @throws RangeError if index is out of bounds
    */
   get(index: number): T;
 
   /**
-   * Returns the index of the first occurrence of the specified element,
+   * This method gives the index of the first occurrence of the specified element,
    * or -1 if not found.
    *
    * @param element The element to search for
@@ -34,7 +34,7 @@ export interface ReadonlyList<T> extends ReadonlyCollection<T> {
   indexOf(element: T, fromIndex?: number): number;
 
   /**
-   * Returns the index of the last occurrence of the specified element,
+   * This method gives the index of the last occurrence of the specified element,
    * or -1 if not found.
    *
    * @param element The element to search for
@@ -43,7 +43,7 @@ export interface ReadonlyList<T> extends ReadonlyCollection<T> {
   lastIndexOf(element: T, fromIndex?: number): number;
 
   /**
-   * Returns a view of the portion of this list between fromIndex (inclusive)
+   * This method gives a view of the portion of this list between fromIndex (inclusive)
    * and toIndex (exclusive).
    *
    * Changes to the sublist are reflected in the original list.
@@ -54,14 +54,14 @@ export interface ReadonlyList<T> extends ReadonlyCollection<T> {
   subList(fromIndex: number, toIndex: number): ReadonlyList<T>;
 
   /**
-   * Returns the first element in the list.
+   * This method gives the first element in the list.
    *
    * @throws Error if list is empty
    */
   first(): T;
 
   /**
-   * Returns the last element in the list.
+   * This method gives the last element in the list.
    *
    * @throws Error if list is empty
    */
@@ -72,11 +72,11 @@ export interface ReadonlyList<T> extends ReadonlyCollection<T> {
  * List<T> - Mutable ordered collection with indexed access.
  *
  * Mirrors java.util.List with full mutation capabilities.
- * Provides methods to insert, replace, and remove elements by index.
+ * This type gives methods to insert, replace, and remove elements by index.
  */
 export interface List<T> extends ReadonlyList<T>, Collection<T> {
   /**
-   * Replaces the element at the specified position.
+   * This method replaces the element at the specified position.
    *
    * @param index The index of the element to replace
    * @param element The new element
@@ -86,7 +86,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   set(index: number, element: T): T;
 
   /**
-   * Inserts an element at the specified position.
+   * This method inserts an element at the specified position.
    * Shifts elements at and after the position to the right.
    *
    * @param index The index at which to insert
@@ -96,7 +96,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   insert(index: number, element: T): void;
 
   /**
-   * Inserts all elements from the specified collection at the specified position.
+   * This method inserts all elements from the specified collection at the specified position.
    *
    * @param index The index at which to insert
    * @param other The collection whose elements to insert
@@ -105,7 +105,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   insertAll(index: number, other: Iterable<T>): boolean;
 
   /**
-   * Removes the element at the specified position.
+   * This method removes the element at the specified position.
    * Shifts elements after the position to the left.
    *
    * @param index The index of the element to remove
@@ -115,7 +115,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   removeAt(index: number): T;
 
   /**
-   * Removes elements in the specified index range.
+   * This method removes elements in the specified index range.
    *
    * @param fromIndex Start index (inclusive)
    * @param toIndex End index (exclusive)
@@ -123,19 +123,19 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   removeRange(fromIndex: number, toIndex: number): void;
 
   /**
-   * Sorts this list according to the specified comparator.
+   * This method sorts this list according to the specified comparator.
    *
    * @param compare The comparison function
    */
   sort(compare?: Compare<T>): void;
 
   /**
-   * Reverses the order of elements in this list.
+   * This method reverses the order of elements in this list.
    */
   reverse(): void;
 
   /**
-   * Returns a mutable sublist view.
+   * This method gives a mutable sublist view.
    *
    * @param fromIndex Start index (inclusive)
    * @param toIndex End index (exclusive)
@@ -145,15 +145,15 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   // Stack-like operations
 
   /**
-   * Appends an element to the end of this list.
-   * Equivalent to add() but doesn't return boolean.
+   * This method appends an element to the end of this list.
+   * Equivalent to add() but doesn't give boolean.
    *
    * @param element The element to append
    */
   push(element: T): void;
 
   /**
-   * Removes and returns the last element in this list.
+   * Removes and gives the last element in this list.
    *
    * @returns The last element
    * @throws Error if list is empty
@@ -161,7 +161,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   pop(): T;
 
   /**
-   * Removes and returns the first element in this list.
+   * Removes and gives the first element in this list.
    *
    * @returns The first element
    * @throws Error if list is empty
@@ -169,7 +169,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   shift(): T;
 
   /**
-   * Prepends an element to the beginning of this list.
+   * This method prepends an element to the beginning of this list.
    *
    * @param element The element to prepend
    */
@@ -179,12 +179,12 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
 /**
  * RandomAccess - Marker interface for lists with O(1) indexed access.
  *
- * Indicates that the list provides fast (constant-time) random access.
+ * This type shows that the list gives fast (constant-time) random access.
  * Examples: ArrayList (yes), LinkedList (no).
  */
 export interface RandomAccess {
   /**
-   * Marker property to indicate random access capability.
+   * This marker property shows random access capability.
    * Always true for collections implementing this interface.
    */
   readonly supportsRandomAccess: true;
@@ -194,7 +194,7 @@ export interface RandomAccess {
  * Stack<T> - LIFO (Last-In-First-Out) collection.
  *
  * A stack of elements with push/pop operations.
- * Can be implemented as a specialized list or standalone.
+ * A specialized list or a standalone class can implement this type.
  */
 export interface Stack<T> extends Iterable<T> {
   /** Number of elements */
@@ -204,32 +204,32 @@ export interface Stack<T> extends Iterable<T> {
   readonly isEmpty: boolean;
 
   /**
-   * Pushes an element onto the stack.
+   * This method pushes an element onto the stack.
    */
   push(element: T): void;
 
   /**
-   * Removes and returns the top element.
+   * Removes and gives the top element.
    *
    * @throws Error if stack is empty
    */
   pop(): T;
 
   /**
-   * Returns the top element without removing it.
+   * This method gives the top element without removing it.
    *
    * @throws Error if stack is empty
    */
   peek(): T;
 
   /**
-   * Removes all elements.
+   * This method removes all elements.
    */
   clear(): void;
 
   /**
-   * Searches for an element and returns its distance from the top.
-   * Returns -1 if not found.
+   * This method searches for an element and gives its distance from the top.
+   * This method gives -1 if not found.
    */
   search(element: T): number;
 }
@@ -238,7 +238,7 @@ export interface Stack<T> extends Iterable<T> {
  * Vector<T> - Synchronized growable array.
  *
  * Like ArrayList but with synchronized access.
- * Legacy interface from Java; in our framework, use compose(synchronized())(arrayList()) instead.
+ * This interface is a legacy of Java. Use compose(synchronized())(arrayList()) instead.
  */
 export interface Vector<T> extends List<T> {
   /**
@@ -252,7 +252,7 @@ export interface Vector<T> extends List<T> {
   trimToSize(): void;
 
   /**
-   * Increases capacity to ensure it can hold at least the specified number of elements.
+   * This method increases capacity to make sure that it can hold at least the specified number of elements.
    */
   ensureCapacity(minCapacity: number): void;
 }
@@ -270,7 +270,7 @@ export interface CircularList<T> extends List<T> {
   readonly capacity: number;
 
   /**
-   * Returns true if the list has reached capacity.
+   * This value is true if the list has reached capacity.
    */
   readonly isFull: boolean;
 

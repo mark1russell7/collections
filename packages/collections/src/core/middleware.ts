@@ -1,13 +1,11 @@
 /**
  * Middleware composition system for collections.
  *
- * Provides the core composition mechanism that allows behaviors to be
- * layered on top of collections using the decorator pattern.
+ * This module gives the core composition mechanism. With it, behaviors go in layers
+ * on top of collections with the decorator pattern.
  *
- * This is a specialized form of the unified middleware system (common/src/middleware)
- * optimized for synchronous collection operations. While the unified system supports
- * both sync and async with explicit context objects, collections use a simpler pattern
- * where the collection instance itself serves as the context.
+ * The mechanism is for synchronous collection operations. The collection instance itself
+ * is the context, so a behavior needs no explicit context object.
  *
  * @example
  * const list = compose(
@@ -20,7 +18,7 @@
 import type { Collection } from "../interfaces/collection.js";
 
 /**
- * A middleware is a function that takes a collection and returns
+ * A middleware is a function that takes a collection and gives
  * an enhanced version of that collection.
  *
  * This maps to the unified middleware pattern where:
@@ -42,7 +40,7 @@ export type Middleware<In = any, Out extends In = In> = (next: In) => Out;
 /**
  * Composes multiple middleware layers into a single enhancer function.
  *
- * Uses reduceRight to create an "onion" pattern where the first middleware
+ * This function uses reduceRight to make an "onion" pattern where the first middleware
  * is the outermost layer (runs first when calling into the collection).
  *
  * The type system properly tracks capability additions through composition.
@@ -160,7 +158,7 @@ export interface Async<T> {
 export interface BoundedCollection {
   /** Maximum capacity */
   readonly capacity: number;
-  /** Whether collection is at capacity */
+  /** If collection is at capacity */
   readonly isFull: boolean;
   /** Remaining space */
   readonly remainingCapacity: number;
@@ -199,7 +197,7 @@ export type Asyncify<C> = {
 };
 
 /**
- * Helper to create a proxy that intercepts method calls.
+ * Helper to make a proxy that intercepts method calls.
  * Useful for implementing middleware that needs to wrap method invocations.
  *
  * @example
@@ -228,9 +226,9 @@ export const interceptMethods = <C extends object>(
 };
 
 /**
- * Helper to create a readonly view of a collection by blocking mutating methods.
+ * Helper to make a readonly view of a collection by blocking mutating methods.
  *
- * @param mutatingMethods Set of method names that should be blocked
+ * @param mutatingMethods Set of method names that the middleware blocks
  * @param errorMessage Custom error message to throw
  */
 export const blockMethods = <C extends object>(
@@ -321,7 +319,7 @@ export abstract class CollectionBuilder<C> {
 }
 
 /**
- * Utility to create a middleware that only enhances specific methods.
+ * Utility to make a middleware that only enhances specific methods.
  *
  * @example
  * const logAdd = enhanceMethod('add', (original, args) => {
@@ -355,8 +353,8 @@ export const enhanceMethod = <C extends object, K extends keyof C & string>(
 };
 
 /**
- * Combines multiple middleware into a single middleware.
- * Useful for creating reusable middleware bundles.
+ * This function combines multiple middleware into a single middleware.
+ * Useful for making reusable middleware bundles.
  *
  * Bundle has the same composition semantics as compose - the first middleware
  * is the outermost layer, and types are tracked through the chain.

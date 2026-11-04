@@ -7,7 +7,7 @@
 
 /**
  * Equality comparison function.
- * Returns true if two values are considered equal.
+ * This type gives true if two values are considered equal.
  *
  * @example
  * const primitiveEq: Eq<number> = (a, b) => a === b
@@ -16,10 +16,10 @@
 export type Eq<T> = (a: T, b: T) => boolean;
 
 /**
- * Hash function for creating hash codes.
- * Returns a 32-bit integer hash of the value.
+ * Hash function for making hash codes.
+ * This type gives a 32-bit integer hash of the value.
  *
- * Must satisfy: if eq(a, b) === true, then hash(a) === hash(b)
+ * The function must satisfy: if eq(a, b) === true, then hash(a) === hash(b)
  *
  * @example
  * const stringHash: Hash<string> = (s) => {
@@ -35,12 +35,12 @@ export type Hash<T> = (value: T) => number;
 
 /**
  * Comparison function for ordering values.
- * Returns:
+ * This type gives:
  * - negative number if a < b
  * - zero if a === b
  * - positive number if a > b
  *
- * Must be transitive and consistent with equality.
+ * The function must be transitive and consistent with equality.
  *
  * @example
  * const numberCompare: Compare<number> = (a, b) => a - b
@@ -60,7 +60,7 @@ export interface Sized {
  * Capability: Can be cleared (all elements removed).
  */
 export interface Clearable {
-  /** Removes all elements from the collection. */
+  /** This method removes all elements from the collection. */
   clear(): void;
 }
 
@@ -68,7 +68,7 @@ export interface Clearable {
  * Capability: Can check if empty.
  */
 export interface Emptiable {
-  /** Returns true if the collection contains no elements. */
+  /** This value gives true if the collection contains no elements. */
   readonly isEmpty: boolean;
 }
 
@@ -76,7 +76,7 @@ export interface Emptiable {
  * Capability: Can be cloned.
  */
 export interface Cloneable<T> {
-  /** Creates a shallow copy of the collection. */
+  /** This method makes a shallow copy of the collection. */
   clone(): T;
 }
 
@@ -84,13 +84,13 @@ export interface Cloneable<T> {
  * Capability: Can be converted to an array.
  */
 export interface ArrayConvertible<T> {
-  /** Returns an array containing all elements in the collection. */
+  /** This method gives an array containing all elements in the collection. */
   toArray(): T[];
 }
 
 /**
  * Base read-only collection capabilities.
- * Combines common traits that most collections share.
+ * This type combines common traits that most collections share.
  */
 export interface ReadonlyCollectionBase<T>
   extends Sized,
@@ -100,14 +100,14 @@ export interface ReadonlyCollectionBase<T>
 
 /**
  * Base mutable collection capabilities.
- * Adds mutation operations to readonly base.
+ * This type adds mutation operations to readonly base.
  */
 export interface MutableCollectionBase<T>
   extends ReadonlyCollectionBase<T>,
     Clearable {}
 
 /**
- * Equality provider - allows collections to specify custom equality.
+ * Equality provider - with it, collections can specify custom equality.
  */
 export interface EqualityProvider<T> {
   /** The equality function used by this collection. */
@@ -115,7 +115,7 @@ export interface EqualityProvider<T> {
 }
 
 /**
- * Hash provider - allows collections to specify custom hashing.
+ * Hash provider - with it, collections can specify custom hashing.
  */
 export interface HashProvider<T> {
   /** The hash function used by this collection. */
@@ -123,7 +123,7 @@ export interface HashProvider<T> {
 }
 
 /**
- * Comparison provider - allows collections to specify custom ordering.
+ * Comparison provider - with it, collections can specify custom ordering.
  */
 export interface ComparisonProvider<T> {
   /** The comparison function used by this collection. */
@@ -137,10 +137,10 @@ export interface Bounded {
   /** The maximum number of elements this collection can hold. */
   readonly capacity: number;
 
-  /** Returns true if the collection is at capacity. */
+  /** This value gives true if the collection is at capacity. */
   readonly isFull: boolean;
 
-  /** Returns the number of additional elements that can be added. */
+  /** This value gives the number of elements that the collection can still take. */
   readonly remainingCapacity: number;
 }
 
@@ -148,7 +148,7 @@ export interface Bounded {
  * Disposable resource - can be explicitly cleaned up.
  */
 export interface Disposable {
-  /** Releases any resources held by this collection. */
+  /** This method releases any resources held by this collection. */
   dispose(): void;
 }
 
@@ -156,9 +156,9 @@ export interface Disposable {
  * Freezable collection - can be made immutable.
  */
 export interface Freezable<T> {
-  /** Makes this collection immutable. Returns self for chaining. */
+  /** This method makes this collection immutable. This method gives self for chaining. */
   freeze(): T;
 
-  /** Returns true if this collection is frozen. */
+  /** This value gives true if this collection is frozen. */
   readonly isFrozen: boolean;
 }

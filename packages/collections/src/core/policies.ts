@@ -3,7 +3,7 @@
  *
  * Policies define how collections handle edge cases like overflow,
  * underflow, and eviction. These are used by behavior decorators
- * to provide flexible, composable behavior.
+ * to give flexible, composable behavior.
  */
 
 // ============================================================================
@@ -13,7 +13,7 @@
 /**
  * Policy for handling overflow when adding to a full bounded collection.
  *
- * - 'throw': Throw an error when attempting to add to a full collection
+ * - 'throw': Throw an error when trying to add to a full collection
  * - 'drop-oldest': Remove the oldest element and add the new one
  * - 'drop-newest': Ignore the new element (don't add it)
  * - 'reject': Return false/None but don't throw (graceful failure)
@@ -29,7 +29,7 @@ export type OverflowPolicy =
   | "block";
 
 /**
- * Context information provided when overflow occurs.
+ * Context information given when overflow occurs.
  */
 export interface OverflowContext<T> {
   /** The element that triggered the overflow. */
@@ -44,7 +44,7 @@ export interface OverflowContext<T> {
 
 /**
  * Callback invoked when overflow occurs.
- * Can be used for logging, metrics, or custom handling.
+ * This function can log, record metrics or do custom handling.
  */
 export type OverflowHandler<T> = (context: OverflowContext<T>) => void;
 
@@ -55,9 +55,9 @@ export type OverflowHandler<T> = (context: OverflowContext<T>) => void;
 /**
  * Policy for handling underflow when removing from an empty collection.
  *
- * - 'throw': Throw an error when attempting to remove from empty collection
+ * - 'throw': Throw an error when trying to remove from empty collection
  * - 'return-none': Return None/undefined (graceful failure)
- * - 'return-default': Return a default value provided by user
+ * - 'return-default': Give a default value given by user
  * - 'block': For async collections, wait until an element is available
  */
 export type UnderflowPolicy =
@@ -67,7 +67,7 @@ export type UnderflowPolicy =
   | "block";
 
 /**
- * Context information provided when underflow occurs.
+ * Context information given when underflow occurs.
  */
 export interface UnderflowContext {
   /** The operation that triggered the underflow. */
@@ -135,7 +135,7 @@ export interface EvictionCandidate<T> {
 
 /**
  * Custom eviction function.
- * Given candidates, returns the element to evict.
+ * Given candidates, gives the element to evict.
  */
 export type EvictionSelector<T> = (
   candidates: EvictionCandidate<T>[]
@@ -149,7 +149,7 @@ export type EvictionSelector<T> = (
  * Policy for retrying failed async operations.
  */
 export interface RetryPolicy {
-  /** Maximum number of retry attempts. */
+  /** Maximum number of retry tries. */
   readonly maxAttempts: number;
   /** Initial delay in milliseconds. */
   readonly initialDelay: number;
@@ -165,11 +165,11 @@ export interface RetryPolicy {
  * Context for retry decisions.
  */
 export interface RetryContext {
-  /** Current attempt number (1-indexed). */
+  /** Current try number (1-indexed). */
   readonly attempt: number;
   /** The error that caused the retry. */
   readonly error: unknown;
-  /** Elapsed time since first attempt. */
+  /** Elapsed time since first try. */
   readonly elapsedMs: number;
 }
 
@@ -183,7 +183,7 @@ export type RetryPredicate = (context: RetryContext) => boolean;
 // ============================================================================
 
 /**
- * Policy for resolving conflicts when same key is modified concurrently.
+ * Policy for resolving conflicts when same key is changed concurrently.
  *
  * - 'last-write-wins': Most recent write takes precedence
  * - 'first-write-wins': First write takes precedence
@@ -209,7 +209,7 @@ export type MergeFunction<T> = (current: T, incoming: T) => T;
  * Policy for when to compact internal storage.
  */
 export interface CompactionPolicy {
-  /** Compact when capacity utilization drops below this ratio (0-1). */
+  /** Compact when the used part of the capacity drops below this ratio (0-1). */
   readonly minLoadFactor?: number;
   /** Compact when wasted space exceeds this many elements. */
   readonly maxWastedSpace?: number;
@@ -244,8 +244,8 @@ export interface GrowthPolicy {
  *
  * - 'throw': Throw an error
  * - 'drop': Silently drop the invalid element
- * - 'coerce': Attempt to coerce to valid type
- * - 'log': Log warning but allow
+ * - 'coerce': Try to coerce to valid type
+ * - 'log': Log a warning and continue
  */
 export type ValidationPolicy = "throw" | "drop" | "coerce" | "log";
 
@@ -286,7 +286,7 @@ export const DEFAULT_UNDERFLOW_POLICY: UnderflowPolicy = "throw";
 export const DEFAULT_EVICTION_POLICY: EvictionPolicy = "fifo";
 
 /**
- * Default retry policy: 3 attempts with exponential backoff.
+ * Default retry policy: 3 tries with exponential backoff.
  */
 export const DEFAULT_RETRY_POLICY: RetryPolicy = {
   maxAttempts: 3,

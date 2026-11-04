@@ -1,7 +1,7 @@
 /**
  * Typed event emitter system for collections.
  *
- * Provides a lightweight, type-safe event system for mutation events
+ * This function gives a lightweight, type-safe event system for mutation events
  * and other observable behavior. Events are strongly typed using
  * TypeScript's mapped types.
  */
@@ -31,7 +31,7 @@ export type EventMap = Record<string, any>;
 /**
  * Type-safe event emitter.
  *
- * Supports subscribing to events, emitting events, and managing listeners.
+ * This class supports subscribing to events, emitting events, and managing listeners.
  * All event names and payloads are type-checked at compile time.
  *
  * @example
@@ -166,7 +166,7 @@ export class Emitter<E extends EventMap> {
 }
 
 /**
- * Create an event emitter for a specific event map.
+ * Make an event emitter for a specific event map.
  *
  * This is a convenience factory function.
  *
@@ -179,7 +179,7 @@ export const createEmitter = <E extends EventMap>(): Emitter<E> => {
 
 /**
  * Event batching utility for reducing event noise.
- * Collects events and emits them in batches.
+ * This class collects events and emits them in batches.
  *
  * @example
  * const batcher = new EventBatcher(emitter, 'add', 100)
@@ -240,8 +240,8 @@ export class EventBatcher<E extends EventMap, K extends keyof E> {
 }
 
 /**
- * Async event emitter that returns promises.
- * Waits for all async listeners to complete.
+ * Async event emitter that gives promises.
+ * This class waits for all async listeners to complete.
  *
  * @example
  * const emitter = new AsyncEmitter<{ save: { data: string } }>()
@@ -340,7 +340,7 @@ export const forwardEvent = <
 };
 
 /**
- * Create a filtered event subscription that only fires when predicate is true.
+ * Make a filtered event subscription that only fires when predicate is true.
  *
  * @example
  * const emitter = new Emitter<{ change: { value: number } }>()

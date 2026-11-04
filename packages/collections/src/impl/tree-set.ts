@@ -1,7 +1,7 @@
 /**
  * TreeSet - Red-black tree based sorted set implementation.
  *
- * Implements a sorted set using TreeMap as the backing structure.
+ * This module implements a sorted set using TreeMap as the backing structure.
  * Mirrors java.util.TreeSet.
  *
  * Key features:
@@ -35,7 +35,7 @@ import { defaultEq, defaultCompare } from "../utils/defaults.js";
 const PRESENT = true;
 
 /**
- * Options for creating a TreeSet.
+ * Options for making a TreeSet.
  */
 export interface TreeSetOptions<T> {
   /**
@@ -55,7 +55,7 @@ export interface TreeSetOptions<T> {
  * TreeSet<T> - Red-black tree based sorted set.
  *
  * Maintains elements in sorted order using a TreeMap as backing structure.
- * Provides O(log n) operations and navigation methods.
+ * This class gives O(log n) operations and navigation methods.
  */
 export class TreeSet<T> implements NavigableSet<T> {
   private readonly _map: TreeMap<T, boolean>;
@@ -436,7 +436,7 @@ export class TreeSet<T> implements NavigableSet<T> {
 }
 
 /**
- * Factory function to create a TreeSet.
+ * Factory function to make a TreeSet.
  *
  * @example
  * const set = treeSet<string>()

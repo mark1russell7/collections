@@ -1,7 +1,7 @@
 /**
  * LRU (Least Recently Used) eviction behavior.
  *
- * Tracks access times and automatically evicts the least recently used
+ * This module tracks access times and automatically evicts the least recently used
  * elements when capacity is reached. Perfect for caching.
  *
  * @example
@@ -45,9 +45,9 @@ interface LRUNode<K, V> {
 }
 
 /**
- * Creates an LRU Map middleware.
+ * This function makes an LRU Map middleware.
  *
- * Maintains a doubly-linked list to track access order.
+ * This function maintains a doubly-linked list to track access order.
  * Most recently accessed items are at the head.
  * When capacity is exceeded, items at the tail are evicted.
  */
@@ -275,7 +275,7 @@ export function lruMap<K, V>(
 }
 
 /**
- * Creates an LRU cache with a simpler API.
+ * This class makes an LRU cache with a simpler API.
  * This is a standalone LRU cache implementation.
  *
  * @example
@@ -416,7 +416,7 @@ export class LRUCache<K, V> {
   }
 
   /**
-   * Returns keys in LRU order (most recent first).
+   * This method gives keys in LRU order (most recent first).
    */
   *keys(): IterableIterator<K> {
     let node = this.head;
@@ -427,7 +427,7 @@ export class LRUCache<K, V> {
   }
 
   /**
-   * Returns entries in LRU order (most recent first).
+   * This method gives entries in LRU order (most recent first).
    */
   *entries(): IterableIterator<[K, V]> {
     let node = this.head;
@@ -439,7 +439,7 @@ export class LRUCache<K, V> {
 }
 
 /**
- * Factory function to create an LRU cache.
+ * Factory function to make an LRU cache.
  */
 export function lruCache<K, V>(
   capacity: number,

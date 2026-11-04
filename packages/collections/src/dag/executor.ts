@@ -11,7 +11,7 @@ import type {
 } from "./types.js";
 
 /**
- * Execute a batch of items with concurrency limit
+ * Start a batch of items with concurrency limit
  */
 async function executeWithConcurrency<T, R>(
   items: T[],
@@ -45,7 +45,7 @@ async function executeWithConcurrency<T, R>(
 }
 
 /**
- * Call a listener. A listener that throws does not stop the run: the function returns a log
+ * Call a listener. A listener that throws does not stop the run: the function gives a log
  * line for its error (deep dive DATA-21).
  */
 function notify<T>(name: string, listener: ((arg: T) => void) | undefined, arg: T): string | undefined {
@@ -59,18 +59,18 @@ function notify<T>(name: string, listener: ((arg: T) => void) | undefined, arg: 
 }
 
 /**
- * Execute DAG with level-based parallelization
+ * Start DAG with level-based parallelization
  *
- * - Levels are processed sequentially (level 0 first, then 1, etc.)
+ * - Levels are processed sequentially (level 0 first, then level 1, and so on)
  * - Within each level, nodes are processed in parallel up to concurrency limit
  * - Supports fail-fast or continue-on-error modes
  *
- * A processor that throws does NOT reject the whole run: the throw is captured
- * and recorded as a failed NodeResult, so partial results are always returned.
+ * A processor that throws does NOT reject the whole run. The run records the throw
+ * as a failed NodeResult, so partial results are always given.
  *
- * `failFast` operates at level granularity. When a node in a level fails, every
- * node already in flight in that same level still runs to completion, but no
- * later level is started. (There is no mid-level cancellation.)
+ * `failFast` operates at level granularity. When a node in a level fails, each
+ * node already in flight in that level continues to completion. No later level
+ * starts. (There is no mid-level cancellation.)
  */
 export async function executeDAG<TNode extends DAGNode>(
   dag: DependencyDAG<TNode>,
@@ -143,7 +143,7 @@ export async function executeDAG<TNode extends DAGNode>(
 }
 
 /**
- * Execute DAG sequentially (no parallelization)
+ * Start DAG sequentially (no parallelization)
  */
 export async function executeDAGSequential<TNode extends DAGNode>(
   dag: DependencyDAG<TNode>,
@@ -154,7 +154,7 @@ export async function executeDAGSequential<TNode extends DAGNode>(
 }
 
 /**
- * Create a simple processor that wraps an async function
+ * Make a simple processor that wraps an async function
  */
 export function createProcessor<TNode extends DAGNode>(
   fn: (node: TNode) => Promise<void>

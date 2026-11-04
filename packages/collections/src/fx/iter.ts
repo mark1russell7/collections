@@ -1,7 +1,7 @@
 /**
  * Functional operations for iterables (lazy sync transforms).
  *
- * Provides Stream-like operations with lazy evaluation.
+ * This module gives Stream-like operations with lazy evaluation.
  * All operations return generators for composability.
  *
  * @example
@@ -19,7 +19,7 @@
 // ============================================================================
 
 /**
- * Maps each element through a function.
+ * This function maps each element through a function.
  *
  * @example
  * const doubled = map([1, 2, 3], x => x * 2) // [2, 4, 6]
@@ -35,7 +35,7 @@ export function* map<T, U>(
 }
 
 /**
- * Filters elements based on a predicate.
+ * This function filters elements based on a predicate.
  */
 export function* filter<T>(
   iterable: Iterable<T>,
@@ -50,7 +50,7 @@ export function* filter<T>(
 }
 
 /**
- * FlatMaps each element to an iterable and flattens.
+ * This function flatMaps each element to an iterable and flattens.
  */
 export function* flatMap<T, U>(
   iterable: Iterable<T>,
@@ -63,7 +63,7 @@ export function* flatMap<T, U>(
 }
 
 /**
- * Flattens a nested iterable.
+ * This function flattens a nested iterable.
  */
 export function* flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T> {
   for (const inner of iterable) {
@@ -76,7 +76,7 @@ export function* flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T> {
 // ============================================================================
 
 /**
- * Takes the first n elements.
+ * This function takes the first n elements.
  */
 export function* take<T>(iterable: Iterable<T>, n: number): Generator<T> {
   let count = 0;
@@ -87,7 +87,7 @@ export function* take<T>(iterable: Iterable<T>, n: number): Generator<T> {
 }
 
 /**
- * Skips the first n elements.
+ * This function skips the first n elements.
  */
 export function* skip<T>(iterable: Iterable<T>, n: number): Generator<T> {
   let count = 0;
@@ -99,7 +99,7 @@ export function* skip<T>(iterable: Iterable<T>, n: number): Generator<T> {
 }
 
 /**
- * Takes elements while predicate is true.
+ * This function takes elements while predicate is true.
  */
 export function* takeWhile<T>(
   iterable: Iterable<T>,
@@ -112,7 +112,7 @@ export function* takeWhile<T>(
 }
 
 /**
- * Skips elements while predicate is true.
+ * This function skips elements while predicate is true.
  */
 export function* skipWhile<T>(
   iterable: Iterable<T>,
@@ -186,7 +186,7 @@ export function* chunk<T>(iterable: Iterable<T>, size: number): Generator<T[]> {
 }
 
 /**
- * Creates a sliding window of specified size.
+ * This function makes a sliding window of specified size.
  */
 export function* window<T>(iterable: Iterable<T>, size: number): Generator<T[]> {
   const window: T[] = [];
@@ -227,7 +227,7 @@ export function partition<T>(
 // ============================================================================
 
 /**
- * Reduces iterable to a single value.
+ * This function reduces iterable to a single value.
  */
 export function reduce<T, U>(
   iterable: Iterable<T>,
@@ -263,7 +263,7 @@ export function* scan<T, U>(
 // ============================================================================
 
 /**
- * Sorts elements (materializes the iterable).
+ * This function sorts elements (materializes the iterable).
  */
 export function* sort<T>(
   iterable: Iterable<T>,
@@ -288,7 +288,7 @@ export function* reverse<T>(iterable: Iterable<T>): Generator<T> {
 // ============================================================================
 
 /**
- * Removes duplicate elements (by reference or key function).
+ * This function removes duplicate elements (by reference or key function).
  */
 export function* distinct<T, K = T>(
   iterable: Iterable<T>,
@@ -305,7 +305,7 @@ export function* distinct<T, K = T>(
 }
 
 /**
- * Removes consecutive duplicates.
+ * This function removes consecutive duplicates.
  */
 export function* distinctConsecutive<T, K = T>(
   iterable: Iterable<T>,
@@ -329,7 +329,7 @@ export function* distinctConsecutive<T, K = T>(
 // ============================================================================
 
 /**
- * Performs a side effect for each element without modifying the stream.
+ * This function does a side effect for each element. The stream does not change.
  */
 export function* tap<T>(
   iterable: Iterable<T>,
@@ -347,7 +347,7 @@ export function* tap<T>(
 // ============================================================================
 
 /**
- * Returns true if any element matches the predicate.
+ * This function gives true if any element matches the predicate.
  */
 export function some<T>(
   iterable: Iterable<T>,
@@ -360,7 +360,7 @@ export function some<T>(
 }
 
 /**
- * Returns true if all elements match the predicate.
+ * This function gives true if all elements match the predicate.
  */
 export function every<T>(
   iterable: Iterable<T>,
@@ -373,7 +373,7 @@ export function every<T>(
 }
 
 /**
- * Returns true if no elements match the predicate.
+ * This function gives true if no elements match the predicate.
  */
 export function none<T>(
   iterable: Iterable<T>,
@@ -383,7 +383,7 @@ export function none<T>(
 }
 
 /**
- * Finds the first element matching the predicate.
+ * This function finds the first element matching the predicate.
  */
 export function find<T>(
   iterable: Iterable<T>,
@@ -396,7 +396,7 @@ export function find<T>(
 }
 
 /**
- * Counts elements (optionally matching a predicate).
+ * This function counts elements (optionally matching a predicate).
  */
 export function count<T>(
   iterable: Iterable<T>,
@@ -416,7 +416,7 @@ export function count<T>(
 // ============================================================================
 
 /**
- * Returns the minimum element.
+ * This function gives the minimum element.
  */
 export function min<T>(
   iterable: Iterable<T>,
@@ -435,7 +435,7 @@ export function min<T>(
 }
 
 /**
- * Returns the maximum element.
+ * This function gives the maximum element.
  */
 export function max<T>(
   iterable: Iterable<T>,
@@ -454,7 +454,7 @@ export function max<T>(
 }
 
 /**
- * Returns the sum of elements.
+ * This function gives the sum of elements.
  */
 export function sum(iterable: Iterable<number>): number {
   let total = 0;
@@ -465,7 +465,7 @@ export function sum(iterable: Iterable<number>): number {
 }
 
 /**
- * Returns the average of elements.
+ * This function gives the average of elements.
  */
 export function average(iterable: Iterable<number>): number | undefined {
   let total = 0;
@@ -484,21 +484,21 @@ export function average(iterable: Iterable<number>): number | undefined {
 // ============================================================================
 
 /**
- * Collects elements into an array.
+ * This function collects elements into an array.
  */
 export function toArray<T>(iterable: Iterable<T>): T[] {
   return Array.from(iterable);
 }
 
 /**
- * Collects elements into a Set.
+ * This function collects elements into a Set.
  */
 export function toSet<T>(iterable: Iterable<T>): Set<T> {
   return new Set(iterable);
 }
 
 /**
- * Collects elements into a Map.
+ * This function collects elements into a Map.
  */
 export function toMap<T, K, V>(
   iterable: Iterable<T>,
@@ -517,7 +517,7 @@ export function toMap<T, K, V>(
 // ============================================================================
 
 /**
- * Pipes a value through a series of transformations.
+ * This function pipes a value through a series of transformations.
  *
  * @example
  * const result = pipe(

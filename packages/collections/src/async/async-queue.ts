@@ -1,9 +1,9 @@
 /**
  * AsyncQueue - An async iterable queue with backpressure support.
  *
- * Designed for producer-consumer patterns where producers can wait when
+ * The queue is for producer-consumer patterns where producers can wait when
  * the queue is full and consumers can wait when the queue is empty.
- * Implements AsyncIterable for use with for-await-of loops.
+ * This module implements AsyncIterable for use with for-await-of loops.
  *
  * @example
  * const queue = asyncQueue<number>({ capacity: 10 })
@@ -23,7 +23,7 @@
 import type { AsyncQueue as IAsyncQueue } from "../interfaces/queue.js";
 
 /**
- * Options for creating an AsyncQueue.
+ * Options for making an AsyncQueue.
  */
 export interface AsyncQueueOptions {
   /**
@@ -115,7 +115,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   // ========================================================================
 
   /**
-   * Adds an element to the queue.
+   * This method adds an element to the queue.
    * If the queue is full, waits until space is available. With a capacity of 0, it waits until
    * a taker takes the element (a rendezvous).
    *
@@ -152,7 +152,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   }
 
   /**
-   * Removes and returns an element from the queue.
+   * Removes and gives an element from the queue.
    * If the queue is empty, waits until an element is available.
    *
    * @throws Error if queue is closed and empty
@@ -191,10 +191,10 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
    * `onElement` and the closure of the queue to `onClosed`. These calls are synchronous: they
    * occur in the call that adds the element or closes the queue. The method has no timeout.
    *
-   * The function that it returns withdraws the wait. A withdrawn wait gets no element, so no
+   * The function that it gives withdraws the wait. A withdrawn wait gets no element, so no
    * element goes to a taker that left. `select` races its cases with this method.
    *
-   * @returns A function that withdraws the wait. It returns true when the wait had no element yet.
+   * @returns A function that withdraws the wait. It gives true when the wait had no element yet.
    */
   waitTake(onElement: (element: T) => void, onClosed: (error: Error) => void): () => boolean {
     const next = this.takeNow();
@@ -221,8 +221,8 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   // ========================================================================
 
   /**
-   * Attempts to add an element without waiting.
-   * Returns false if queue is full (with a capacity of 0: if no taker waits).
+   * This method tries to add an element without waiting.
+   * This method gives false if queue is full (with a capacity of 0: if no taker waits).
    */
   tryPut(element: T): boolean {
     if (this._isClosed) {
@@ -232,15 +232,15 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   }
 
   /**
-   * Attempts to remove an element without waiting.
-   * Returns undefined if queue is empty.
+   * This method tries to remove an element without waiting.
+   * This method gives undefined if queue is empty.
    */
   tryTake(): T | undefined {
     const next = this.takeNow();
     return next.found ? next.element : undefined;
   }
 
-  /** Gives the element to a waiting taker, or puts it in the buffer when there is space. */
+  /** This method gives the element to a waiting taker, or puts it in the buffer when there is space. */
   private tryPutNow(element: T): boolean {
     // A waiting taker gets the element directly (the buffer is empty when a taker waits)
     const taker = this.takers.shift();
@@ -269,9 +269,9 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   }
 
   /**
-   * Takes the next element: from the buffer (then a waiting putter moves its element into the
+   * This method takes the next element: from the buffer (then a waiting putter moves its element into the
    * buffer), or directly from a waiting putter (a capacity of 0). (Before, the direct path
-   * released the putter but never gave its element to the taker, so the taker waited forever:
+   * released the putter but did not give its element to the taker, so the taker waited forever:
    * BUGS-2026-07 C11.)
    */
   private takeNow(): { found: true; element: T } | { found: false } {
@@ -294,7 +294,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   // ========================================================================
 
   /**
-   * Returns the next element without removing it.
+   * This method gives the next element without removing it.
    * Waits if queue is empty.
    */
   async peek(): Promise<T> {
@@ -328,8 +328,8 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   }
 
   /**
-   * Returns the next element without waiting.
-   * Returns undefined if queue is empty.
+   * This method gives the next element without waiting.
+   * This method gives undefined if queue is empty.
    */
   tryPeek(): T | undefined {
     return this.buffer.length > 0 ? this.buffer[0] : this.putters[0]?.element;
@@ -340,7 +340,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   // ========================================================================
 
   /**
-   * Closes the queue. No more elements can be added.
+   * This method closes the queue. No more elements can be added.
    * Existing elements can still be consumed.
    */
   close(): void {
@@ -369,8 +369,8 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   }
 
   /**
-   * Drains all elements into an array.
-   * Returns immediately with current elements.
+   * This method drains all elements into an array.
+   * This method gives immediately with current elements.
    */
   drain(): T[] {
     // The buffer, then the elements of the waiting putters, in order. (Before, the waiting
@@ -439,7 +439,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   // ========================================================================
 
   /**
-   * Returns statistics about the queue.
+   * This method gives statistics about the queue.
    */
   getStats() : {
     size: number;
@@ -469,7 +469,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
 }
 
 /**
- * Factory function to create an AsyncQueue.
+ * Factory function to make an AsyncQueue.
  *
  * @example
  * const queue = asyncQueue<number>({ capacity: 100 })

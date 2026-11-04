@@ -1,7 +1,7 @@
 /**
  * LinkedList implementation - A doubly-linked list.
  *
- * Provides O(1) insertion/removal at both ends and at known positions.
+ * This module gives O(1) insertion/removal at both ends and at known positions.
  * Slower random access O(n) compared to ArrayList.
  * Mirrors java.util.LinkedList.
  *
@@ -33,7 +33,7 @@ class Node<T> {
 }
 
 /**
- * Options for creating a LinkedList.
+ * Options for making a LinkedList.
  */
 export interface LinkedListOptions<T> {
   /**
@@ -55,7 +55,7 @@ export interface LinkedListOptions<T> {
  * - Random access by index: O(n)
  * - Search: O(n)
  *
- * Implements both List and Deque interfaces.
+ * This class implements both List and Deque interfaces.
  */
 export class LinkedList<T> implements List<T>, Deque<T> {
   private _head: Node<T> | null = null;
@@ -590,7 +590,7 @@ export class LinkedList<T> implements List<T>, Deque<T> {
 }
 
 /**
- * Factory function to create a LinkedList.
+ * Factory function to make a LinkedList.
  *
  * @example
  * const list = linkedList<number>()

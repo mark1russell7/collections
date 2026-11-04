@@ -1,7 +1,7 @@
 /**
  * Go-style channels for CSP (Communicating Sequential Processes).
  *
- * Provides typed, bidirectional communication channels inspired by Go.
+ * This module gives typed, bidirectional communication channels inspired by Go.
  * Perfect for coordinating async operations and implementing concurrent patterns.
  *
  * @example
@@ -25,7 +25,7 @@ import { asyncQueue, type AsyncQueue } from "./async-queue.js";
 /**
  * Channel<T> - Bidirectional communication channel.
  *
- * Inspired by Go channels. Provides send/receive operations
+ * The channels of Go are the model. This class gives send/receive operations
  * that can block until the other side is ready.
  */
 export class Channel<T> {
@@ -39,7 +39,7 @@ export class Channel<T> {
   }
 
   /**
-   * Sends a value through the channel.
+   * This method sends a value through the channel.
    * Blocks if channel buffer is full.
    *
    * @throws Error if channel is closed
@@ -52,7 +52,7 @@ export class Channel<T> {
   }
 
   /**
-   * Receives a value from the channel.
+   * This method receives a value from the channel.
    * Blocks if no value is available.
    *
    * @throws Error if channel is closed and empty
@@ -66,17 +66,17 @@ export class Channel<T> {
    * channel is closed and empty, it calls `onClosed`. These calls are synchronous: they occur in
    * the call that sends the value or closes the channel.
    *
-   * The function that it returns withdraws the wait, so no later value goes to it.
+   * The function that it gives withdraws the wait, so no later value goes to it.
    *
-   * @returns A function that withdraws the wait. It returns true when the wait had no value yet.
+   * @returns A function that withdraws the wait. It gives true when the wait had no value yet.
    */
   waitReceive(onValue: (value: T) => void, onClosed: (error: Error) => void): () => boolean {
     return this.queue.waitTake(onValue, onClosed);
   }
 
   /**
-   * Attempts to send without blocking.
-   * Returns false if channel is full.
+   * This method tries to send without blocking.
+   * This method gives false if channel is full.
    */
   trySend(value: T): boolean {
     if (this._isClosed) return false;
@@ -84,15 +84,15 @@ export class Channel<T> {
   }
 
   /**
-   * Attempts to receive without blocking.
-   * Returns undefined if no value is available.
+   * This method tries to receive without blocking.
+   * This method gives undefined if no value is available.
    */
   tryReceive(): T | undefined {
     return this.queue.tryTake();
   }
 
   /**
-   * Closes the channel. No more values can be sent.
+   * This method closes the channel. No more values can be sent.
    * Receivers can still drain remaining values.
    */
   close(): void {
@@ -109,8 +109,8 @@ export class Channel<T> {
   }
 
   /**
-   * Creates a select case for this channel.
-   * Used with the select() function for multiplexing.
+   * This method makes a select case for this channel.
+   * The select() function uses this value for multiplexing.
    */
   case<R>(handler: (value: T) => R): SelectCase<R> {
     return {
@@ -199,12 +199,12 @@ function firstOf(waits: readonly Wait[]): Promise<{ index: number; value: unknow
 /**
  * Selects from multiple channels (like Go's select statement).
  *
- * Waits for the first channel to have a value available,
- * then calls its handler and returns the result.
+ * This function waits for the first channel to have a value available,
+ * then calls its handler and gives the result.
  *
  * The first case with a value at once wins. The cases that lose keep no receive: a value that
  * comes later stays in its channel for the next receiver. When the channel of a case is closed
- * and empty, the returned promise rejects.
+ * and empty, the given promise rejects.
  *
  * @example
  * const result = await select(
@@ -222,7 +222,7 @@ export async function select<R>(...cases: SelectCase<R>[]): Promise<R> {
 }
 
 /**
- * Creates a timeout channel that sends after the specified duration.
+ * This function makes a timeout channel that sends after the specified duration.
  *
  * @example
  * const result = await select(
@@ -240,7 +240,7 @@ export function timeout(ms: number): Channel<void> {
 }
 
 /**
- * Creates a ticker channel that sends at regular intervals.
+ * This function makes a ticker channel that sends at regular intervals.
  *
  * @example
  * const tick = ticker(1000) // Every second
@@ -353,8 +353,8 @@ export function fanIn<T>(...inputs: Channel<T>[]): Channel<T> {
 /**
  * Merge: like fanIn but closes output when first input closes.
  *
- * It takes one value at a time, from the inputs in turn, and keeps no receive on an input while
- * it waits for the reader of the output. So each value of each input reaches the output one
+ * It takes one value at a time, from the inputs in turn. It keeps no receive on an input while
+ * it waits for the reader of the output. Thus each value of each input reaches the output one
  * time, in the order of its input, or stays in its input.
  */
 export function merge<T>(...inputs: Channel<T>[]): Channel<T> {
@@ -403,7 +403,7 @@ export function unbuffered<T>(): Channel<T> {
 }
 
 /**
- * Factory function to create a channel.
+ * Factory function to make a channel.
  *
  * @example
  * const ch = channel<number>()

@@ -100,7 +100,7 @@ export function getDescendants<TNode extends DAGNode>(
 }
 
 /**
- * Create a DAG node from minimal input
+ * Make a DAG node from minimal input
  */
 export function createNode<TData = unknown>(
   id: string,

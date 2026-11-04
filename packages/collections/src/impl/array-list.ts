@@ -1,7 +1,7 @@
 /**
  * ArrayList implementation - A dynamic array-backed list.
  *
- * Provides O(1) indexed access and amortized O(1) append.
+ * This module gives O(1) indexed access and amortized O(1) append.
  * Mirrors java.util.ArrayList.
  *
  * @example
@@ -17,7 +17,7 @@ import type { Eq, Compare } from "../core/traits.js";
 import { defaultEq, defaultCompare } from "../utils/defaults.js";
 
 /**
- * Options for creating an ArrayList.
+ * Options for making an ArrayList.
  */
 export interface ArrayListOptions<T> {
   /**
@@ -36,8 +36,8 @@ export interface ArrayListOptions<T> {
 /**
  * ArrayList<T> - Resizable array implementation of the List interface.
  *
- * Provides fast random access (O(1)) and fast append (amortized O(1)).
- * Insertion and removal in the middle require shifting elements (O(n)).
+ * This class gives fast random access (O(1)) and fast append (amortized O(1)).
+ * Insertion and removal in the middle shift elements (O(n)).
  *
  * This is the most commonly used list implementation.
  */
@@ -411,7 +411,7 @@ export class ArrayList<T> implements List<T>, RandomAccess {
   // ========================================================================
 
   /**
-   * Ensures that the capacity is at least the specified minimum.
+   * This method makes sure that the capacity is at least the specified minimum.
    */
   ensureCapacity(minCapacity: number): void {
     if (minCapacity <= this._array.length) return;
@@ -430,7 +430,7 @@ export class ArrayList<T> implements List<T>, RandomAccess {
   }
 
   /**
-   * Trims the capacity to the current size to minimize memory usage.
+   * This method trims the capacity to the current size to minimize memory usage.
    */
   trimToSize(): void {
     if (this._size < this._array.length) {
@@ -468,7 +468,7 @@ export class ArrayList<T> implements List<T>, RandomAccess {
 }
 
 /**
- * Factory function to create an ArrayList.
+ * Factory function to make an ArrayList.
  *
  * @example
  * const list = arrayList<number>()

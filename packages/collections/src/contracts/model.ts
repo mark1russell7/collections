@@ -15,8 +15,8 @@ export interface Step<S, M> {
 export const smallInt: fc.Arbitrary<number> = fc.integer({ min: -20, max: 20 });
 
 /**
- * This function runs random sequences of steps against a new implementation and a new model,
- * and calls `check` after each step. fast-check shrinks a failure to a short sequence.
+ * This function runs random sequences of steps against a new implementation and a new model.
+ * It calls `check` after each step. fast-check shrinks a failure to a short sequence.
  */
 export function runModel<S, M>(options: {
   create: () => { sut: S; model: M };

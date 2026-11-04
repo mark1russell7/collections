@@ -11,49 +11,49 @@ import type { Eq } from "../core/traits.js";
  * ReadonlyCollection<T> - The root interface for readonly collections.
  *
  * Mirrors java.util.Collection but without mutation operations.
- * All collections should extend this or a more specific readonly interface.
+ * All collections must extend this or a more specific readonly interface.
  */
 export interface ReadonlyCollection<T> extends Iterable<T> {
   /**
-   * Returns the number of elements in this collection.
+   * This value is the number of elements in this collection.
    */
   readonly size: number;
 
   /**
-   * Returns true if this collection contains no elements.
+   * This value is true if this collection contains no elements.
    */
   readonly isEmpty: boolean;
 
   /**
-   * Returns true if this collection contains the specified element.
-   * Uses the collection's equality function to compare elements.
+   * This method gives true if this collection contains the specified element.
+   * This method uses the collection's equality function to compare elements.
    *
    * @param element The element to check for
    */
   contains(element: T): boolean;
 
   /**
-   * Returns true if this collection contains all elements in the specified collection.
+   * This method gives true if this collection contains all elements in the specified collection.
    *
    * @param other The collection whose elements to check for
    */
   containsAll(other: Iterable<T>): boolean;
 
   /**
-   * Returns an array containing all elements in this collection.
-   * The returned array is safe to modify (it's a copy).
+   * This method gives an array containing all elements in this collection.
+   * The given array is safe to change (it's a copy).
    */
   toArray(): T[];
 
   /**
-   * Performs the given action for each element.
+   * This method does the given action for each element.
    *
-   * @param action The action to perform for each element
+   * @param action The action to do for each element
    */
   forEach(action: (element: T, index: number) => void): void;
 
   /**
-   * Returns the equality function used by this collection.
+   * This value is the equality function used by this collection.
    */
   readonly eq: Eq<T>;
 }
@@ -62,14 +62,14 @@ export interface ReadonlyCollection<T> extends Iterable<T> {
  * Collection<T> - The root interface for mutable collections.
  *
  * Mirrors java.util.Collection with mutation operations.
- * All mutable collections should extend this or a more specific interface.
+ * All mutable collections must extend this or a more specific interface.
  */
 export interface Collection<T> extends ReadonlyCollection<T> {
   /**
-   * Adds an element to this collection.
+   * This method adds an element to this collection.
    *
-   * Returns true if the collection was modified as a result of this call.
-   * Some collections (like Set) may return false if the element already exists.
+   * This method gives true if the collection was changed as a result of this call.
+   * Some collections (like Set) can give false if the element already exists.
    *
    * @param element The element to add
    * @returns true if the collection changed
@@ -78,7 +78,7 @@ export interface Collection<T> extends ReadonlyCollection<T> {
   add(element: T): boolean;
 
   /**
-   * Adds all elements from the specified collection to this collection.
+   * This method adds all elements from the specified collection to this collection.
    *
    * @param other The collection whose elements to add
    * @returns true if the collection changed
@@ -86,9 +86,9 @@ export interface Collection<T> extends ReadonlyCollection<T> {
   addAll(other: Iterable<T>): boolean;
 
   /**
-   * Removes a single instance of the specified element from this collection.
+   * This method removes a single instance of the specified element from this collection.
    *
-   * Returns true if an element was removed as a result of this call.
+   * This method gives true if an element was removed as a result of this call.
    *
    * @param element The element to remove
    * @returns true if an element was removed
@@ -96,7 +96,7 @@ export interface Collection<T> extends ReadonlyCollection<T> {
   remove(element: T): boolean;
 
   /**
-   * Removes all elements from this collection that are also in the specified collection.
+   * This method removes all elements from this collection that are also in the specified collection.
    *
    * @param other The collection whose elements to remove
    * @returns true if the collection changed
@@ -104,7 +104,7 @@ export interface Collection<T> extends ReadonlyCollection<T> {
   removeAll(other: Iterable<T>): boolean;
 
   /**
-   * Retains only the elements in this collection that are in the specified collection.
+   * This method retains only the elements in this collection that are in the specified collection.
    * In other words, removes all elements not in the specified collection.
    *
    * @param other The collection of elements to retain
@@ -113,8 +113,8 @@ export interface Collection<T> extends ReadonlyCollection<T> {
   retainAll(other: Iterable<T>): boolean;
 
   /**
-   * Removes all elements from this collection.
-   * The collection will be empty after this call returns.
+   * This method removes all elements from this collection.
+   * The collection will be empty after this call gives.
    */
   clear(): void;
 }

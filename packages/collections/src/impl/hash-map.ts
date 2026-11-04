@@ -1,8 +1,8 @@
 /**
  * HashMap implementation - A hash table with custom equality and hashing.
  *
- * Provides O(1) average case lookup, insertion, and deletion.
- * Supports custom equality and hash functions for keys.
+ * This module gives O(1) average case lookup, insertion, and deletion.
+ * This module supports custom equality and hash functions for keys.
  * Mirrors java.util.HashMap.
  *
  * @example
@@ -33,12 +33,12 @@ interface Node<K, V> {
 }
 
 /**
- * Options for creating a HashMap.
+ * Options for making a HashMap.
  */
 export interface HashMapOptions<K, V> {
   /**
    * Initial capacity (number of buckets).
-   * Must be a power of 2.
+   * This value must be a power of 2.
    * @default 16
    */
   initialCapacity?: number;
@@ -72,7 +72,7 @@ export interface HashMapOptions<K, V> {
 /**
  * HashMap<K, V> - Hash table implementation with custom equality/hashing.
  *
- * Uses separate chaining for collision resolution.
+ * This class uses separate chaining for collision resolution.
  * Automatically resizes when load factor is exceeded.
  *
  * Not thread-safe. Use synchronized() behavior for concurrent access.
@@ -487,7 +487,7 @@ export class HashMap<K, V> implements MapLike<K, V> {
   }
 
   /**
-   * Returns the bucket index for a given hash.
+   * This method gives the bucket index for a given hash.
    */
   private bucketIndex(hash: number): number {
     // Use bitwise AND with (length - 1) for efficient modulo
@@ -496,7 +496,7 @@ export class HashMap<K, V> implements MapLike<K, V> {
   }
 
   /**
-   * Resizes the hash table to double its current capacity.
+   * This method resizes the hash table to double its current capacity.
    */
   private resize(): void {
     const oldBuckets = this._buckets;
@@ -524,7 +524,7 @@ export class HashMap<K, V> implements MapLike<K, V> {
   }
 
   /**
-   * Returns the next power of 2 >= n.
+   * This method gives the next power of 2 >= n.
    */
   private nextPowerOfTwo(n: number): number {
     if (n <= 0) return 1;
@@ -542,21 +542,21 @@ export class HashMap<K, V> implements MapLike<K, V> {
   // ========================================================================
 
   /**
-   * Returns the current number of buckets.
+   * This value is the current number of buckets.
    */
   get capacity(): number {
     return this._buckets.length;
   }
 
   /**
-   * Returns the current load factor (size / capacity).
+   * This value is the current load factor (size / capacity).
    */
   get loadFactor(): number {
     return this._size / this._buckets.length;
   }
 
   /**
-   * Returns statistics about bucket distribution (for debugging).
+   * This method gives statistics about bucket distribution (for debugging).
    */
   getStats(): {
     size: number;
@@ -597,7 +597,7 @@ export class HashMap<K, V> implements MapLike<K, V> {
 }
 
 /**
- * Factory function to create a HashMap.
+ * Factory function to make a HashMap.
  *
  * @example
  * const map = hashMap<string, number>()

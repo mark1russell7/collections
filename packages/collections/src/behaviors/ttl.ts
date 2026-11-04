@@ -20,7 +20,7 @@ import type { Collection } from "../interfaces/collection.js";
 
 /**
  * Start the background expiration checker without keeping a Node.js process alive.
- * (In a browser, setInterval returns a number and there is nothing to unref.)
+ * (In a browser, setInterval gives a number and there is nothing to unref.)
  */
 function startExpirationTimer(check: () => void, interval: number): ReturnType<typeof setInterval> {
   const timer = setInterval(check, interval);
@@ -60,10 +60,10 @@ interface TTLEntry<V> {
 }
 
 /**
- * Creates a TTL Map middleware.
+ * This function makes a TTL Map middleware.
  *
  * Automatically removes entries after TTL expires.
- * Uses a background interval to check for expired entries.
+ * This function uses a background interval to check for expired entries.
  */
 export function ttlMap<K, V>(
   options: TTLOptions
@@ -192,10 +192,10 @@ export function ttlMap<K, V>(
 }
 
 /**
- * Creates a TTL Collection middleware.
+ * This function makes a TTL Collection middleware.
  *
  * Note: This is less precise than TTL map because collections don't have keys.
- * Elements are tracked by reference, which may not work for primitive types.
+ * Elements are tracked by reference, which can fail for primitive types.
  */
 export function ttlCollection<T>(
   options: Omit<TTLOptions, "onExpire"> & {
@@ -385,7 +385,7 @@ export class TTLCache<K, V> {
 
   /**
    * Get remaining TTL for a key in milliseconds.
-   * Returns undefined if key doesn't exist or is expired.
+   * This method gives undefined if key doesn't exist or is expired.
    */
   getTTL(key: K): number | undefined {
     const entry = this.map.get(key);
@@ -447,7 +447,7 @@ export class TTLCache<K, V> {
 }
 
 /**
- * Factory function to create a TTL cache.
+ * Factory function to make a TTL cache.
  */
 export function ttlCache<K, V>(
   ttl: number,

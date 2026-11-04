@@ -1,8 +1,8 @@
 /**
  * Collectors for Stream-style collection operations.
  *
- * Provides Java Stream API-style collectors for transforming iterables
- * into various collection types. Inspired by java.util.stream.Collectors.
+ * This module gives Java Stream API-style collectors for transforming iterables
+ * into various collection types. The model is java.util.stream.Collectors.
  *
  * @example
  * import { collect, toList, groupingBy } from './collectors'
@@ -27,31 +27,31 @@ import { hashSet, type HashSet } from "../impl/hash-set.js";
  */
 export interface Collector<T, A, R> {
   /**
-   * Creates the initial accumulator.
+   * This value makes the initial accumulator.
    */
   supplier: () => A;
 
   /**
-   * Incorporates an element into the accumulator and returns the next accumulator. A mutable
-   * accumulator (a list, a map) returns itself. An immutable one (a count, a sum) returns the
+   * This value incorporates an element into the accumulator and gives the next accumulator. A mutable
+   * accumulator (a list, a map) gives itself. An immutable one (a count, a sum) gives the
    * new value. (Before, the result was ignored, so every immutable collector - counting,
-   * summing, minBy, maxBy, reducing, first, last - returned its seed: BUGS-2026-07 C12.)
+   * summing, minBy, maxBy, reducing, first, last - given its seed: BUGS-2026-07 C12.)
    */
   accumulator: (acc: A, element: T) => A;
 
   /**
-   * Combines two accumulators (for parallel streams).
+   * This value combines two accumulators (for parallel streams).
    */
   combiner?: (acc1: A, acc2: A) => A;
 
   /**
-   * Transforms the accumulator into the final result.
+   * This value transforms the accumulator into the final result.
    */
   finisher: (acc: A) => R;
 }
 
 /**
- * Collects elements using a collector.
+ * This function collects elements using a collector.
  *
  * @example
  * const list = collect([1, 2, 3], toList())
@@ -73,7 +73,7 @@ export function collect<T, A, R>(
 // ============================================================================
 
 /**
- * Collects elements into an ArrayList.
+ * This function collects elements into an ArrayList.
  */
 export function toList<T>(): Collector<T, ArrayList<T>, ArrayList<T>> {
   return {
@@ -84,7 +84,7 @@ export function toList<T>(): Collector<T, ArrayList<T>, ArrayList<T>> {
 }
 
 /**
- * Collects elements into a HashSet.
+ * This function collects elements into a HashSet.
  */
 export function toSet<T>(): Collector<T, HashSet<T>, HashSet<T>> {
   return {
@@ -95,7 +95,7 @@ export function toSet<T>(): Collector<T, HashSet<T>, HashSet<T>> {
 }
 
 /**
- * Collects elements into a native Array.
+ * This function collects elements into a native Array.
  */
 export function toArray<T>(): Collector<T, T[], T[]> {
   return {
@@ -106,7 +106,7 @@ export function toArray<T>(): Collector<T, T[], T[]> {
 }
 
 /**
- * Collects elements into a HashMap using key and value extractors.
+ * This function collects elements into a HashMap using key and value extractors.
  */
 export function toMap<T, K, V>(
   keyExtractor: (element: T) => K,
@@ -127,7 +127,7 @@ export function toMap<T, K, V>(
 // ============================================================================
 
 /**
- * Groups elements by a classifier function.
+ * This function groups elements by a classifier function.
  *
  * @example
  * const byAge = collect(users, groupingBy(u => u.age))
@@ -201,7 +201,7 @@ export function partitioningBy<T>(
 // ============================================================================
 
 /**
- * Counts the number of elements.
+ * This function counts the number of elements.
  */
 export function counting<T>(): Collector<T, number, number> {
   return {
@@ -242,7 +242,7 @@ export function averagingNumber<T>(
 }
 
 /**
- * Finds the minimum element.
+ * This function finds the minimum element.
  */
 export function minBy<T>(
   comparator: (a: T, b: T) => number
@@ -260,7 +260,7 @@ export function minBy<T>(
 }
 
 /**
- * Finds the maximum element.
+ * This function finds the maximum element.
  */
 export function maxBy<T>(
   comparator: (a: T, b: T) => number
@@ -311,7 +311,7 @@ export function joining<T>(
 // ============================================================================
 
 /**
- * Applies a mapping function before collecting.
+ * This function applies a mapping function before collecting.
  *
  * @example
  * const names = collect(
@@ -331,7 +331,7 @@ export function mapping<T, U, A, R>(
 }
 
 /**
- * Filters elements before collecting.
+ * This function filters elements before collecting.
  */
 export function filtering<T, A, R>(
   predicate: (element: T) => boolean,
@@ -403,7 +403,7 @@ export function reducingWith<T, U>(
 // ============================================================================
 
 /**
- * Collects with two collectors and combines results.
+ * This function collects with two collectors and combines results.
  *
  * @example
  * const stats = collect(
@@ -437,7 +437,7 @@ export function teeing<T, A1, A2, R1, R2, R>(
 // ============================================================================
 
 /**
- * Collects the first element.
+ * This function collects the first element.
  */
 export function first<T>(): Collector<T, T | undefined, T | undefined> {
   return {
@@ -448,7 +448,7 @@ export function first<T>(): Collector<T, T | undefined, T | undefined> {
 }
 
 /**
- * Collects the last element.
+ * This function collects the last element.
  */
 export function last<T>(): Collector<T, T | undefined, T | undefined> {
   return {
@@ -459,7 +459,7 @@ export function last<T>(): Collector<T, T | undefined, T | undefined> {
 }
 
 /**
- * Creates summary statistics.
+ * This type makes summary statistics.
  */
 export interface SummaryStatistics {
   count: number;

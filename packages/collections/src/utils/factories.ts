@@ -1,8 +1,8 @@
 /**
- * Factory utilities for creating collections.
+ * Factory utilities for making collections.
  *
- * Provides convenient factory methods similar to Java's Collections class.
- * These mirror methods like Collections.emptyList(), singletonList(), etc.
+ * This module gives convenient factory methods similar to Java's Collections class.
+ * These functions mirror Java methods like Collections.emptyList() and singletonList().
  */
 
 import { arrayList, ArrayList } from "../impl/array-list.js";
@@ -19,7 +19,7 @@ import { compose } from "../core/middleware.js";
 // ============================================================================
 
 /**
- * Returns an empty, immutable list.
+ * This value is an empty, immutable list.
  * Multiple calls return the same instance (singleton pattern).
  *
  * @example
@@ -39,7 +39,7 @@ export function emptyList<T>(): List<T> {
 }
 
 /**
- * Returns an empty, immutable queue.
+ * This value is an empty, immutable queue.
  */
 const EMPTY_QUEUE_CACHE = new Map<any, any>();
 
@@ -53,7 +53,7 @@ export function emptyQueue<T>(): Queue<T> {
 }
 
 /**
- * Returns an empty, immutable map.
+ * This value is an empty, immutable map.
  */
 const EMPTY_MAP_CACHE = new Map<any, any>();
 
@@ -71,7 +71,7 @@ export function emptyMap<K, V>(): MapLike<K, V> {
 // ============================================================================
 
 /**
- * Returns an immutable list containing only the specified element.
+ * This function gives an immutable list containing only the specified element.
  *
  * @example
  * const list = singletonList(42)
@@ -86,7 +86,7 @@ export function singletonList<T>(element: T): List<T> {
 }
 
 /**
- * Returns an immutable map containing only the specified key-value mapping.
+ * This function gives an immutable map containing only the specified key-value mapping.
  */
 export function singletonMap<K, V>(key: K, value: V): MapLike<K, V> {
   const map = hashMap<K, V>();
@@ -99,7 +99,7 @@ export function singletonMap<K, V>(key: K, value: V): MapLike<K, V> {
 // ============================================================================
 
 /**
- * Returns an immutable list consisting of n copies of the specified element.
+ * This function gives an immutable list consisting of n copies of the specified element.
  *
  * @example
  * const list = nCopies(5, 'hello')
@@ -123,7 +123,7 @@ export function nCopies<T>(n: number, element: T): List<T> {
 // ============================================================================
 
 /**
- * Creates a new ArrayList from the given elements.
+ * This function makes a new ArrayList from the given elements.
  *
  * @example
  * const list = listOf(1, 2, 3, 4, 5)
@@ -133,14 +133,14 @@ export function listOf<T>(...elements: T[]): ArrayList<T> {
 }
 
 /**
- * Creates a new ArrayDeque from the given elements.
+ * This function makes a new ArrayDeque from the given elements.
  */
 export function queueOf<T>(...elements: T[]): ArrayDeque<T> {
   return arrayDeque(elements);
 }
 
 /**
- * Creates a new HashMap from the given key-value pairs.
+ * This function makes a new HashMap from the given key-value pairs.
  *
  * @example
  * const map = mapOf(['a', 1], ['b', 2], ['c', 3])
@@ -154,7 +154,7 @@ export function mapOf<K, V>(...entries: [K, V][]): HashMap<K, V> {
 // ============================================================================
 
 /**
- * Creates a new mutable ArrayList with optional initial elements.
+ * This function makes a new mutable ArrayList with optional initial elements.
  *
  * @example
  * const list = mutableListOf(1, 2, 3)
@@ -165,7 +165,7 @@ export function mutableListOf<T>(...elements: T[]): ArrayList<T> {
 }
 
 /**
- * Creates a new mutable HashMap with optional initial entries.
+ * This function makes a new mutable HashMap with optional initial entries.
  */
 export function mutableMapOf<K, V>(...entries: [K, V][]): HashMap<K, V> {
   return hashMap(entries);
@@ -176,7 +176,7 @@ export function mutableMapOf<K, V>(...entries: [K, V][]): HashMap<K, V> {
 // ============================================================================
 
 /**
- * Creates an immutable List from the given elements.
+ * This function makes an immutable List from the given elements.
  *
  * @example
  * const list = immutableListOf(1, 2, 3)
@@ -195,7 +195,7 @@ export function immutableListOf<T>(...elements: T[]): List<T> {
 }
 
 /**
- * Creates an immutable Map from the given entries.
+ * This function makes an immutable Map from the given entries.
  */
 export function immutableMapOf<K, V>(...entries: [K, V][]): MapLike<K, V> {
   if (entries.length === 0) {
@@ -213,7 +213,7 @@ export function immutableMapOf<K, V>(...entries: [K, V][]): MapLike<K, V> {
 // ============================================================================
 
 /**
- * Creates a list containing integers from start (inclusive) to end (exclusive).
+ * This function makes a list containing integers from start (inclusive) to end (exclusive).
  *
  * @example
  * const list = range(0, 5) // [0, 1, 2, 3, 4]
@@ -240,7 +240,7 @@ export function range(start: number, end: number, step: number = 1): ArrayList<n
 }
 
 /**
- * Creates a list containing integers from 0 to n (exclusive).
+ * This function makes a list containing integers from 0 to n (exclusive).
  *
  * @example
  * const list = rangeTo(5) // [0, 1, 2, 3, 4]
@@ -285,7 +285,7 @@ export function buildMap<K, V>(builder: (map: HashMap<K, V>) => void): HashMap<K
 // ============================================================================
 
 /**
- * Converts an iterable to an ArrayList.
+ * This function converts an iterable to an ArrayList.
  *
  * @example
  * const set = new Set([1, 2, 3])
@@ -296,7 +296,7 @@ export function toList<T>(iterable: Iterable<T>): ArrayList<T> {
 }
 
 /**
- * Converts an iterable to a HashMap using a key extractor function.
+ * This function converts an iterable to a HashMap using a key extractor function.
  *
  * @example
  * const users = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
@@ -330,7 +330,7 @@ export function toMap<T, K, V>(
 // ============================================================================
 
 /**
- * Groups elements by a key extractor function.
+ * This function groups elements by a key extractor function.
  *
  * @example
  * const users = [

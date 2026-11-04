@@ -1,12 +1,12 @@
 /**
- * Synchronized behavior - Provides thread-safe access with mutex locking.
+ * Synchronized behavior - Gives thread-safe access with mutex locking.
  *
- * Wraps collections to serialize all operations using a mutex, ensuring
+ * This module wraps collections to serialize all operations using a mutex, making sure that
  * thread-safe access in concurrent environments. Mirrors Java's
  * Collections.synchronizedList() and related methods.
  *
  * Note: JavaScript is single-threaded, but async operations can interleave.
- * This middleware ensures atomic operations across async boundaries.
+ * This middleware makes sure that atomic operations across async boundaries.
  *
  * @example
  * const list = compose(
@@ -26,8 +26,8 @@ import type { Middleware } from "../core/middleware.js";
 /**
  * Simple mutex implementation for JavaScript async operations.
  *
- * Ensures that only one operation executes at a time, even if
- * multiple async operations are initiated concurrently.
+ * This middleware makes sure that only one operation starts at a time, even if
+ * multiple async operations are started concurrently.
  */
 /** True for an `async` function or method. */
 function isAsyncFunction(value: unknown): boolean {
@@ -38,7 +38,7 @@ class Mutex {
   private queue: Promise<void> = Promise.resolve();
 
   /**
-   * Acquires the lock and executes the function.
+   * This method acquires the lock and starts the function.
    * Other operations wait until this completes.
    */
   async lock<T>(fn: () => T | Promise<T>): Promise<T> {
@@ -51,17 +51,17 @@ class Mutex {
   }
 
   /**
-   * Synchronous version that executes immediately.
+   * Synchronous version that starts immediately.
    * Still queues to prevent interleaving with async operations.
    */
 
 }
 
 /**
- * Creates a synchronized middleware that locks all method calls.
+ * This function makes a synchronized middleware that locks all method calls.
  *
  * Every method call on the collection is wrapped with a mutex,
- * ensuring atomic execution even in concurrent async scenarios.
+ * making sure that atomic execution even in concurrent async scenarios.
  *
  * @example
  * const syncList = compose(
@@ -132,11 +132,11 @@ export const synchronizedSet : typeof synchronized = synchronized;
 /**
  * Advanced synchronized middleware with reentrant locking.
  *
- * Allows the same "thread" (async context) to acquire the lock multiple times.
+ * With this function, the same "thread" (async context) can acquire the lock multiple times.
  * Useful for methods that call other synchronized methods internally.
  *
- * Note: JavaScript doesn't have true thread IDs, so we use async context
- * tracking if available, or fall back to non-reentrant behavior.
+ * Note: JavaScript has no true thread IDs. This function uses async context
+ * tracking if available. If not, the behavior is non-reentrant.
  */
 export function reentrantSynchronized<C extends object>(): Middleware<C> {
   return (next: C): C => {
@@ -190,7 +190,7 @@ export function reentrantSynchronized<C extends object>(): Middleware<C> {
 /**
  * Read-write lock implementation for collections.
  *
- * Allows multiple concurrent readers but exclusive writers.
+ * With this function, multiple concurrent readers can read, but a writer is exclusive.
  * More efficient than full synchronization for read-heavy workloads.
  *
  * @example

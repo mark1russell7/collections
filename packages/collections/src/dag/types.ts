@@ -39,7 +39,7 @@ export interface DependencyDAG<TNode extends DAGNode = DAGNode> {
 export interface DAGExecutionOptions<TNode extends DAGNode = DAGNode> {
   /** Max parallel operations per level (default: 4) */
   concurrency?: number;
-  /** Stop on first error vs continue (default: true) */
+  /** When this value is true, the run stops on the first error. The default is true. */
   failFast?: boolean;
   /** Callback for progress reporting */
   onNodeStart?: (node: TNode) => void;
@@ -53,20 +53,20 @@ export interface DAGExecutionOptions<TNode extends DAGNode = DAGNode> {
 export interface NodeResult<TNode extends DAGNode = DAGNode> {
   /** The node that was processed */
   node: TNode;
-  /** Whether processing succeeded */
+  /** If processing succeeded */
   success: boolean;
   /** Error if failed */
   error?: Error | undefined;
   /** Duration in milliseconds */
   duration: number;
-  /** Logs from processing */
+  /** This value logs from processing */
   logs: string[];
   /** Optional output from the processor */
   output?: unknown | undefined;
 }
 
 /**
- * Result of executing an entire DAG
+ * The result of a run of an entire DAG
  */
 export interface DAGResult<TNode extends DAGNode = DAGNode> {
   /** Overall success */

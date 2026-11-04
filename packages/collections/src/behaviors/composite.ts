@@ -1,11 +1,11 @@
 /**
  * Composite map methods built on `has`, `get`, `set` and `delete`.
  *
- * A map behavior (lruMap, ttlMap) intercepts the primitive methods. It returns these
- * implementations for the composite methods, bound to the behavior's own proxy, so a call such
- * as `setIfAbsent` goes through the behavior's `set` and keeps its rules: capacity and recency
- * for LRU, expiry for TTL. (BUGS-2026-07 L13: the composite methods went straight to the map
- * below, so they bypassed the behavior.)
+ * A map behavior (lruMap, ttlMap) intercepts the primitive methods. It gives these
+ * implementations for the composite methods, bound to the behavior's own proxy.
+ * Thus a call like `setIfAbsent` goes through the behavior's `set` and keeps its rules:
+ * capacity and recency for LRU, expiry for TTL. (BUGS-2026-07 L13: the composite methods
+ * went straight to the map below, so they bypassed the behavior.)
  *
  * The semantics follow HashMap. One difference: `replaceEntry` and `deleteEntry` compare
  * values with Object.is, not with a map's custom value equality.

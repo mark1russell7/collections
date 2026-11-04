@@ -1,8 +1,8 @@
 /**
  * `@mark1russell7/collections/dag`: directed acyclic graphs of dependencies.
  *
- * This entry gives the levels and the topological order of a graph, a run with a limit of concurrency,
- * the cycle check, and the filters of a graph.
+ * This entry gives the levels and the topological order of a graph, and the filters of a graph.
+ * It also gives a run with a limit of concurrency.
  */
 
 export type { DAGNode, DependencyDAG, DAGExecutionOptions, NodeResult, DAGResult, NodeProcessor } from "./types.js";

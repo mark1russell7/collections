@@ -5,7 +5,7 @@
  * A summary is a value of a monoid: the caller gives the monoid as data, with `empty` and `combine`. The order of the
  * leaves is kept, so `combine` must be associative, but it can be non-commutative.
  *
- * Each operation returns a new tree and keeps the old tree. The two trees share the nodes that did not change.
+ * Each operation gives a new tree and keeps the old tree. The two trees share the nodes that did not change.
  * Concatenation, a split at an index or at a summary search, an edit and a lookup are O(log n).
  *
  * The algorithms are the "join" algorithms of Blelloch, Ferizovic and Sun, "Just Join for Parallel Ordered Sets"
@@ -63,7 +63,7 @@ export interface SummaryLocation<Leaf> {
   readonly offset: number;
 }
 
-/** One node of the tree. The tree never changes a node after it makes it. */
+/** One node of the tree. The tree does not change a node after it makes it. */
 interface Node<Leaf, Summary> {
   readonly left: Node<Leaf, Summary> | null;
   readonly leaf: Leaf;
@@ -224,8 +224,9 @@ class Builder<L, S> {
   }
 
   /**
-   * This function replaces the leaf at an index with one or more leaves. It descends once: at the node of the leaf, it
-   * puts the first new leaf in the node and the other new leaves at the start of its right subtree.
+   * This function replaces the leaf at an index with one or more leaves. It descends once.
+   * At the node of the leaf, it puts the first new leaf in the node.
+   * It puts the other new leaves at the start of the right subtree of that node.
    */
   replaceSpan(tree: Node<L, S>, index: number, leaves: readonly L[]): Node<L, S> {
     const before = sizeOf(tree.left);
@@ -321,7 +322,7 @@ function clamp(value: number, size: number): number {
 
 /**
  * A persistent sequence of leaves with a summary of each part. Make one with `summaryTree`. Each method that changes
- * the sequence returns a new tree.
+ * the sequence gives a new tree.
  */
 export class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
   private readonly builder: Builder<Leaf, Summary>;
@@ -482,7 +483,7 @@ export class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
 
   /**
    * This function removes `deleteCount` leaves at `start` and puts the leaves of `inserted` there, as
-   * `Array.prototype.splice` does. It returns the new tree, not the removed leaves.
+   * `Array.prototype.splice` does. It gives the new tree, not the removed leaves.
    */
   splice(start: number, deleteCount: number = this.size, inserted: SummaryTree<Leaf, Summary> | Iterable<Leaf> = []): SummaryTree<Leaf, Summary> {
     const from = clamp(start, this.size);

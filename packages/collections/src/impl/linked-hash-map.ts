@@ -1,7 +1,7 @@
 /**
  * LinkedHashMap - HashMap that maintains insertion order.
  *
- * Combines a hash table with a doubly-linked list to maintain predictable
+ * This module combines a hash table with a doubly-linked list to maintain predictable
  * iteration order. Mirrors java.util.LinkedHashMap.
  *
  * Key features:
@@ -47,7 +47,7 @@ interface LinkedNode<K, V> {
 }
 
 /**
- * Options for creating a LinkedHashMap.
+ * Options for making a LinkedHashMap.
  */
 export interface LinkedHashMapOptions<K, V> {
   /**
@@ -91,7 +91,7 @@ export interface LinkedHashMapOptions<K, V> {
 /**
  * LinkedHashMap<K, V> - Hash map with predictable iteration order.
  *
- * Maintains a doubly-linked list of entries to preserve insertion order
+ * This class maintains a doubly-linked list of entries to preserve insertion order
  * (or access order if accessOrder is true).
  */
 export class LinkedHashMap<K, V> implements MapLike<K, V> {
@@ -539,7 +539,7 @@ export class LinkedHashMap<K, V> implements MapLike<K, V> {
 }
 
 /**
- * Factory function to create a LinkedHashMap.
+ * Factory function to make a LinkedHashMap.
  *
  * @example
  * const map = linkedHashMap<string, number>()

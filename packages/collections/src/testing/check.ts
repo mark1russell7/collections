@@ -1,6 +1,6 @@
 /**
  * The checks of the contract suite. The suite does not import a test framework, so a runtime
- * entry of this package never loads one. A failed check throws `ContractViolation`.
+ * entry of this package does not load one. A failed check throws `ContractViolation`.
  */
 
 /** The error of a failed check of the contract suite. */

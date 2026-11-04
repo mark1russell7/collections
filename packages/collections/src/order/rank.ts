@@ -4,10 +4,10 @@
  * between two others gets a key between theirs, so a move writes one item and no other.
  *
  * - A key has an integer part and a fraction part. The first character of the integer part gives its
- *   length. An insertion at an end changes the integer part, so the keys stay short. An insertion
- *   between two keys uses the fraction part, which can grow without a limit: the keys never run out,
- *   and the list needs no rebalance.
- * - Compare two keys by the code units of the strings (`a < b`), never with `localeCompare`.
+ *   length. An insertion at an end changes the integer part, so the keys stay short.
+ * - An insertion between two keys uses the fraction part, which can grow without a limit. Thus the keys
+ *   do not run out, and the list needs no rebalance.
+ * - Compare two keys by the code units of the strings (`a < b`), not with `localeCompare`.
  * - Two writers that move items into the same gap at the same time can get the same key. Sort by the
  *   key, then by the id of the item, so each reader sees one order.
  *
@@ -27,7 +27,7 @@ function invalid(message: string): RangeError {
   return new RangeError(message);
 }
 
-/** The length of the integer part that starts with a head character: a to z give 2 to 27, Z to A give 2 to 27. */
+/** This function gives the length of an integer part from its head character: a to z and Z to A give 2 to 27. */
 function integerLength(head: string): number {
   if (head >= "a" && head <= "z") return head.charCodeAt(0) - "a".charCodeAt(0) + 2;
   if (head >= "A" && head <= "Z") return "Z".charCodeAt(0) - head.charCodeAt(0) + 2;
@@ -148,8 +148,8 @@ export function keyBetween(prev: string | null | undefined, next: string | null 
 }
 
 /**
- * This function gives `count` keys in ascending order, strictly between two keys, for example to put
- * several items at one place, or to give keys to the items of a list for the first time.
+ * This function gives `count` keys in ascending order, strictly between two keys.
+ * Use it to put several items at one place, or to give keys to a new list.
  *
  * @throws RangeError as `keyBetween`, or when `count` is not an integer of 0 or more
  */
@@ -203,10 +203,10 @@ export interface KeyedItem {
 /**
  * This function gives the writes of a move: the new key of the item that moves, and new keys for the
  * neighbors that need them. Give the other items of the list in order (by key, then by id), without
- * the item that moves, and the index of the drop from 0 to their number (`dropIndex`).
+ * the item that moves. Also give the index of the drop, from 0 to their number (`dropIndex`).
  *
- * Two writers can give two items one key. A drop between two such items has no key between them, so
- * the helper first gives new keys to the items after the drop that have the key of the item before
+ * Two writers can give two items one key. A drop between two such items has no key between them.
+ * So the helper first gives new keys to the items after the drop that have the key of the item before
  * it. Each write is `{ id, key }`. The writes of the neighbors come first, and the write of the item
  * that moves comes last.
  *
@@ -236,7 +236,7 @@ export function keysForDrop(items: readonly KeyedItem[], index: number, movingId
   return writes;
 }
 
-/** The order of two keys: the code units of the strings, as the keys need (never `localeCompare`). */
+/** The order of two keys: the code units of the strings, as the keys need (not `localeCompare`). */
 export function compareKeys(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
@@ -248,9 +248,9 @@ export interface Point {
 }
 
 /**
- * This function gives the index at which a point goes among the items of a list on the screen, in
- * reading order: the rows from top to bottom, and each row from left to right. It is the index of the
- * first item whose center comes after the point, from 0 to the number of items. A center within
+ * This function gives the index at which a point goes among the items of a list on the screen.
+ * The reading order is the rows from top to bottom, and each row from left to right.
+ * The index is that of the first item whose center comes after the point, from 0 to the number of items. A center within
  * `rowTolerance` of the point on the vertical axis is in the row of the point.
  *
  * Give the centers in reading order, the same order as the keys, and without the item that moves.

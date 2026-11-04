@@ -1,8 +1,8 @@
 /**
- * Readonly behavior - Creates immutable views of collections.
+ * Readonly behavior - Makes immutable views of collections.
  *
- * Wraps collections to prevent modifications by throwing errors
- * on any mutation attempt. Mirrors Java's Collections.unmodifiable*() methods.
+ * This module wraps collections to prevent modifications by throwing errors
+ * on any mutation try. Mirrors Java's Collections.unmodifiable*() methods.
  *
  * @example
  * const list = compose(
@@ -24,14 +24,14 @@ import type { ReadonlyCollection } from "../interfaces/collection.js";
  */
 export interface ReadonlyOptions {
   /**
-   * Custom error message to throw on mutation attempts.
+   * Custom error message to throw on mutation tries.
    * @default 'Cannot modify readonly collection'
    */
   errorMessage?: string;
 }
 
 /**
- * Set of method names that mutate collections.
+ * This set holds the names of the methods that mutate collections.
  */
 const MUTATING_METHODS = new Set([
   // Collection mutations
@@ -101,7 +101,7 @@ const VIEW_METHODS = new Set([
 ]);
 
 /**
- * Creates a readonly middleware for any collection type.
+ * This function makes a readonly middleware for any collection type.
  */
 function createReadonly<C extends object>(
   errorMessage: string = "Cannot modify readonly collection"
@@ -160,7 +160,7 @@ function createReadonly<C extends object>(
 }
 
 /**
- * Creates a readonly List middleware.
+ * This function makes a readonly List middleware.
  *
  * All mutation methods will throw an error.
  * Read operations work normally.
@@ -178,7 +178,7 @@ export function readonlyList<T>(
 }
 
 /**
- * Creates a readonly Queue middleware.
+ * This function makes a readonly Queue middleware.
  */
 export function readonlyQueue<T>(
   options: ReadonlyOptions = {}
@@ -188,7 +188,7 @@ export function readonlyQueue<T>(
 }
 
 /**
- * Creates a readonly Map middleware.
+ * This function makes a readonly Map middleware.
  */
 export function readonlyMap<K, V>(
   options: ReadonlyOptions = {}
@@ -198,7 +198,7 @@ export function readonlyMap<K, V>(
 }
 
 /**
- * Creates a readonly Collection middleware.
+ * This function makes a readonly Collection middleware.
  *
  * Generic version that works with any collection type.
  */

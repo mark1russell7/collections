@@ -1,8 +1,8 @@
 /**
  * Default implementations of equality, hashing, and comparison functions.
  *
- * Provides sensible defaults for primitive types and utilities for
- * creating custom comparators.
+ * This module gives sensible defaults for primitive types and utilities for
+ * making custom comparators.
  */
 
 import type { Eq, Hash, Compare } from "../core/traits.js";
@@ -19,7 +19,7 @@ export const defaultEq: Eq<any> = (a, b) => a === b;
 
 /**
  * Structural equality for objects (shallow comparison of properties).
- * Compares own enumerable properties using ===.
+ * This function compares own enumerable properties using ===.
  */
 export const shallowEq: Eq<any> = (a, b) => {
   if (a === b) return true;
@@ -41,7 +41,7 @@ export const shallowEq: Eq<any> = (a, b) => {
 
 /**
  * Deep structural equality (recursive comparison).
- * Handles nested objects and arrays.
+ * This function handles nested objects and arrays.
  */
 export const deepEq: Eq<any> = (a, b): boolean => {
   if (a === b) return true;
@@ -171,7 +171,7 @@ export const combineHashes = (...hashes: number[]): number => {
 };
 
 /**
- * Create a hash function that hashes by a specific property.
+ * Make a hash function that hashes by a specific property.
  *
  * @example
  * const userHash = hashBy<User>((u) => u.id)
@@ -256,7 +256,7 @@ export const booleanCompare: Compare<boolean> = (a, b) =>
 // ============================================================================
 
 /**
- * Reverses a comparator.
+ * This function reverses a comparator.
  *
  * @example
  * const descending = reversed(numberCompare)
@@ -265,7 +265,7 @@ export const reversed = <T>(compare: Compare<T>): Compare<T> =>
   (a, b) => compare(b, a);
 
 /**
- * Creates a comparator that compares by a specific property or function.
+ * This function makes a comparator that compares by a specific property or function.
  *
  * @example
  * const byAge = comparing<Person>((p) => p.age)
@@ -280,7 +280,7 @@ export const comparing = <T, K extends keyof T = keyof T>(
 };
 
 /**
- * Chains comparators. If the first comparator returns 0 (equal),
+ * Chains comparators. If the first comparator gives 0 (equal),
  * tries the next comparator, and so on.
  *
  * @example
@@ -301,7 +301,7 @@ export const thenComparing = <T>(...comparators: Compare<T>[]): Compare<T> => {
 };
 
 /**
- * Creates a comparator that treats null/undefined as less than all other values.
+ * This function makes a comparator that treats null/undefined as less than all other values.
  *
  * @example
  * const compare = nullsFirst(numberCompare)
@@ -316,7 +316,7 @@ export const nullsFirst = <T>(compare: Compare<T>): Compare<T | null | undefined
 };
 
 /**
- * Creates a comparator that treats null/undefined as greater than all other values.
+ * This function makes a comparator that treats null/undefined as greater than all other values.
  *
  * @example
  * const compare = nullsLast(numberCompare)
@@ -331,7 +331,7 @@ export const nullsLast = <T>(compare: Compare<T>): Compare<T | null | undefined>
 };
 
 /**
- * Creates a comparator from a key extraction function.
+ * This function makes a comparator from a key extraction function.
  * Elements are compared by their extracted keys.
  *
  * @example

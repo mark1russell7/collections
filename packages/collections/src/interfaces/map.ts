@@ -1,7 +1,7 @@
 /**
  * Map interfaces that mirror Java's Map interface hierarchy.
  *
- * Maps store key-value pairs and provide efficient lookup by key.
+ * A map holds key-value pairs and gives efficient lookup by key.
  * Keys are unique within a map.
  */
 
@@ -24,74 +24,74 @@ export interface Entry<K, V> {
 /**
  * ReadonlyMapLike<K, V> - Readonly key-value mapping.
  *
- * Provides read-only access to map operations.
+ * This type gives read-only access to map operations.
  * Note: We use "MapLike" to avoid conflicts with TypeScript's built-in Map type.
  */
 export interface ReadonlyMapLike<K, V> extends Iterable<Entry<K, V>> {
   /**
-   * Returns the number of key-value pairs in this map.
+   * This value is the number of key-value pairs in this map.
    */
   readonly size: number;
 
   /**
-   * Returns true if this map contains no key-value mappings.
+   * This value is true if this map contains no key-value mappings.
    */
   readonly isEmpty: boolean;
 
   /**
-   * Returns true if this map contains a mapping for the specified key.
+   * This method gives true if this map contains a mapping for the specified key.
    */
   has(key: K): boolean;
 
   /**
-   * Returns the value to which the specified key is mapped.
+   * This method gives the value to which the specified key is mapped.
    *
    * @throws Error if key is not present
    */
   get(key: K): V;
 
   /**
-   * Returns the value for the key, or undefined if not present.
+   * This method gives the value for the key, or undefined if not present.
    */
   getOrUndefined(key: K): V | undefined;
 
   /**
-   * Returns the value for the key, or the default value if not present.
+   * This method gives the value for the key, or the default value if not present.
    */
   getOrDefault(key: K, defaultValue: V): V;
 
   /**
-   * Returns true if this map maps one or more keys to the specified value.
+   * This method gives true if this map maps one or more keys to the specified value.
    */
   containsValue(value: V): boolean;
 
   /**
-   * Returns an iterable view of the keys in this map.
+   * This method gives an iterable view of the keys in this map.
    */
   keys(): Iterable<K>;
 
   /**
-   * Returns an iterable view of the values in this map.
+   * This method gives an iterable view of the values in this map.
    */
   values(): Iterable<V>;
 
   /**
-   * Returns an iterable view of the key-value pairs in this map.
+   * This method gives an iterable view of the key-value pairs in this map.
    */
   entries(): Iterable<Entry<K, V>>;
 
   /**
-   * Performs the given action for each key-value pair.
+   * This method does the given action for each key-value pair.
    */
   forEach(action: (value: V, key: K, map: this) => void): void;
 
   /**
-   * Returns the equality function used for keys.
+   * This value is the equality function used for keys.
    */
   readonly keyEq: Eq<K>;
 
   /**
-   * Returns the equality function used for values.
+   * This value is the equality function used for values.
    */
   readonly valueEq: Eq<V>;
 }
@@ -103,7 +103,7 @@ export interface ReadonlyMapLike<K, V> extends Iterable<Entry<K, V>> {
  */
 export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
   /**
-   * Associates the specified value with the specified key in this map.
+   * This method associates the specified value with the specified key in this map.
    * If the map previously contained a mapping for the key, the old value is replaced.
    *
    * @param key The key
@@ -120,28 +120,28 @@ export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
   setIfAbsent(key: K, value: V): V;
 
   /**
-   * Removes the mapping for a key if it is present.
+   * This method removes the mapping for a key if it is present.
    *
    * @returns The value that was associated with key, or undefined if none
    */
   delete(key: K): V | undefined;
 
   /**
-   * Removes the entry for key only if currently mapped to the specified value.
+   * This method removes the entry for key only if the key has the specified value.
    *
    * @returns true if the entry was removed
    */
   deleteEntry(key: K, value: V): boolean;
 
   /**
-   * Replaces the entry for key only if currently mapped to some value.
+   * This method replaces the entry for key only if the key has a value.
    *
    * @returns The previous value, or undefined if key was not present
    */
   replace(key: K, value: V): V | undefined;
 
   /**
-   * Replaces the entry for key only if currently mapped to the specified oldValue.
+   * This method replaces the entry for key only if the key has the specified oldValue.
    *
    * @returns true if the value was replaced
    */
@@ -156,7 +156,7 @@ export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
   computeIfAbsent(key: K, mappingFunction: (key: K) => V): V;
 
   /**
-   * If the value for the specified key is present, attempts to compute
+   * If the value for the specified key is present, tries to compute
    * a new mapping given the key and its current mapped value.
    *
    * @returns The new value associated with the key, or undefined if none
@@ -164,7 +164,7 @@ export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
   computeIfPresent(key: K, remappingFunction: (key: K, value: V) => V | undefined): V | undefined;
 
   /**
-   * Attempts to compute a mapping for the specified key and its current mapped value.
+   * This method tries to compute a mapping for the specified key and its current mapped value.
    *
    * @returns The new value associated with the key, or undefined if none
    */
@@ -180,12 +180,12 @@ export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
   merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V) => V | undefined): V | undefined;
 
   /**
-   * Copies all mappings from the specified map to this map.
+   * This method copies all mappings from the specified map to this map.
    */
   putAll(other: ReadonlyMapLike<K, V> | Iterable<Entry<K, V>>): void;
 
   /**
-   * Removes all mappings from this map.
+   * This method removes all mappings from this map.
    */
   clear(): void;
 }
@@ -197,36 +197,36 @@ export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
  */
 export interface SortedMap<K, V> extends MapLike<K, V> {
   /**
-   * Returns the comparison function used to order keys.
+   * This value is the comparison function used to order keys.
    */
   readonly comparator: Compare<K>;
 
   /**
-   * Returns the first (lowest) key in this map.
+   * This method gives the first (lowest) key in this map.
    *
    * @throws Error if map is empty
    */
   firstKey(): K;
 
   /**
-   * Returns the last (highest) key in this map.
+   * This method gives the last (highest) key in this map.
    *
    * @throws Error if map is empty
    */
   lastKey(): K;
 
   /**
-   * Returns a view of the portion of this map whose keys are less than toKey.
+   * This method gives a view of the portion of this map whose keys are less than toKey.
    */
   headMap(toKey: K): SortedMap<K, V>;
 
   /**
-   * Returns a view of the portion of this map whose keys are greater than or equal to fromKey.
+   * This method gives a view of the portion of this map whose keys are greater than or equal to fromKey.
    */
   tailMap(fromKey: K): SortedMap<K, V>;
 
   /**
-   * Returns a view of the portion of this map whose keys range from fromKey to toKey.
+   * This method gives a view of the portion of this map whose keys range from fromKey to toKey.
    */
   subMap(fromKey: K, toKey: K): SortedMap<K, V>;
 }
@@ -238,78 +238,78 @@ export interface SortedMap<K, V> extends MapLike<K, V> {
  */
 export interface NavigableMap<K, V> extends SortedMap<K, V> {
   /**
-   * Returns the greatest key less than or equal to the given key, or undefined if none.
+   * This method gives the greatest key less than or equal to the given key, or undefined if none.
    */
   floorKey(key: K): K | undefined;
 
   /**
-   * Returns the least key greater than or equal to the given key, or undefined if none.
+   * This method gives the least key greater than or equal to the given key, or undefined if none.
    */
   ceilingKey(key: K): K | undefined;
 
   /**
-   * Returns the greatest key strictly less than the given key, or undefined if none.
+   * This method gives the greatest key strictly less than the given key, or undefined if none.
    */
   lowerKey(key: K): K | undefined;
 
   /**
-   * Returns the least key strictly greater than the given key, or undefined if none.
+   * This method gives the least key strictly greater than the given key, or undefined if none.
    */
   higherKey(key: K): K | undefined;
 
   /**
-   * Returns the entry for the greatest key less than or equal to the given key, or undefined.
+   * This method gives the entry for the greatest key less than or equal to the given key, or undefined.
    */
   floorEntry(key: K): Entry<K, V> | undefined;
 
   /**
-   * Returns the entry for the least key greater than or equal to the given key, or undefined.
+   * This method gives the entry for the least key greater than or equal to the given key, or undefined.
    */
   ceilingEntry(key: K): Entry<K, V> | undefined;
 
   /**
-   * Returns the entry for the greatest key strictly less than the given key, or undefined.
+   * This method gives the entry for the greatest key strictly less than the given key, or undefined.
    */
   lowerEntry(key: K): Entry<K, V> | undefined;
 
   /**
-   * Returns the entry for the least key strictly greater than the given key, or undefined.
+   * This method gives the entry for the least key strictly greater than the given key, or undefined.
    */
   higherEntry(key: K): Entry<K, V> | undefined;
 
   /**
-   * Returns the first (lowest) entry in this map, or undefined if empty.
+   * This method gives the first (lowest) entry in this map, or undefined if empty.
    */
   firstEntry(): Entry<K, V> | undefined;
 
   /**
-   * Returns the last (highest) entry in this map, or undefined if empty.
+   * This method gives the last (highest) entry in this map, or undefined if empty.
    */
   lastEntry(): Entry<K, V> | undefined;
 
   /**
-   * Removes and returns the first (lowest) entry, or undefined if empty.
+   * Removes and gives the first (lowest) entry, or undefined if empty.
    */
   pollFirstEntry(): Entry<K, V> | undefined;
 
   /**
-   * Removes and returns the last (highest) entry, or undefined if empty.
+   * Removes and gives the last (highest) entry, or undefined if empty.
    */
   pollLastEntry(): Entry<K, V> | undefined;
 
   /**
-   * Returns a reverse order view of this map.
+   * This method gives a reverse order view of this map.
    */
   descendingMap(): NavigableMap<K, V>;
 
   /**
-   * Returns a reverse order iterable of the keys.
+   * This method gives a reverse order iterable of the keys.
    */
   descendingKeys(): Iterable<K>;
 }
 
 /**
- * MultiMap<K, V> - Map that allows multiple values per key.
+ * MultiMap<K, V> - Map that can hold multiple values per key.
  *
  * Not in standard Java Collections, but commonly used.
  */
@@ -318,52 +318,52 @@ export interface MultiMap<K, V> {
   readonly isEmpty: boolean;
 
   /**
-   * Returns true if the map contains at least one value for the key.
+   * This method gives true if the map contains at least one value for the key.
    */
   has(key: K): boolean;
 
   /**
-   * Returns all values associated with the key.
+   * This method gives all values associated with the key.
    */
   get(key: K): ReadonlyCollection<V>;
 
   /**
-   * Adds a value to the collection of values for the key.
+   * This method adds a value to the collection of values for the key.
    */
   put(key: K, value: V): boolean;
 
   /**
-   * Adds all values to the collection of values for the key.
+   * This method adds all values to the collection of values for the key.
    */
   putAll(key: K, values: Iterable<V>): boolean;
 
   /**
-   * Removes a single occurrence of value from the key's collection.
+   * This method removes a single occurrence of value from the key's collection.
    */
   remove(key: K, value: V): boolean;
 
   /**
-   * Removes all values for the key.
+   * This method removes all values for the key.
    */
   removeAll(key: K): ReadonlyCollection<V>;
 
   /**
-   * Replaces all values for the key with the given values.
+   * This method replaces all values for the key with the given values.
    */
   replaceAll(key: K, values: Iterable<V>): ReadonlyCollection<V>;
 
   /**
-   * Returns all keys that have at least one value.
+   * This method gives all keys that have at least one value.
    */
   keys(): Iterable<K>;
 
   /**
-   * Returns all entries (key with one of its values).
+   * This method gives all entries (key with one of its values).
    */
   entries(): Iterable<Entry<K, V>>;
 
   /**
-   * Removes all mappings.
+   * This method removes all mappings.
    */
   clear(): void;
 }
@@ -372,21 +372,21 @@ export interface MultiMap<K, V> {
  * BiMap<K, V> - Bidirectional map (1:1 mapping).
  *
  * Both keys and values are unique.
- * Allows lookup by key or by value.
+ * With this type, lookup is by key or by value.
  */
 export interface BiMap<K, V> extends MapLike<K, V> {
   /**
-   * Returns the inverse view of this bimap (swaps keys and values).
+   * This method gives the inverse view of this bimap (swaps keys and values).
    */
   inverse(): BiMap<V, K>;
 
   /**
-   * Returns the key mapped to the specified value, or undefined if none.
+   * This method gives the key mapped to the specified value, or undefined if none.
    */
   getKey(value: V): K | undefined;
 
   /**
-   * Forces the put by removing any existing entry with the same value.
+   * This method forces the put by removing any existing entry with the same value.
    */
   forcePut(key: K, value: V): V | undefined;
 }
@@ -395,7 +395,7 @@ export interface BiMap<K, V> extends MapLike<K, V> {
  * WeakMapLike<K extends object, V> - Map with weak key references.
  *
  * Mirrors JavaScript's WeakMap but with our interface conventions.
- * Keys must be objects and are held weakly (allow garbage collection).
+ * Keys must be objects and are held weakly (so garbage collection can remove them).
  */
 export interface WeakMapLike<K extends object, V> {
   has(key: K): boolean;

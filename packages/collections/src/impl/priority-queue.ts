@@ -1,9 +1,9 @@
 /**
  * PriorityQueue implementation - A binary heap-based priority queue.
  *
- * Elements are ordered according to their natural ordering (via comparator).
+ * Elements are ordered according to their natural ordering (through a comparator).
  * The head of the queue is the least element according to the comparator.
- * Provides O(log n) enqueue and O(log n) dequeue operations.
+ * This module gives O(log n) enqueue and O(log n) dequeue operations.
  * Mirrors java.util.PriorityQueue.
  *
  * @example
@@ -19,7 +19,7 @@ import type { Eq, Compare } from "../core/traits.js";
 import { defaultEq, defaultCompare } from "../utils/defaults.js";
 
 /**
- * Options for creating a PriorityQueue.
+ * Options for making a PriorityQueue.
  */
 export interface PriorityQueueOptions<T> {
   /**
@@ -248,7 +248,7 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   // ========================================================================
 
   /**
-   * Iterator returns elements in arbitrary order (not priority order).
+   * Iterator gives elements in arbitrary order (not priority order).
    * To get elements in priority order, repeatedly call poll().
    */
   *[Symbol.iterator](): Iterator<T> {
@@ -260,14 +260,14 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   }
 
   /**
-   * Returns elements in arbitrary heap order (not sorted).
+   * This method gives elements in arbitrary heap order (not sorted).
    */
   toArray(): T[] {
     return this._heap.slice();
   }
 
   /**
-   * Returns elements in priority order (sorted).
+   * This method gives elements in priority order (sorted).
    * This is a destructive operation that drains the queue.
    */
   toSortedArray(): T[] {
@@ -286,7 +286,7 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   // ========================================================================
 
   /**
-   * Bubbles an element up the heap to maintain heap property.
+   * This method bubbles an element up the heap to maintain heap property.
    */
   private bubbleUp(index: number): void {
     const element = this._heap[index]!;
@@ -307,12 +307,12 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   }
 
   /**
-   * Bubbles an element down the heap to maintain heap property.
+   * This method bubbles an element down the heap to maintain heap property.
    *
    * The element moves down through a hole: a smaller child moves up into the hole, and the
-   * element goes into the last hole. The children are compared with the element. (Before, they
-   * were compared with `_heap[index]`, which after the first step is a copy of the child that
-   * moved up: a poll could leave a larger element above a smaller one.)
+   * element goes into the last hole. The children are compared with the element.
+   * Before, they were compared with `_heap[index]`. After the first step, that value is a copy of
+   * the child that moved up. Thus a poll could leave a larger element above a smaller one.
    */
   private bubbleDown(index: number): void {
     const length = this._heap.length;
@@ -345,8 +345,8 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   }
 
   /**
-   * Rebuilds the heap from an arbitrary array.
-   * Uses Floyd's algorithm (O(n) time).
+   * This method rebuilds the heap from an arbitrary array.
+   * This method uses Floyd's algorithm (O(n) time).
    */
   private heapify(): void {
     // Start from last non-leaf node and bubble down
@@ -360,7 +360,7 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   // ========================================================================
 
   /**
-   * Creates a shallow copy of this priority queue.
+   * This method makes a shallow copy of this priority queue.
    */
   clone(): PriorityQueue<T> {
     const clone = new PriorityQueue<T>({
@@ -372,8 +372,8 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   }
 
   /**
-   * Validates the heap property (for debugging).
-   * Returns true if the heap is valid.
+   * This method validates the heap property (for debugging).
+   * This method gives true if the heap is valid.
    */
   validate(): boolean {
     for (let i = 0; i < this._heap.length; i++) {
@@ -399,7 +399,7 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
   }
 
   /**
-   * Returns a string representation for debugging.
+   * This method gives a string representation for debugging.
    */
   toString(): string {
     return `PriorityQueue[${this._heap.join(", ")}]`;
@@ -407,7 +407,7 @@ export class PriorityQueue<T> implements IPriorityQueue<T> {
 }
 
 /**
- * Factory function to create a PriorityQueue.
+ * Factory function to make a PriorityQueue.
  *
  * @example
  * // Min heap (default)

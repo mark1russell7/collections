@@ -1,7 +1,7 @@
 /**
- * Safe behavior - Provides Option/Result-based error handling.
+ * Safe behavior - Gives Option/Result-based error handling.
  *
- * Wraps collection operations that throw errors to instead return
+ * This module wraps collection operations that throw errors to instead return
  * Option<T> or Result<T, E>, enabling functional error handling.
  *
  * @example
@@ -27,17 +27,17 @@ import { None, Some, tryCatch } from "../core/effects.js";
  */
 export interface SafeListOperations<T> {
   /**
-   * Get element at index, returning Option.
+   * Get element at index, giving Option.
    */
   get(index: number): Option<T>;
 
   /**
-   * Set element at index, returning Result with old value or error.
+   * Set element at index, giving Result with old value or error.
    */
   set(index: number, element: T): Result<T, string>;
 
   /**
-   * Remove element at index, returning Result with removed value or error.
+   * Remove element at index, giving Result with removed value or error.
    */
   removeAt(index: number): Result<T, string>;
 
@@ -52,12 +52,12 @@ export interface SafeListOperations<T> {
   last(): Option<T>;
 
   /**
-   * Pop element, returning Option.
+   * Pop element, giving Option.
    */
   pop(): Option<T>;
 
   /**
-   * Shift element, returning Option.
+   * Shift element, giving Option.
    */
   shift(): Option<T>;
 }
@@ -122,20 +122,20 @@ export interface SafeMapOperations<K, V> {
   get(key: K): Option<V>;
 
   /**
-   * Set value for key, returning Result with old value or success.
+   * Set value for key, giving Result with old value or success.
    */
   set(key: K, value: V): Result<V | undefined, string>;
 
   /**
-   * Delete key, returning Result with deleted value or error.
+   * Delete key, giving Result with deleted value or error.
    */
   delete(key: K): Result<V | undefined, string>;
 }
 
 /**
- * Creates a safe List middleware.
+ * This function makes a safe List middleware.
  *
- * Exposes a `safe` property with Option/Result-based operations.
+ * This function exposes a `safe` property with Option/Result-based operations.
  */
 export function safeList<T>(): Middleware<
   List<T>,
@@ -204,7 +204,7 @@ export function safeList<T>(): Middleware<
 }
 
 /**
- * Creates a safe Queue middleware.
+ * This function makes a safe Queue middleware.
  */
 export function safeQueue<T>(): Middleware<
   Queue<T>,
@@ -251,7 +251,7 @@ export function safeQueue<T>(): Middleware<
 }
 
 /**
- * Creates a safe Deque middleware.
+ * This function makes a safe Deque middleware.
  */
 export function safeDeque<T>(): Middleware<
   Deque<T>,
@@ -316,7 +316,7 @@ export function safeDeque<T>(): Middleware<
 }
 
 /**
- * Creates a safe Map middleware.
+ * This function makes a safe Map middleware.
  */
 export function safeMap<K, V>(): Middleware<
   MapLike<K, V>,

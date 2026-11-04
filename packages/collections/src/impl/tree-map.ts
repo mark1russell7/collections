@@ -1,7 +1,7 @@
 /**
  * TreeMap - Red-black tree based sorted map implementation.
  *
- * Implements a self-balancing binary search tree that maintains keys in sorted
+ * This module implements a self-balancing binary search tree that maintains keys in sorted
  * order. Mirrors java.util.TreeMap.
  *
  * Key features:
@@ -67,7 +67,7 @@ function setColor<K, V>(node: TreeNode<K, V> | null, color: Color): void {
 }
 
 /**
- * Options for creating a TreeMap.
+ * Options for making a TreeMap.
  */
 export interface TreeMapOptions<K, V> {
   /**
@@ -93,7 +93,7 @@ export interface TreeMapOptions<K, V> {
  * TreeMap<K, V> - Red-black tree based sorted map.
  *
  * Maintains keys in sorted order using a self-balancing binary search tree.
- * Provides O(log n) operations and navigation methods.
+ * This class gives O(log n) operations and navigation methods.
  */
 export class TreeMap<K, V> implements NavigableMap<K, V> {
   private _root: TreeNode<K, V> | null = null;
@@ -770,10 +770,10 @@ export class TreeMap<K, V> implements NavigableMap<K, V> {
   }
 
   /**
-   * Deletes a node (the CLRS algorithm, as in java.util.TreeMap). A null leaf counts as black.
+   * This method deletes a node (the CLRS algorithm, as in java.util.TreeMap). A null leaf counts as black.
    *
    * Before (BUGS-2026-07 L10): the deletion of a black leaf skipped the fix-up, so the black
-   * heights drifted and the tree became unbalanced, and the fix-up treated a null leaf as
+   * heights drifted and the tree became unbalanced. Also, the fix-up treated a null leaf as
    * "not black", so it chose the wrong case and rotated at null (a TypeError).
    */
   private deleteNode(target: TreeNode<K, V>): void {
@@ -877,7 +877,7 @@ export class TreeMap<K, V> implements NavigableMap<K, V> {
 }
 
 /**
- * Factory function to create a TreeMap.
+ * Factory function to make a TreeMap.
  *
  * @example
  * const map = treeMap<string, number>()

@@ -1,7 +1,7 @@
 /**
  * Common helper utilities for collections.
  *
- * Provides shared functionality to reduce code duplication across implementations.
+ * This module gives shared functionality to reduce code duplication across implementations.
  */
 
 import type { Eq } from "../core/traits.js";
@@ -12,7 +12,7 @@ import type { Eq } from "../core/traits.js";
 
 /**
  * Checks if an index is within valid bounds [0, size).
- * Throws RangeError if out of bounds.
+ * This function throws RangeError if out of bounds.
  *
  * @param index The index to check
  * @param size The size of the collection
@@ -27,7 +27,7 @@ export function checkBounds(index: number, size: number, collectionName: string 
 
 /**
  * Checks if an index is valid for insertion [0, size].
- * Allows index === size for append operations.
+ * In this function, index === size is correct for append operations.
  *
  * @param index The index to check
  * @param size The size of the collection
@@ -67,7 +67,7 @@ export function checkRangeBounds(
 // ============================================================================
 
 /**
- * Finds the index of an element in an array using custom equality.
+ * This function finds the index of an element in an array using custom equality.
  *
  * @param array The array to search
  * @param element The element to find
@@ -84,7 +84,7 @@ export function findIndex<T>(array: T[], element: T, eq: Eq<T>): number {
 }
 
 /**
- * Finds the last index of an element in an array using custom equality.
+ * This function finds the last index of an element in an array using custom equality.
  *
  * @param array The array to search
  * @param element The element to find
@@ -113,9 +113,9 @@ export function arrayContains<T>(array: T[], element: T, eq: Eq<T>): boolean {
 }
 
 /**
- * Removes the first occurrence of an element from an array.
+ * This function removes the first occurrence of an element from an array.
  *
- * @param array The array to modify
+ * @param array The array to change
  * @param element The element to remove
  * @param eq Equality function
  * @returns true if element was found and removed
@@ -128,9 +128,9 @@ export function arrayRemove<T>(array: T[], element: T, eq: Eq<T>): boolean {
 }
 
 /**
- * Removes all occurrences of an element from an array.
+ * This function removes all occurrences of an element from an array.
  *
- * @param array The array to modify
+ * @param array The array to change
  * @param element The element to remove
  * @param eq Equality function
  * @returns Number of elements removed
@@ -151,7 +151,7 @@ export function arrayRemoveAll<T>(array: T[], element: T, eq: Eq<T>): number {
 // ============================================================================
 
 /**
- * Creates a simple iterator for an array.
+ * This function makes a simple iterator for an array.
  *
  * @param array The array to iterate
  * @returns Iterator over the array
@@ -161,7 +161,7 @@ export function* arrayIterator<T>(array: T[]): Iterator<T> {
 }
 
 /**
- * Creates a reversed iterator for an array.
+ * This function makes a reversed iterator for an array.
  *
  * @param array The array to iterate
  * @returns Reversed iterator over the array
@@ -173,7 +173,7 @@ export function* reverseArrayIterator<T>(array: T[]): Iterator<T> {
 }
 
 /**
- * Converts an iterable to an array.
+ * This function converts an iterable to an array.
  *
  * @param iterable The iterable to convert
  * @returns Array containing all elements
@@ -187,7 +187,7 @@ export function toArray<T>(iterable: Iterable<T>): T[] {
 // ============================================================================
 
 /**
- * Ensures a value is not null or undefined.
+ * This function makes sure that a value is not null or undefined.
  *
  * @param value The value to check
  * @param message Error message
@@ -202,7 +202,7 @@ export function requireNonNull<T>(value: T | null | undefined, message: string =
 }
 
 /**
- * Ensures a collection is not empty.
+ * This function makes sure that a collection is not empty.
  *
  * @param size Current size
  * @param collectionName Optional name for error message
@@ -219,7 +219,7 @@ export function requireNonEmpty(size: number, collectionName: string = "Collecti
 // ============================================================================
 
 /**
- * Clamps a value between min and max.
+ * This function clamps a value between min and max.
  *
  * @param value The value to clamp
  * @param min Minimum value
@@ -231,8 +231,8 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * Calculates hash code for a string.
- * Uses Java's String.hashCode() algorithm.
+ * This function calculates hash code for a string.
+ * This function uses Java's String.hashCode() algorithm.
  *
  * @param str The string to hash
  * @returns Hash code

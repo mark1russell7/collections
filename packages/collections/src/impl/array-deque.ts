@@ -1,7 +1,7 @@
 /**
  * ArrayDeque implementation - A ring buffer backed double-ended queue.
  *
- * Provides O(1) insertion and removal at both ends.
+ * This module gives O(1) insertion and removal at both ends.
  * More efficient than ArrayList for queue/stack operations.
  * Mirrors java.util.ArrayDeque.
  *
@@ -17,12 +17,12 @@ import type { Eq } from "../core/traits.js";
 import { defaultEq } from "../utils/defaults.js";
 
 /**
- * Options for creating an ArrayDeque.
+ * Options for making an ArrayDeque.
  */
 export interface ArrayDequeOptions<T> {
   /**
    * Initial capacity of the underlying array.
-   * Must be a power of 2 for efficient modulo operations.
+   * This value must be a power of 2 for efficient modulo operations.
    * @default 16
    */
   initialCapacity?: number;
@@ -37,7 +37,7 @@ export interface ArrayDequeOptions<T> {
 /**
  * ArrayDeque<T> - Ring buffer implementation of Deque.
  *
- * Uses a circular array to provide O(1) operations at both ends.
+ * This class uses a circular array to give O(1) operations at both ends.
  * The array grows automatically when full.
  *
  * Not thread-safe. Use synchronized() behavior for concurrent access.
@@ -267,7 +267,7 @@ export class ArrayDeque<T> implements Deque<T> {
   }
 
   /**
-   * Removes the element at a position from the head. The shorter side moves one place.
+   * This method removes the element at a position from the head. The shorter side moves one place.
    * (Before, a bitwise expression chose the side, and it was not a valid test.)
    */
   private removeAtOffset(offset: number): void {
@@ -377,7 +377,7 @@ export class ArrayDeque<T> implements Deque<T> {
   // ========================================================================
 
   /**
-   * Doubles the capacity of the deque.
+   * This method doubles the capacity of the deque.
    */
   private grow(): void {
     const oldCapacity = this._elements.length;
@@ -409,7 +409,7 @@ export class ArrayDeque<T> implements Deque<T> {
   }
 
   /**
-   * Returns the next power of 2 >= n.
+   * This method gives the next power of 2 >= n.
    */
   private nextPowerOfTwo(n: number): number {
     if (n <= 0) return 1;
@@ -427,14 +427,14 @@ export class ArrayDeque<T> implements Deque<T> {
   // ========================================================================
 
   /**
-   * Returns the current capacity of the underlying array.
+   * This value is the current capacity of the underlying array.
    */
   get capacity(): number {
     return this._elements.length;
   }
 
   /**
-   * Returns a string representation for debugging.
+   * This method gives a string representation for debugging.
    */
   toString(): string {
     return `ArrayDeque[${this.toArray().join(", ")}]`;
@@ -442,7 +442,7 @@ export class ArrayDeque<T> implements Deque<T> {
 }
 
 /**
- * Factory function to create an ArrayDeque.
+ * Factory function to make an ArrayDeque.
  *
  * @example
  * const deque = arrayDeque<number>()

@@ -27,6 +27,15 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 /**
  * This function compares two values deeply: JSON values, arrays, plain objects and maps. Two maps
  * are equal when they have the same keys with equal values, in any order.
+ *
+ * This function is for JSON values in tests. It is not `deepEq`, the equality of the collections,
+ * and it differs in these cases:
+ *
+ * - A `Date`, a `Set` or an instance of a class equals only itself here. So `new Date(0)` does not
+ *   equal `new Date(0)` here, and it does under `deepEq`.
+ * - 0 does not equal -0 here, and it does under `deepEq`.
+ * - `{}` equals `Object.create(null)` here, and it does not under `deepEq`.
+ * - A cyclic value exhausts the stack here, and it ends under `deepEq`.
  */
 export function deepEqual(actual: unknown, expected: unknown): boolean {
   if (Object.is(actual, expected)) return true;

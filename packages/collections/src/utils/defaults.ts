@@ -65,6 +65,15 @@ function equalElements(a: ArrayLike<unknown>, b: ArrayLike<unknown>): boolean {
   return true;
 }
 
+/** The kinds of `equalObjects` and `hashFields`, so that the relation and its hash stay in step. */
+const isBinary = (value: object): value is ArrayBufferLike | DataView =>
+  value instanceof DataView || value instanceof ArrayBuffer || (typeof SharedArrayBuffer !== "undefined" && value instanceof SharedArrayBuffer);
+
+const isOpaque = (value: object): boolean => value instanceof Promise || value instanceof WeakMap || value instanceof WeakSet || value instanceof WeakRef;
+
+const isBoxed = (value: object): boolean =>
+  value instanceof Number || value instanceof String || value instanceof Boolean || value instanceof BigInt || value instanceof Symbol;
+
 function bytesOf(value: ArrayBufferLike | DataView): Uint8Array {
   return ArrayBuffer.isView(value) ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength) : new Uint8Array(value);
 }
@@ -114,16 +123,13 @@ function equalObjects(a: any, b: any, held: HeldPairs): boolean {
     }
     return true;
   }
-  if (a instanceof DataView || a instanceof ArrayBuffer || (typeof SharedArrayBuffer !== "undefined" && a instanceof SharedArrayBuffer)) {
-    return equalElements(bytesOf(a), bytesOf(b));
-  }
+  if (isBinary(a)) return equalElements(bytesOf(a), bytesOf(b));
   if (ArrayBuffer.isView(a)) return equalElements(a as unknown as ArrayLike<unknown>, b);
-  if (a instanceof Promise || a instanceof WeakMap || a instanceof WeakSet || a instanceof WeakRef) return false;
+  if (isOpaque(a)) return false;
   if (a instanceof Date && !sameValueZero(a.getTime(), b.getTime())) return false;
   if (a instanceof RegExp && (a.source !== b.source || a.flags !== b.flags)) return false;
   if (a instanceof Error && !(a.name === b.name && a.message === b.message && equalValues(a.cause, b.cause, held))) return false;
-  const boxed = a instanceof Number || a instanceof String || a instanceof Boolean || a instanceof BigInt || a instanceof Symbol;
-  if (boxed && !sameValueZero(a.valueOf(), b.valueOf())) return false;
+  if (isBoxed(a) && !sameValueZero(a.valueOf(), b.valueOf())) return false;
   if ((a instanceof Map || a instanceof Set) && !equalEntries(a, b, held)) return false;
   return equalKeys(a, b, held);
 }
@@ -166,6 +172,7 @@ function equalValues(a: unknown, b: unknown, held: HeldPairs): boolean {
  * - Cycles are safe: two cyclic values are equal when they unfold to the same infinite tree.
  *
  * The recursion follows the depth of the data, so a very deep value can exhaust the stack.
+ * `defaultHash` agrees with this relation: two equal values have one hash.
  */
 export const deepEq: Eq<any> = (a, b): boolean => equalValues(a, b, { partners: new Map(), log: [] });
 
@@ -188,17 +195,11 @@ export const eqBy = <T, K extends keyof T = keyof T>(
 // Default Hashing
 // ============================================================================
 
-/**
- * Default hash function for primitives and objects.
- * For objects, hashes the JSON string representation.
- */
-export const defaultHash: Hash<any> = (value: any): number => {
+/** The hash of one primitive or function. */
+function hashPrimitive(value: unknown): number {
   if (value === null) return 0;
   if (value === undefined) return 1;
-
-  const type = typeof value;
-
-  switch (type) {
+  switch (typeof value) {
     case "boolean":
       return value ? 1 : 0;
     case "number":
@@ -209,19 +210,104 @@ export const defaultHash: Hash<any> = (value: any): number => {
       return hashString(value.toString());
     case "bigint":
       return hashString(value.toString());
-    case "object":
-      // For objects, hash their JSON representation
-      // This is not ideal for all cases but provides a reasonable default
-      try {
-        return hashString(JSON.stringify(value));
-      } catch {
-        // If JSON.stringify fails, fall back to toString
-        return hashString(value.toString());
-      }
     default:
       return 2;
   }
-};
+}
+
+/** The levels of an object that `defaultHash` reads. A cyclic value unfolds to this depth and stops. */
+const HASH_DEPTH = 16;
+
+/** The hashes of one call, by object and by remaining depth. A shared part costs one visit per depth. */
+type HashMemo = Map<object, number[]>;
+
+/** This function adds one hash to a running hash. The result depends on the order. */
+const mix = (hash: number, part: number): number => (Math.imul(hash, 31) + part) | 0;
+
+/** The finalizer of MurmurHash3. It makes a sum of entries depend on each pair, not on each half. */
+function scramble(hash: number): number {
+  let mixed = hash ^ (hash >>> 16);
+  mixed = Math.imul(mixed, 0x85ebca6b);
+  mixed ^= mixed >>> 13;
+  mixed = Math.imul(mixed, 0xc2b2ae35);
+  return mixed ^ (mixed >>> 16);
+}
+
+/** The start values of the kinds. Two kinds do not compare equal, so their hashes can differ. */
+const KIND = { array: 3, binary: 5, elements: 7, opaque: 11, record: 13 } as const;
+
+const hashAt = (value: unknown, depth: number, memo: HashMemo): number =>
+  isObject(value) ? hashObject(value, depth, memo) : hashPrimitive(value);
+
+function hashElements(start: number, elements: ArrayLike<unknown>): number {
+  let hash = start;
+  for (let i = 0; i < elements.length; i++) hash = mix(hash, hashPrimitive(elements[i]));
+  return hash;
+}
+
+/** The sum of the entries of a map or a set. A sum does not depend on the order of the entries. */
+function hashEntries(value: Map<unknown, unknown> | Set<unknown>, depth: number, memo: HashMemo): number {
+  let sum = 0;
+  for (const [key, entry] of value.entries()) sum = (sum + scramble(mix(hashAt(key, depth, memo), hashAt(entry, depth, memo)))) | 0;
+  return sum;
+}
+
+/** The sum of the own enumerable keys and their values, as `equalKeys` reads them. */
+function hashKeys(value: any, depth: number, memo: HashMemo): number {
+  let sum = 0;
+  for (const key of enumerableKeys(value)) sum = (sum + scramble(mix(hashPrimitive(key), hashAt(value[key], depth, memo)))) | 0;
+  return sum;
+}
+
+/** The hash of the fields of one object. This function reads only what `equalObjects` reads. */
+function hashFields(value: any, depth: number, memo: HashMemo): number {
+  if (Array.isArray(value)) {
+    let hash: number = KIND.array;
+    for (let i = 0; i < value.length; i++) hash = mix(hash, hashAt(value[i], depth, memo));
+    return hash;
+  }
+  if (isBinary(value)) return hashElements(KIND.binary, bytesOf(value));
+  if (ArrayBuffer.isView(value)) return hashElements(KIND.elements, value as unknown as ArrayLike<unknown>);
+  if (isOpaque(value)) return KIND.opaque;
+  let hash: number = KIND.record;
+  if (value instanceof Date) hash = mix(hash, hashNumber(value.getTime()));
+  if (value instanceof RegExp) hash = mix(mix(hash, hashString(value.source)), hashString(value.flags));
+  if (value instanceof Error) {
+    hash = mix(mix(mix(hash, hashAt(value.name, depth, memo)), hashAt(value.message, depth, memo)), hashAt(value.cause, depth, memo));
+  }
+  if (isBoxed(value)) hash = mix(hash, hashPrimitive(value.valueOf()));
+  if (value instanceof Map || value instanceof Set) hash = mix(hash, hashEntries(value, depth, memo));
+  return mix(hash, hashKeys(value, depth, memo));
+}
+
+/** The hash of one object at one depth. The depth falls with each level, so a cycle ends. */
+function hashObject(value: object, depth: number, memo: HashMemo): number {
+  if (depth === 0) return 0;
+  let byDepth = memo.get(value);
+  if (byDepth === undefined) {
+    byDepth = [];
+    memo.set(value, byDepth);
+  }
+  const known = byDepth[depth];
+  if (known !== undefined) return known;
+  const hash = hashFields(value, depth - 1, memo);
+  byDepth[depth] = hash;
+  return hash;
+}
+
+/**
+ * This function is the default hash of a key. It agrees with `deepEq`: when `deepEq(a, b)` is true,
+ * `defaultHash(a)` equals `defaultHash(b)`. So a hash map with `deepEq` finds an equal key.
+ *
+ * - The hash of an object reads the same fields as `deepEq`. The order of the keys of an object,
+ *   and of the entries of a `Map` or a `Set`, has no effect.
+ * - The hash reads 16 levels, so a cyclic or very deep value ends. Two values that differ only
+ *   below that depth have one hash, and `deepEq` then tells them apart.
+ * - A shared part costs one visit per level, so a dense graph ends.
+ * - The hash of an object can change in a new version. Do not store it.
+ */
+export const defaultHash: Hash<any> = (value: any): number =>
+  isObject(value) ? hashObject(value, HASH_DEPTH, new Map()) : hashPrimitive(value);
 
 /**
  * Hash function for strings using djb2 algorithm.

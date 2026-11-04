@@ -4,7 +4,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { deepEq } from "./defaults.js";
+import { deepEq, defaultHash } from "./defaults.js";
 
 /** Values of each kind that `deepEq` compares by value. Small domains, so that equal pairs occur. */
 const valueOf = (leaf: fc.Arbitrary<unknown>): fc.Arbitrary<unknown> =>
@@ -271,5 +271,122 @@ describe("deepEq cycles", () => {
     };
     expect(deepEq(doubled(0), doubled(0))).toBe(true);
     expect(deepEq(doubled(0), doubled(1))).toBe(false);
+  });
+});
+
+/** A copy with the entries of each object, map and set in reverse order. Cycles are not followed. */
+const reversed = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(reversed);
+  if (value instanceof Set) return new Set([...value].reverse().map(reversed));
+  if (value instanceof Map) return new Map([...value].reverse().map(([key, entry]) => [reversed(key), reversed(entry)]));
+  if (value instanceof Date || value instanceof RegExp || ArrayBuffer.isView(value)) return structuredClone(value);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(Object.entries(value).reverse().map(([key, entry]) => [key, reversed(entry)]));
+};
+
+describe("defaultHash follows deepEq", () => {
+  it("gives a value, its copy and its reversed copy one hash", () => {
+    fc.assert(
+      fc.property(valueOf(anyLeaf), (value) => {
+        expect(defaultHash(structuredClone(value))).toBe(defaultHash(value));
+        expect(defaultHash(reversed(value))).toBe(defaultHash(value));
+      }),
+    );
+  });
+
+  it("gives each pair that deepEq accepts one hash", () => {
+    fc.assert(
+      fc.property(valueOf(smallLeaf), valueOf(smallLeaf), (a, b) => {
+        if (deepEq(a, b)) expect(defaultHash(a)).toBe(defaultHash(b));
+      }),
+      { numRuns: 2000 },
+    );
+  });
+
+  it("gives equal hashes in each rule of deepEq", () => {
+    const pairs: readonly (readonly [unknown, unknown])[] = [
+      [{ a: 1, b: 2 }, { b: 2, a: 1 }],
+      [{ a: Number.NaN }, { a: Number.NaN }],
+      [[0], [-0]],
+      [[undefined], new Array(1)],
+      [new Date(5), new Date(5)],
+      [new Date(Number.NaN), new Date(Number.NaN)],
+      [/a/g, /a/g],
+      [new Map([["a", 1], ["b", 2]]), new Map([["b", 2], ["a", 1]])],
+      [new Map([[{ k: 1 }, 1], [{ k: 2 }, 2]]), new Map([[{ k: 2 }, 2], [{ k: 1 }, 1]])],
+      [new Set([1, 2, Number.NaN]), new Set([Number.NaN, 2, 1])],
+      [new Set([{ k: 1 }, { k: 1 }]), new Set([{ k: 1 }, { k: 1 }])],
+      [new Error("a", { cause: 1 }), new Error("a", { cause: 1 })],
+      [Object(1), Object(1)],
+      [Object("ab"), Object("ab")],
+      [Float64Array.of(Number.NaN, -0), Float64Array.of(Number.NaN, 0)],
+      [Uint8Array.of(1).buffer, Uint8Array.of(1).buffer],
+      [new DataView(Uint8Array.of(9, 1, 2).buffer, 1), new DataView(Uint8Array.of(1, 2).buffer)],
+      [Object.assign(new Date(1), { a: 1 }), Object.assign(new Date(1), { a: 1 })],
+      [Object.assign([1], { extra: 1 }), [1]],
+      [Object.assign(Uint8Array.of(1), { extra: 1 }), Uint8Array.of(1)],
+    ];
+    for (const [a, b] of pairs) {
+      expect(deepEq(a, b)).toBe(true);
+      expect(defaultHash(a)).toBe(defaultHash(b));
+    }
+  });
+
+  it("ends on a cycle, and gives two equal cyclic values one hash", () => {
+    const ring = (size: number): object => {
+      const first: { next?: object } = {};
+      let last = first;
+      for (let i = 1; i < size; i++) last = { next: last };
+      first.next = last;
+      return first;
+    };
+    expect(deepEq(ring(1), ring(2))).toBe(true);
+    expect(defaultHash(ring(1))).toBe(defaultHash(ring(2)));
+    const list: unknown[] = [];
+    list.push(list);
+    const set = new Set<unknown>();
+    set.add(set);
+    const map = new Map<unknown, unknown>();
+    map.set(map, map);
+    for (const value of [list, set, map]) expect(defaultHash(value)).toBe(defaultHash(value));
+  });
+
+  it("ends on a dense graph", () => {
+    const nodes: object[][] = Array.from({ length: 12 }, () => []);
+    for (const node of nodes) node.push(...nodes);
+    expect(defaultHash(nodes)).toBe(defaultHash(nodes));
+  });
+
+  it("does not exhaust the stack on a very deep value", () => {
+    let list: unknown = null;
+    for (let i = 0; i < 200_000; i++) list = { next: list };
+    expect(Number.isInteger(defaultHash(list))).toBe(true);
+  });
+
+  it("keeps apart the values that it can tell apart", () => {
+    const pairs: readonly (readonly [unknown, unknown])[] = [
+      [{ a: 1, b: 2 }, { a: 2, b: 1 }],
+      [[1, 2], [2, 1]],
+      [[0], [0, 0]],
+      [[], {}],
+      [new Date(1), new Date(2)],
+      [/a/, /a/g],
+      [new Map([["a", 1]]), new Map([["a", 2]])],
+      [new Set([1]), new Set([2])],
+      [new Error("a"), new Error("b")],
+      [Uint8Array.of(1), Uint8Array.of(2)],
+    ];
+    for (const [a, b] of pairs) expect(defaultHash(a)).not.toBe(defaultHash(b));
+  });
+
+  it("keeps the hash of each primitive", () => {
+    expect(defaultHash(null)).toBe(0);
+    expect(defaultHash(undefined)).toBe(1);
+    expect(defaultHash(true)).toBe(1);
+    expect(defaultHash(false)).toBe(0);
+    expect(defaultHash(7)).toBe(7);
+    expect(defaultHash(-0)).toBe(0);
+    expect(defaultHash(Number.NaN)).toBe(0);
+    expect(defaultHash(() => 1)).toBe(2);
   });
 });

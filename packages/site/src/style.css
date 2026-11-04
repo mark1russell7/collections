@@ -159,16 +159,22 @@ button {
   cursor: default;
 }
 
-.keys,
 .needs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
+.keys {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
 .keys button {
-  flex: 1 1 2.75rem;
+  min-width: 0;
   min-height: 2.75rem;
+  padding: 0;
   font-weight: 650;
 }
 
@@ -237,7 +243,7 @@ button {
 }
 
 .bars button {
-  height: calc(var(--value) * 1rem);
+  height: calc(var(--value) * 0.85rem + 0.9rem);
   min-width: 0;
   min-height: 0;
   padding: 0;

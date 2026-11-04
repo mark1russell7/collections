@@ -185,7 +185,7 @@ export function mountGraph(): void {
             if (set.has(task)) set.delete(task);
             else set.add(task);
             states.clear();
-            log.textContent = "";
+            log.textContent = "Press Run to start the tasks.";
             draw();
           });
           item.dataset["need"] = task;

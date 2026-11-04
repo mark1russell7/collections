@@ -111,7 +111,7 @@ export const TASKS: Readonly<Record<string, readonly string[]>> = {
   deploy: ["test", "build"],
 };
 
-/** What each task needs now. */
+/** What each task needs. */
 export type Needs = Map<string, Set<string>>;
 
 /** This function gives a copy of the tasks that the page can change. */

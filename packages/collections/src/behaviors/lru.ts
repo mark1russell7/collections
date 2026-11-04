@@ -284,14 +284,16 @@ export function lruMap<K, V>(
  * cache.get('key') // Moves to front
  */
 export class LRUCache<K, V> {
+  private readonly capacity: number;
+  private readonly onEvict: ((key: K, value: V) => void) | undefined;
   private map: Map<K, { value: V; node: LRUNode<K, V> }> = new Map();
   private head: LRUNode<K, V> | null = null;
   private tail: LRUNode<K, V> | null = null;
 
-  constructor(
-    private readonly capacity: number,
-    private readonly onEvict?: (key: K, value: V) => void
-  ) {}
+  constructor(capacity: number, onEvict?: (key: K, value: V) => void) {
+    this.capacity = capacity;
+    this.onEvict = onEvict;
+  }
 
   get size(): number {
     return this.map.size;

@@ -21,11 +21,15 @@ import { defaultEq, defaultCompare } from "../utils/defaults.js";
  * Internal node structure for the linked list.
  */
 class Node<T> {
-  constructor(
-    public value: T,
-    public prev: Node<T> | null = null,
-    public next: Node<T> | null = null
-  ) {}
+  value: T;
+  prev: Node<T> | null;
+  next: Node<T> | null;
+
+  constructor(value: T, prev: Node<T> | null = null, next: Node<T> | null = null) {
+    this.value = value;
+    this.prev = prev;
+    this.next = next;
+  }
 }
 
 /**

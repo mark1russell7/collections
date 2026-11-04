@@ -90,7 +90,11 @@ function sizeOf<L, S>(tree: Tree<L, S>): number {
 
 /** The functions that make and join nodes for one monoid. */
 class Builder<L, S> {
-  constructor(readonly spec: SummarySpec<L, S>) {}
+  readonly spec: SummarySpec<L, S>;
+
+  constructor(spec: SummarySpec<L, S>) {
+    this.spec = spec;
+  }
 
   summaryOf(tree: Tree<L, S>): S {
     return tree === null ? this.spec.monoid.empty : tree.summary;
@@ -320,10 +324,13 @@ function clamp(value: number, size: number): number {
  * the sequence returns a new tree.
  */
 export class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
-  private constructor(
-    private readonly builder: Builder<Leaf, Summary>,
-    private readonly root: Tree<Leaf, Summary>,
-  ) {}
+  private readonly builder: Builder<Leaf, Summary>;
+  private readonly root: Tree<Leaf, Summary>;
+
+  private constructor(builder: Builder<Leaf, Summary>, root: Tree<Leaf, Summary>) {
+    this.builder = builder;
+    this.root = root;
+  }
 
   /** This function makes a tree of a spec from leaves, as `summaryTree` does. */
   static of<Leaf, Summary>(spec: SummarySpec<Leaf, Summary>, leaves: Iterable<Leaf> = []): SummaryTree<Leaf, Summary> {

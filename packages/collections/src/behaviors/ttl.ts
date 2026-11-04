@@ -303,14 +303,16 @@ export function ttlCollection<T>(
  * }, 61000)
  */
 export class TTLCache<K, V> {
+  private readonly ttl: number;
+  private readonly checkInterval: number;
+  private readonly onExpire: ((key: K, value: V) => void) | undefined;
   private map = new Map<K, TTLEntry<V>>();
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  constructor(
-    private readonly ttl: number,
-    private readonly checkInterval: number = 1000,
-    private readonly onExpire?: (key: K, value: V) => void
-  ) {
+  constructor(ttl: number, checkInterval: number = 1000, onExpire?: (key: K, value: V) => void) {
+    this.ttl = ttl;
+    this.checkInterval = checkInterval;
+    this.onExpire = onExpire;
     this.startExpirationCheck();
   }
 

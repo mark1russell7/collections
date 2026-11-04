@@ -31,10 +31,11 @@ import { defaultEq, defaultCompare } from "../utils/defaults.js";
 /**
  * Node color in red-black tree.
  */
-enum Color {
-  RED = "RED",
-  BLACK = "BLACK",
-}
+const Color = {
+  RED: "RED",
+  BLACK: "BLACK",
+} as const;
+type Color = (typeof Color)[keyof typeof Color];
 
 /**
  * Node in the red-black tree.

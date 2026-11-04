@@ -188,14 +188,21 @@ export const createEmitter = <E extends EventMap>(): Emitter<E> => {
  * // After 100ms or flush(), emits single 'batch-add' event with both items
  */
 export class EventBatcher<E extends EventMap, K extends keyof E> {
+  private emitter: Emitter<E & { [P in `batch-${K & string}`]: E[K][] }>;
+  private event: K;
+  private delayMs: number;
   private batch: E[K][] = [];
   private timer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
-    private emitter: Emitter<E & { [P in `batch-${K & string}`]: E[K][] }>,
-    private event: K,
-    private delayMs: number
-  ) {}
+    emitter: Emitter<E & { [P in `batch-${K & string}`]: E[K][] }>,
+    event: K,
+    delayMs: number
+  ) {
+    this.emitter = emitter;
+    this.event = event;
+    this.delayMs = delayMs;
+  }
 
   /**
    * Add an event to the current batch.

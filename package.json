@@ -16,7 +16,6 @@
     "typecheck:scripts": "tsc -p tsconfig.scripts.json",
     "lint:ste": "ste-lint",
     "check:boundaries": "depcruise --config .dependency-cruiser.ts packages",
-    "check:api": "api-report check",
     "check:conventions": "conventions check"
   },
   "devDependencies": {

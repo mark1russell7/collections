@@ -1,0 +1,2610 @@
+# The public API of @mark1russell7/collections
+#
+# The names of each entry of the exports field, and the declaration of each name, without comments
+# and private members. The command `api-report check` compares this file with the built .d.ts files.
+# To accept a change of the API, start the build, then `api-report update`, and review the diff.
+
+## . (build/index.d.ts): 358 names
+
+ArrayConvertible: build/index.d.ts#ArrayConvertible
+ArrayDeque: build/index.d.ts#ArrayDeque
+ArrayDequeOptions: build/index.d.ts#ArrayDequeOptions
+ArrayList: build/index.d.ts#ArrayList
+ArrayListOptions: build/index.d.ts#ArrayListOptions
+Async: build/index.d.ts#Async
+AsyncEmitter: build/index.d.ts#AsyncEmitter
+AsyncOption: build/index.d.ts#AsyncOption
+AsyncQueue: build/index.d.ts#AsyncQueue
+AsyncQueueOptions: build/index.d.ts#AsyncQueueOptions
+AsyncResult: build/index.d.ts#AsyncResult
+Asyncify: build/index.d.ts#Asyncify
+BiMap: build/index.d.ts#BiMap
+type BlockingQueue: build/index.d.ts#BlockingQueue
+Bounded: build/index.d.ts#Bounded
+BoundedCollection: build/index.d.ts#BoundedCollection
+type BoundedOptions: build/index.d.ts#BoundedOptions
+Channel: build/index.d.ts#Channel
+CircularList: build/index.d.ts#CircularList
+Clearable: build/index.d.ts#Clearable
+Cloneable: build/index.d.ts#Cloneable
+Collection: build/index.d.ts#Collection
+CollectionBuilder: build/index.d.ts#CollectionBuilder
+CollectionEvents: build/index.d.ts#CollectionEvents
+Collector: build/index.d.ts#Collector
+CompactionPolicy: build/index.d.ts#CompactionPolicy
+Compare: build/index.d.ts#Compare
+ComparisonProvider: build/index.d.ts#ComparisonProvider
+ConflictResolutionPolicy: build/index.d.ts#ConflictResolutionPolicy
+DEFAULT_CONFLICT_POLICY: build/index.d.ts#DEFAULT_CONFLICT_POLICY
+DEFAULT_EVICTION_POLICY: build/index.d.ts#DEFAULT_EVICTION_POLICY
+DEFAULT_GROWTH_POLICY: build/index.d.ts#DEFAULT_GROWTH_POLICY
+DEFAULT_OVERFLOW_POLICY: build/index.d.ts#DEFAULT_OVERFLOW_POLICY
+DEFAULT_RETRY_POLICY: build/index.d.ts#DEFAULT_RETRY_POLICY
+DEFAULT_UNDERFLOW_POLICY: build/index.d.ts#DEFAULT_UNDERFLOW_POLICY
+DEFAULT_VALIDATION_POLICY: build/index.d.ts#DEFAULT_VALIDATION_POLICY
+type DelayQueue: build/index.d.ts#DelayQueue
+type Deque: build/index.d.ts#Deque
+DequeEvents: build/index.d.ts#DequeEvents
+Disposable: build/index.d.ts#Disposable
+ElementOf: build/index.d.ts#ElementOf
+ElementType: build/index.d.ts#ElementType
+Emitter: build/index.d.ts#Emitter
+Emptiable: build/index.d.ts#Emptiable
+Entry: build/index.d.ts#Entry
+Eq: build/index.d.ts#Eq
+EqualityProvider: build/index.d.ts#EqualityProvider
+Err: build/index.d.ts#Err
+EventBatcher: build/index.d.ts#EventBatcher
+EventMap: build/index.d.ts#EventMap
+Evented: build/index.d.ts#Evented
+EvictionCandidate: build/index.d.ts#EvictionCandidate
+EvictionMetadata: build/index.d.ts#EvictionMetadata
+EvictionPolicy: build/index.d.ts#EvictionPolicy
+EvictionSelector: build/index.d.ts#EvictionSelector
+Freezable: build/index.d.ts#Freezable
+GrowthPolicy: build/index.d.ts#GrowthPolicy
+Hash: build/index.d.ts#Hash
+HashMap: build/index.d.ts#HashMap
+HashMapOptions: build/index.d.ts#HashMapOptions
+HashProvider: build/index.d.ts#HashProvider
+HashSet: build/index.d.ts#HashSet
+HashSetOptions: build/index.d.ts#HashSetOptions
+type IAsyncQueue: build/index.d.ts#AsyncQueue$1
+type IPriorityQueue: build/index.d.ts#PriorityQueue
+IsReadonly: build/index.d.ts#IsReadonly
+KEY_DIGITS: build/index.d.ts#KEY_DIGITS
+type KeyCheckOptions: build/index.d.ts#KeyCheckOptions
+type KeyedItem: build/index.d.ts#KeyedItem
+LRUCache: build/index.d.ts#LRUCache
+LRUOptions: build/index.d.ts#LRUOptions
+LinkedHashMap: build/index.d.ts#LinkedHashMap
+LinkedHashMapOptions: build/index.d.ts#LinkedHashMapOptions
+LinkedList: build/index.d.ts#LinkedList
+LinkedListOptions: build/index.d.ts#LinkedListOptions
+List: build/index.d.ts#List
+ListEvents: build/index.d.ts#ListEvents
+Listener: build/index.d.ts#Listener
+type ListenerErrorHandler: build/index.d.ts#ListenerErrorHandler
+MapEvents: build/index.d.ts#MapEvents
+MapLike: build/index.d.ts#MapLike
+MergeFunction: build/index.d.ts#MergeFunction
+Middleware: build/index.d.ts#Middleware
+MultiMap: build/index.d.ts#MultiMap
+MutableCollectionBase: build/index.d.ts#MutableCollectionBase
+NavigableMap: build/index.d.ts#NavigableMap
+NavigableSet: build/index.d.ts#NavigableSet
+None: build/index.d.ts#None
+Ok: build/index.d.ts#Ok
+Option: build/index.d.ts#Option
+OverflowContext: build/index.d.ts#OverflowContext
+OverflowHandler: build/index.d.ts#OverflowHandler
+OverflowPolicy: build/index.d.ts#OverflowPolicy
+type Point: build/index.d.ts#Point
+PriorityQueue: build/index.d.ts#PriorityQueue$1
+PriorityQueueOptions: build/index.d.ts#PriorityQueueOptions
+type Queue: build/index.d.ts#Queue
+QueueEvents: build/index.d.ts#QueueEvents
+RandomAccess: build/index.d.ts#RandomAccess
+Readonly: build/index.d.ts#Readonly
+ReadonlyCollection: build/index.d.ts#ReadonlyCollection
+ReadonlyCollectionBase: build/index.d.ts#ReadonlyCollectionBase
+ReadonlyList: build/index.d.ts#ReadonlyList
+ReadonlyMapLike: build/index.d.ts#ReadonlyMapLike
+ReadonlyOptions: build/index.d.ts#ReadonlyOptions
+type ReadonlyQueue: build/index.d.ts#ReadonlyQueue
+ReadonlySet: build/index.d.ts#ReadonlySet
+Result: build/index.d.ts#Result
+RetryContext: build/index.d.ts#RetryContext
+RetryPolicy: build/index.d.ts#RetryPolicy
+RetryPredicate: build/index.d.ts#RetryPredicate
+SafeCollection: build/index.d.ts#SafeCollection
+SafeDequeOperations: build/index.d.ts#SafeDequeOperations
+SafeListOperations: build/index.d.ts#SafeListOperations
+SafeMapOperations: build/index.d.ts#SafeMapOperations
+SafeQueueOperations: build/index.d.ts#SafeQueueOperations
+SelectCase: build/index.d.ts#SelectCase
+Set: build/index.d.ts#Set$1
+Settled: build/index.d.ts#Settled
+Sized: build/index.d.ts#Sized
+Some: build/index.d.ts#Some
+SortedMap: build/index.d.ts#SortedMap
+SortedSet: build/index.d.ts#SortedSet
+Stack: build/index.d.ts#Stack
+StorageListeners: build/index.d.ts#StorageListeners
+type SummaryLocation: build/index.d.ts#SummaryLocation
+type SummaryMonoid: build/index.d.ts#SummaryMonoid
+type SummarySearch: build/index.d.ts#SummarySearch
+type SummarySpec: build/index.d.ts#SummarySpec
+SummaryStatistics: build/index.d.ts#SummaryStatistics
+SummaryTree: build/index.d.ts#SummaryTree
+TTLCache: build/index.d.ts#TTLCache
+TTLOptions: build/index.d.ts#TTLOptions
+type TransferQueue: build/index.d.ts#TransferQueue
+TreeMap: build/index.d.ts#TreeMap
+TreeMapOptions: build/index.d.ts#TreeMapOptions
+TreeSet: build/index.d.ts#TreeSet
+TreeSetOptions: build/index.d.ts#TreeSetOptions
+UnderflowContext: build/index.d.ts#UnderflowContext
+UnderflowHandler: build/index.d.ts#UnderflowHandler
+UnderflowPolicy: build/index.d.ts#UnderflowPolicy
+Unsubscribe: build/index.d.ts#Unsubscribe
+ValidationContext: build/index.d.ts#ValidationContext
+ValidationHandler: build/index.d.ts#ValidationHandler
+ValidationPolicy: build/index.d.ts#ValidationPolicy
+Vector: build/index.d.ts#Vector
+WeakMapLike: build/index.d.ts#WeakMapLike
+WithCapability: build/index.d.ts#WithCapability
+arrayContains: build/index.d.ts#arrayContains
+arrayDeque: build/index.d.ts#arrayDeque
+arrayIterator: build/index.d.ts#arrayIterator
+arrayList: build/index.d.ts#arrayList
+arrayRemove: build/index.d.ts#arrayRemove
+arrayRemoveAll: build/index.d.ts#arrayRemoveAll
+asSettled: build/index.d.ts#asSettled
+asyncQueue: build/index.d.ts#asyncQueue
+average: build/index.d.ts#average
+averagingNumber: build/index.d.ts#averagingNumber
+blockMethods: build/index.d.ts#blockMethods
+booleanCompare: build/index.d.ts#booleanCompare
+bounded: build/index.d.ts#bounded
+boundedDeque: build/index.d.ts#boundedDeque
+boundedList: build/index.d.ts#boundedList
+boundedMap: build/index.d.ts#boundedMap
+boundedQueue: build/index.d.ts#boundedQueue
+buffered: build/index.d.ts#buffered
+buildList: build/index.d.ts#buildList
+buildMap: build/index.d.ts#buildMap
+bundle: build/index.d.ts#bundle
+channel: build/index.d.ts#channel
+checkBounds: build/index.d.ts#checkBounds
+checkInsertBounds: build/index.d.ts#checkInsertBounds
+checkRangeBounds: build/index.d.ts#checkRangeBounds
+chunk: build/index.d.ts#chunk
+clamp: build/index.d.ts#clamp
+collect: build/index.d.ts#collect
+collectToArray: build/index.d.ts#toArray
+collectToList: build/index.d.ts#toList
+collectToMap: build/index.d.ts#toMap
+collectToSet: build/index.d.ts#toSet
+combineHashes: build/index.d.ts#combineHashes
+compareKeys: build/index.d.ts#compareKeys
+comparing: build/index.d.ts#comparing
+comparingKey: build/index.d.ts#comparingKey
+compose: build/index.d.ts#compose
+concat: build/index.d.ts#concat
+count: build/index.d.ts#count
+counting: build/index.d.ts#counting
+createEmitter: build/index.d.ts#createEmitter
+dateCompare: build/index.d.ts#dateCompare
+deepEq: build/index.d.ts#deepEq
+defaultCompare: build/index.d.ts#defaultCompare
+defaultEq: build/index.d.ts#defaultEq
+defaultHash: build/index.d.ts#defaultHash
+delegate: build/index.d.ts#delegate
+distinct: build/index.d.ts#distinct
+distinctConsecutive: build/index.d.ts#distinctConsecutive
+dropIndex: build/index.d.ts#dropIndex
+emptyList: build/index.d.ts#emptyList
+emptyMap: build/index.d.ts#emptyMap
+emptyQueue: build/index.d.ts#emptyQueue
+enhanceMethod: build/index.d.ts#enhanceMethod
+enumerate: build/index.d.ts#enumerate
+eqBy: build/index.d.ts#eqBy
+evented: build/index.d.ts#evented
+eventedDeque: build/index.d.ts#eventedDeque
+eventedList: build/index.d.ts#eventedList
+eventedMap: build/index.d.ts#eventedMap
+eventedQueue: build/index.d.ts#eventedQueue
+every: build/index.d.ts#every
+fanIn: build/index.d.ts#fanIn
+fanOut: build/index.d.ts#fanOut
+filter: build/index.d.ts#filter
+filtering: build/index.d.ts#filtering
+find: build/index.d.ts#find
+findIndex: build/index.d.ts#findIndex
+findLastIndex: build/index.d.ts#findLastIndex
+first: build/index.d.ts#first
+flatMap: build/index.d.ts#flatMap
+flatMapOption: build/index.d.ts#flatMapOption
+flatMapResult: build/index.d.ts#flatMapResult
+flatMapping: build/index.d.ts#flatMapping
+flatten: build/index.d.ts#flatten
+forwardEvent: build/index.d.ts#forwardEvent
+fromNullable: build/index.d.ts#fromNullable
+getOrElse: build/index.d.ts#getOrElse
+getOrElseResult: build/index.d.ts#getOrElseResult
+groupBy: build/index.d.ts#groupBy
+groupingBy: build/index.d.ts#groupingBy
+groupingByWith: build/index.d.ts#groupingByWith
+hasCapability: build/index.d.ts#hasCapability
+hashBy: build/index.d.ts#hashBy
+hashMap: build/index.d.ts#hashMap
+hashNumber: build/index.d.ts#hashNumber
+hashSet: build/index.d.ts#hashSet
+hashString: build/index.d.ts#hashString
+immutableListOf: build/index.d.ts#immutableListOf
+immutableMapOf: build/index.d.ts#immutableMapOf
+interceptMethods: build/index.d.ts#interceptMethods
+isErr: build/index.d.ts#isErr
+isNone: build/index.d.ts#isNone
+isOk: build/index.d.ts#isOk
+isSome: build/index.d.ts#isSome
+isValidKey: build/index.d.ts#isValidKey
+iterToMap: build/index.d.ts#toMap$1
+joining: build/index.d.ts#joining
+keyBetween: build/index.d.ts#keyBetween
+keysBetween: build/index.d.ts#keysBetween
+keysForDrop: build/index.d.ts#keysForDrop
+last: build/index.d.ts#last
+linkedHashMap: build/index.d.ts#linkedHashMap
+linkedList: build/index.d.ts#linkedList
+listOf: build/index.d.ts#listOf
+lruCache: build/index.d.ts#lruCache
+lruMap: build/index.d.ts#lruMap
+map: build/index.d.ts#map
+mapAsyncOption: build/index.d.ts#mapAsyncOption
+mapAsyncResult: build/index.d.ts#mapAsyncResult
+mapError: build/index.d.ts#mapError
+mapOf: build/index.d.ts#mapOf
+mapOption: build/index.d.ts#mapOption
+mapResult: build/index.d.ts#mapResult
+mapping: build/index.d.ts#mapping
+max: build/index.d.ts#max
+maxBy: build/index.d.ts#maxBy
+merge: build/index.d.ts#merge
+min: build/index.d.ts#min
+minBy: build/index.d.ts#minBy
+mutableListOf: build/index.d.ts#mutableListOf
+mutableMapOf: build/index.d.ts#mutableMapOf
+nCopies: build/index.d.ts#nCopies
+none: build/index.d.ts#none
+nullsFirst: build/index.d.ts#nullsFirst
+nullsLast: build/index.d.ts#nullsLast
+numberCompare: build/index.d.ts#numberCompare
+onWhen: build/index.d.ts#onWhen
+optionToResult: build/index.d.ts#optionToResult
+partition: build/index.d.ts#partition
+partitioningBy: build/index.d.ts#partitioningBy
+pipe: build/index.d.ts#pipe
+pipeline: build/index.d.ts#pipeline
+priorityQueue: build/index.d.ts#priorityQueue
+queueOf: build/index.d.ts#queueOf
+range: build/index.d.ts#range
+rangeTo: build/index.d.ts#rangeTo
+readWriteLock: build/index.d.ts#readWriteLock
+readonly: build/index.d.ts#readonly
+readonlyCollection: build/index.d.ts#readonlyCollection
+readonlyList: build/index.d.ts#readonlyList
+readonlyMap: build/index.d.ts#readonlyMap
+readonlyQueue: build/index.d.ts#readonlyQueue
+reduce: build/index.d.ts#reduce
+reducing: build/index.d.ts#reducing
+reducingWith: build/index.d.ts#reducingWith
+reentrantSynchronized: build/index.d.ts#reentrantSynchronized
+reportListenerError: build/index.d.ts#reportListenerError
+requireNonEmpty: build/index.d.ts#requireNonEmpty
+requireNonNull: build/index.d.ts#requireNonNull
+resultToOption: build/index.d.ts#resultToOption
+reverse: build/index.d.ts#reverse
+reverseArrayIterator: build/index.d.ts#reverseArrayIterator
+reversed: build/index.d.ts#reversed
+safe: build/index.d.ts#safe
+safeDeque: build/index.d.ts#safeDeque
+safeList: build/index.d.ts#safeList
+safeMap: build/index.d.ts#safeMap
+safeQueue: build/index.d.ts#safeQueue
+scan: build/index.d.ts#scan
+select: build/index.d.ts#select
+sequence: build/index.d.ts#sequence
+sequenceResults: build/index.d.ts#sequenceResults
+shallowEq: build/index.d.ts#shallowEq
+singletonList: build/index.d.ts#singletonList
+singletonMap: build/index.d.ts#singletonMap
+skip: build/index.d.ts#skip
+skipWhile: build/index.d.ts#skipWhile
+some: build/index.d.ts#some
+sort: build/index.d.ts#sort
+stringCompare: build/index.d.ts#stringCompare
+stringCompareIgnoreCase: build/index.d.ts#stringCompareIgnoreCase
+stringHashCode: build/index.d.ts#stringHashCode
+sum: build/index.d.ts#sum
+summarizingNumber: build/index.d.ts#summarizingNumber
+summaryTree: build/index.d.ts#summaryTree
+summingNumber: build/index.d.ts#summingNumber
+synchronized: build/index.d.ts#synchronized
+synchronizedCollection: build/index.d.ts#synchronizedCollection
+synchronizedList: build/index.d.ts#synchronizedList
+synchronizedMap: build/index.d.ts#synchronizedMap
+synchronizedSet: build/index.d.ts#synchronizedSet
+take: build/index.d.ts#take
+takeWhile: build/index.d.ts#takeWhile
+tap: build/index.d.ts#tap
+teeing: build/index.d.ts#teeing
+thenComparing: build/index.d.ts#thenComparing
+ticker: build/index.d.ts#ticker
+timeout: build/index.d.ts#timeout
+toArray: build/index.d.ts#toArray$1
+toList: build/index.d.ts#toList$1
+toMap: build/index.d.ts#toMap$2
+toNullable: build/index.d.ts#toNullable
+toSet: build/index.d.ts#toSet$1
+treeMap: build/index.d.ts#treeMap
+treeSet: build/index.d.ts#treeSet
+tryCatch: build/index.d.ts#tryCatch
+tryCatchAsync: build/index.d.ts#tryCatchAsync
+ttlCache: build/index.d.ts#ttlCache
+ttlCollection: build/index.d.ts#ttlCollection
+ttlMap: build/index.d.ts#ttlMap
+unbuffered: build/index.d.ts#unbuffered
+unmodifiableCollection: build/index.d.ts#unmodifiableCollection
+unmodifiableList: build/index.d.ts#unmodifiableList
+unmodifiableMap: build/index.d.ts#unmodifiableMap
+unwrap: build/index.d.ts#unwrap
+unwrapResult: build/index.d.ts#unwrapResult
+window: build/index.d.ts#window
+workerPool: build/index.d.ts#workerPool
+zip: build/index.d.ts#zip
+ambient: build/index.d.ts#declare module "../core/effects.js"
+
+## ./dag (build/dag/index.d.ts): 17 names
+
+type DAGExecutionOptions: build/dag/index.d.ts#DAGExecutionOptions
+type DAGNode: build/dag/index.d.ts#DAGNode
+type DAGResult: build/dag/index.d.ts#DAGResult
+type DependencyDAG: build/dag/index.d.ts#DependencyDAG
+type NodeProcessor: build/dag/index.d.ts#NodeProcessor
+type NodeResult: build/dag/index.d.ts#NodeResult
+buildLeveledDAG: build/dag/index.d.ts#buildLeveledDAG
+buildNodeMap: build/dag/index.d.ts#buildNodeMap
+createNode: build/dag/index.d.ts#createNode
+createProcessor: build/dag/index.d.ts#createProcessor
+executeDAG: build/dag/index.d.ts#executeDAG
+executeDAGSequential: build/dag/index.d.ts#executeDAGSequential
+filterDAGFromRoot: build/dag/index.d.ts#filterDAGFromRoot
+getAncestors: build/dag/index.d.ts#getAncestors
+getDescendants: build/dag/index.d.ts#getDescendants
+getTopologicalOrder: build/dag/index.d.ts#getTopologicalOrder
+visualizeDAG: build/dag/index.d.ts#visualizeDAG
+
+## ./graph (build/graph/index.d.ts): 2 names
+
+type WeightedEdge: build/graph/index.d.ts#WeightedEdge
+hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
+
+## ./testing (build/testing/index.d.ts): 6 names
+
+ContractViolation: build/testing/index.d.ts#ContractViolation
+deepEqual: build/testing/index.d.ts#deepEqual
+holds: build/testing/index.d.ts#holds
+rejects: build/testing/index.d.ts#rejects
+same: build/testing/index.d.ts#same
+show: build/testing/index.d.ts#show
+
+## Declarations
+
+### build/dag/index.d.ts#DAGExecutionOptions
+interface DAGExecutionOptions<TNode extends DAGNode = DAGNode> {
+  concurrency?: number;
+  failFast?: boolean;
+  onNodeStart?: (node: TNode) => void;
+  onNodeComplete?: (result: NodeResult<TNode>) => void;
+}
+
+### build/dag/index.d.ts#DAGNode
+interface DAGNode<TData = unknown> {
+  id: string;
+  dependencies: string[];
+  level?: number;
+  data?: TData | undefined;
+}
+
+### build/dag/index.d.ts#DAGResult
+interface DAGResult<TNode extends DAGNode = DAGNode> {
+  success: boolean;
+  results: Map<string, NodeResult<TNode>>;
+  failedNodes: string[];
+  totalDuration: number;
+}
+
+### build/dag/index.d.ts#DependencyDAG
+interface DependencyDAG<TNode extends DAGNode = DAGNode> {
+  nodes: Map<string, TNode>;
+  levels: TNode[][];
+  roots: string[];
+  leaves: string[];
+}
+
+### build/dag/index.d.ts#NodeProcessor
+type NodeProcessor<TNode extends DAGNode = DAGNode> = (node: TNode) => Promise<NodeResult<TNode>>;
+
+### build/dag/index.d.ts#NodeResult
+interface NodeResult<TNode extends DAGNode = DAGNode> {
+  node: TNode;
+  success: boolean;
+  error?: Error | undefined;
+  duration: number;
+  logs: string[];
+  output?: unknown | undefined;
+}
+
+### build/dag/index.d.ts#buildLeveledDAG
+export declare function buildLeveledDAG<TNode extends DAGNode>(nodes: Map<string, TNode>): DependencyDAG<TNode>;
+
+### build/dag/index.d.ts#buildNodeMap
+export declare function buildNodeMap<TNode extends DAGNode>(nodes: TNode[]): Map<string, TNode>;
+
+### build/dag/index.d.ts#createNode
+export declare function createNode<TData = unknown>(id: string, dependencies?: string[], data?: TData | undefined): DAGNode<TData>;
+
+### build/dag/index.d.ts#createProcessor
+export declare function createProcessor<TNode extends DAGNode>(fn: (node: TNode) => Promise<void>): (node: TNode) => Promise<NodeResult<TNode>>;
+
+### build/dag/index.d.ts#executeDAG
+export declare function executeDAG<TNode extends DAGNode>(dag: DependencyDAG<TNode>, processor: (node: TNode) => Promise<NodeResult<TNode>>, options?: DAGExecutionOptions<TNode>): Promise<DAGResult<TNode>>;
+
+### build/dag/index.d.ts#executeDAGSequential
+export declare function executeDAGSequential<TNode extends DAGNode>(dag: DependencyDAG<TNode>, processor: (node: TNode) => Promise<NodeResult<TNode>>, options?: Omit<DAGExecutionOptions<TNode>, "concurrency">): Promise<DAGResult<TNode>>;
+
+### build/dag/index.d.ts#filterDAGFromRoot
+export declare function filterDAGFromRoot<TNode extends DAGNode>(nodes: Map<string, TNode>, rootId: string): Map<string, TNode>;
+
+### build/dag/index.d.ts#getAncestors
+export declare function getAncestors<TNode extends DAGNode>(nodes: Map<string, TNode>, id: string): Set<string>;
+
+### build/dag/index.d.ts#getDescendants
+export declare function getDescendants<TNode extends DAGNode>(nodes: Map<string, TNode>, id: string): Set<string>;
+
+### build/dag/index.d.ts#getTopologicalOrder
+export declare function getTopologicalOrder<TNode extends DAGNode>(dag: DependencyDAG<TNode>): TNode[];
+
+### build/dag/index.d.ts#visualizeDAG
+export declare function visualizeDAG<TNode extends DAGNode>(dag: DependencyDAG<TNode>): string;
+
+### build/graph/index.d.ts#WeightedEdge
+interface WeightedEdge {
+  readonly a: number;
+  readonly b: number;
+  readonly weight?: number | undefined;
+}
+
+### build/graph/index.d.ts#hubBreadthFirstOrder
+export declare function hubBreadthFirstOrder(n: number, edges?: readonly WeightedEdge[], compare?: (i: number, j: number) => number): number[];
+
+### build/index.d.ts#ArrayConvertible
+export interface ArrayConvertible<T> {
+  toArray(): T[];
+}
+
+### build/index.d.ts#ArrayDeque
+export declare class ArrayDeque<T> implements Deque<T> {
+  constructor(options?: ArrayDequeOptions<T>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get eq(): Eq<T>;
+  addFirst(element: T): void;
+  offerFirst(element: T): boolean;
+  removeFirst(): T;
+  pollFirst(): T | undefined;
+  peekFirst(): T;
+  peekFirstOrUndefined(): T | undefined;
+  addLast(element: T): void;
+  offerLast(element: T): boolean;
+  removeLast(): T;
+  pollLast(): T | undefined;
+  peekLast(): T;
+  peekLastOrUndefined(): T | undefined;
+  push(element: T): void;
+  pop(): T;
+  offer(element: T): boolean;
+  poll(): T;
+  peek(): T;
+  peekOrUndefined(): T | undefined;
+  pollOrUndefined(): T | undefined;
+  enqueue(element: T): boolean;
+  dequeue(): T;
+  add(element: T): boolean;
+  addAll(other: Iterable<T>): boolean;
+  contains(element: T): boolean;
+  containsAll(other: Iterable<T>): boolean;
+  remove(element: T): boolean;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+  clear(): void;
+  [Symbol.iterator](): Iterator<T>;
+  forEach(action: (element: T, index: number) => void): void;
+  toArray(): T[];
+  get capacity(): number;
+  toString(): string;
+}
+
+### build/index.d.ts#ArrayDequeOptions
+export interface ArrayDequeOptions<T> {
+  initialCapacity?: number;
+  eq?: Eq<T>;
+}
+
+### build/index.d.ts#ArrayList
+export declare class ArrayList<T> implements List<T>, RandomAccess {
+  readonly supportsRandomAccess: true;
+  constructor(options?: ArrayListOptions<T>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get capacity(): number;
+  get eq(): Eq<T>;
+  get(index: number): T;
+  set(index: number, element: T): T;
+  contains(element: T): boolean;
+  indexOf(element: T, fromIndex?: number): number;
+  lastIndexOf(element: T, fromIndex?: number): number;
+  containsAll(other: Iterable<T>): boolean;
+  add(element: T): boolean;
+  push(element: T): void;
+  unshift(element: T): void;
+  insert(index: number, element: T): void;
+  insertAll(index: number, other: Iterable<T>): boolean;
+  addAll(other: Iterable<T>): boolean;
+  remove(element: T): boolean;
+  removeAt(index: number): T;
+  pop(): T;
+  shift(): T;
+  removeRange(fromIndex: number, toIndex: number): void;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+  clear(): void;
+  sort(compare?: Compare<T>): void;
+  reverse(): void;
+  first(): T;
+  last(): T;
+  subList(fromIndex: number, toIndex: number): List<T>;
+  [Symbol.iterator](): Iterator<T>;
+  forEach(action: (element: T, index: number) => void): void;
+  toArray(): T[];
+  ensureCapacity(minCapacity: number): void;
+  trimToSize(): void;
+}
+
+### build/index.d.ts#ArrayListOptions
+export interface ArrayListOptions<T> {
+  initialCapacity?: number;
+  eq?: Eq<T>;
+}
+
+### build/index.d.ts#Async
+export interface Async<T> {
+  [Symbol.asyncIterator](): AsyncIterator<T>;
+}
+
+### build/index.d.ts#AsyncEmitter
+export declare class AsyncEmitter<E extends EventMap> {
+  on<K extends keyof E>(event: K, listener: Listener<E[K]>): Unsubscribe;
+  emit<K extends keyof E>(event: K, payload: E[K]): Promise<void>;
+  off<K extends keyof E>(event?: K): void;
+  listenerCount<K extends keyof E>(event: K): number;
+  eventNames(): (keyof E)[];
+  dispose(): void;
+}
+
+### build/index.d.ts#AsyncOption
+export type AsyncOption<T> = Promise<Option<T>>;
+
+### build/index.d.ts#AsyncQueue
+export declare class AsyncQueue<T> implements AsyncQueue$1<T> {
+  constructor(options?: AsyncQueueOptions);
+  get size(): number;
+  get isEmpty(): boolean;
+  get isFull(): boolean;
+  get isClosed(): boolean;
+  get remainingCapacity(): number;
+  put(element: T, timeout?: number): Promise<void>;
+  take(timeout?: number): Promise<T>;
+  waitTake(onElement: (element: T) => void, onClosed: (error: Error) => void): () => boolean;
+  tryPut(element: T): boolean;
+  tryTake(): T | undefined;
+  peek(): Promise<T>;
+  tryPeek(): T | undefined;
+  close(): void;
+  drain(): T[];
+  [Symbol.asyncIterator](): AsyncIterator<T>;
+  getStats(): {
+    size: number;
+    capacity: number;
+    isEmpty: boolean;
+    isFull: boolean;
+    isClosed: boolean;
+    waitingPutters: number;
+    waitingTakers: number;
+    remainingCapacity: number;
+  };
+  toString(): string;
+}
+
+### build/index.d.ts#AsyncQueue$1
+interface AsyncQueue$1<T> extends AsyncIterable<T> {
+  readonly size: number;
+  readonly isEmpty: boolean;
+  put(element: T): Promise<void>;
+  take(): Promise<T>;
+  tryPut(element: T): boolean;
+  tryTake(): T | undefined;
+  peek(): Promise<T>;
+  close(): void;
+  readonly isClosed: boolean;
+}
+
+### build/index.d.ts#AsyncQueueOptions
+export interface AsyncQueueOptions {
+  capacity?: number;
+  timeout?: number;
+}
+
+### build/index.d.ts#AsyncResult
+export type AsyncResult<T, E> = Promise<Result<T, E>>;
+
+### build/index.d.ts#Asyncify
+export type Asyncify<C> = { [K in keyof C]: C[K] extends ((...args: infer Args) => infer R) ? (...args: Args) => Promise<R> : C[K]; };
+
+### build/index.d.ts#BiMap
+export interface BiMap<K, V> extends MapLike<K, V> {
+  inverse(): BiMap<V, K>;
+  getKey(value: V): K | undefined;
+  forcePut(key: K, value: V): V | undefined;
+}
+
+### build/index.d.ts#BlockingQueue
+interface BlockingQueue<T> extends Queue<T> {
+  put(element: T, timeoutMs?: number): Promise<void>;
+  take(timeoutMs?: number): Promise<T>;
+  readonly remainingCapacity: number;
+  drainTo(target: T[], maxElements?: number): number;
+}
+
+### build/index.d.ts#Bounded
+export interface Bounded {
+  readonly capacity: number;
+  readonly isFull: boolean;
+  readonly remainingCapacity: number;
+}
+
+### build/index.d.ts#BoundedCollection
+export interface BoundedCollection {
+  readonly capacity: number;
+  readonly isFull: boolean;
+  readonly remainingCapacity: number;
+}
+
+### build/index.d.ts#BoundedOptions
+interface BoundedOptions<T> {
+  capacity: number;
+  policy?: OverflowPolicy;
+  onOverflow?: OverflowHandler<T>;
+}
+
+### build/index.d.ts#Channel
+export declare class Channel<T> {
+  constructor(bufferSize?: number);
+  send(value: T): Promise<void>;
+  receive(): Promise<T>;
+  waitReceive(onValue: (value: T) => void, onClosed: (error: Error) => void): () => boolean;
+  trySend(value: T): boolean;
+  tryReceive(): T | undefined;
+  close(): void;
+  get isClosed(): boolean;
+  get size(): number;
+  case<R>(handler: (value: T) => R): SelectCase<R>;
+  [Symbol.asyncIterator](): AsyncIterator<T>;
+}
+
+### build/index.d.ts#CircularList
+export interface CircularList<T> extends List<T> {
+  readonly capacity: number;
+  readonly isFull: boolean;
+  readonly overwriteCount: number;
+}
+
+### build/index.d.ts#Clearable
+export interface Clearable {
+  clear(): void;
+}
+
+### build/index.d.ts#Cloneable
+export interface Cloneable<T> {
+  clone(): T;
+}
+
+### build/index.d.ts#Collection
+export interface Collection<T> extends ReadonlyCollection<T> {
+  add(element: T): boolean;
+  addAll(other: Iterable<T>): boolean;
+  remove(element: T): boolean;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+  clear(): void;
+}
+
+### build/index.d.ts#CollectionBuilder
+export declare abstract class CollectionBuilder<C> {
+  protected middleware: Middleware<C>[];
+  use(middleware: Middleware<C>): this;
+  abstract build(): C;
+}
+
+### build/index.d.ts#CollectionEvents
+export interface CollectionEvents<T> {
+  add: {
+    value: T;
+  };
+  remove: {
+    value: T;
+  };
+  clear: {};
+}
+
+### build/index.d.ts#Collector
+export interface Collector<T, A, R> {
+  supplier: () => A;
+  accumulator: (acc: A, element: T) => A;
+  combiner?: (acc1: A, acc2: A) => A;
+  finisher: (acc: A) => R;
+}
+
+### build/index.d.ts#CompactionPolicy
+export interface CompactionPolicy {
+  readonly minLoadFactor?: number;
+  readonly maxWastedSpace?: number;
+  readonly autoCompact?: boolean;
+}
+
+### build/index.d.ts#Compare
+export type Compare<T> = (a: T, b: T) => number;
+
+### build/index.d.ts#ComparisonProvider
+export interface ComparisonProvider<T> {
+  readonly compare: Compare<T>;
+}
+
+### build/index.d.ts#ConflictResolutionPolicy
+export type ConflictResolutionPolicy = "last-write-wins" | "first-write-wins" | "merge" | "throw";
+
+### build/index.d.ts#DEFAULT_CONFLICT_POLICY
+export declare const DEFAULT_CONFLICT_POLICY: ConflictResolutionPolicy;
+
+### build/index.d.ts#DEFAULT_EVICTION_POLICY
+export declare const DEFAULT_EVICTION_POLICY: EvictionPolicy;
+
+### build/index.d.ts#DEFAULT_GROWTH_POLICY
+export declare const DEFAULT_GROWTH_POLICY: GrowthPolicy;
+
+### build/index.d.ts#DEFAULT_OVERFLOW_POLICY
+export declare const DEFAULT_OVERFLOW_POLICY: OverflowPolicy;
+
+### build/index.d.ts#DEFAULT_RETRY_POLICY
+export declare const DEFAULT_RETRY_POLICY: RetryPolicy;
+
+### build/index.d.ts#DEFAULT_UNDERFLOW_POLICY
+export declare const DEFAULT_UNDERFLOW_POLICY: UnderflowPolicy;
+
+### build/index.d.ts#DEFAULT_VALIDATION_POLICY
+export declare const DEFAULT_VALIDATION_POLICY: ValidationPolicy;
+
+### build/index.d.ts#DelayQueue
+interface DelayQueue<T> extends BlockingQueue<T> {
+  offer(element: T, delayMs?: number): boolean;
+  readonly nextDelay: number;
+}
+
+### build/index.d.ts#Deque
+interface Deque<T> extends Queue<T> {
+  addFirst(element: T): void;
+  offerFirst(element: T): boolean;
+  removeFirst(): T;
+  pollFirst(): T | undefined;
+  peekFirst(): T;
+  peekFirstOrUndefined(): T | undefined;
+  addLast(element: T): void;
+  offerLast(element: T): boolean;
+  removeLast(): T;
+  pollLast(): T | undefined;
+  peekLast(): T;
+  peekLastOrUndefined(): T | undefined;
+  push(element: T): void;
+  pop(): T;
+}
+
+### build/index.d.ts#DequeEvents
+export interface DequeEvents<T> {
+  addFirst: {
+    value: T;
+  };
+  addLast: {
+    value: T;
+  };
+  removeFirst: {
+    value: T;
+  };
+  removeLast: {
+    value: T;
+  };
+  clear: {};
+}
+
+### build/index.d.ts#Disposable
+export interface Disposable {
+  dispose(): void;
+}
+
+### build/index.d.ts#ElementOf
+export type ElementOf<C> = C extends ReadonlyCollection<infer T> ? T : never;
+
+### build/index.d.ts#ElementType
+export type ElementType<C> = C extends {
+  [Symbol.iterator](): Iterator<infer T>;
+} ? T : C extends {
+  get(index: number): infer T;
+} ? T : C extends {
+  peek(): infer T;
+} ? T : never;
+
+### build/index.d.ts#Emitter
+export declare class Emitter<E extends EventMap> {
+  on<K extends keyof E>(event: K, listener: Listener<E[K]>): Unsubscribe;
+  once<K extends keyof E>(event: K, listener: Listener<E[K]>): Unsubscribe;
+  emit<K extends keyof E>(event: K, payload: E[K]): void;
+  off<K extends keyof E>(event?: K): void;
+  listenerCount<K extends keyof E>(event: K): number;
+  eventNames(): (keyof E)[];
+  hasListeners<K extends keyof E>(event: K): boolean;
+  dispose(): void;
+}
+
+### build/index.d.ts#Emptiable
+export interface Emptiable {
+  readonly isEmpty: boolean;
+}
+
+### build/index.d.ts#Entry
+export interface Entry<K, V> {
+  readonly key: K;
+  readonly value: V;
+}
+
+### build/index.d.ts#Eq
+export type Eq<T> = (a: T, b: T) => boolean;
+
+### build/index.d.ts#EqualityProvider
+export interface EqualityProvider<T> {
+  readonly eq: Eq<T>;
+}
+
+### build/index.d.ts#Err
+export interface Err<E> {
+  readonly _tag: "Err";
+  readonly error: E;
+}
+export declare const Err: <E>(error: E) => Err<E>;
+
+### build/index.d.ts#EventBatcher
+export declare class EventBatcher<E extends EventMap, K extends keyof E> {
+  constructor(emitter: Emitter<E & { [P in `batch-${K & string}`]: E[K][]; }>, event: K, delayMs: number);
+  queue(payload: E[K]): void;
+  flush(): void;
+  dispose(): void;
+}
+
+### build/index.d.ts#EventMap
+export type EventMap = Record<string, any>;
+
+### build/index.d.ts#Evented
+export interface Evented<E extends Record<string, any>> {
+  on<K extends keyof E>(event: K, handler: (payload: E[K]) => void): () => void;
+}
+
+### build/index.d.ts#EvictionCandidate
+export interface EvictionCandidate<T> {
+  readonly element: T;
+  readonly metadata: EvictionMetadata;
+}
+
+### build/index.d.ts#EvictionMetadata
+export interface EvictionMetadata {
+  readonly insertedAt: number;
+  lastAccessedAt: number;
+  accessCount: number;
+  readonly expiresAt?: number;
+  readonly priority?: number;
+}
+
+### build/index.d.ts#EvictionPolicy
+export type EvictionPolicy = "lru" | "lfu" | "fifo" | "lifo" | "random" | "ttl" | "priority" | "custom";
+
+### build/index.d.ts#EvictionSelector
+export type EvictionSelector<T> = (candidates: EvictionCandidate<T>[]) => T | undefined;
+
+### build/index.d.ts#Freezable
+export interface Freezable<T> {
+  freeze(): T;
+  readonly isFrozen: boolean;
+}
+
+### build/index.d.ts#GrowthPolicy
+export interface GrowthPolicy {
+  readonly strategy: "double" | "linear" | "golden-ratio" | "custom";
+  readonly linearIncrement?: number;
+  readonly customGrowth?: (currentCapacity: number) => number;
+  readonly maxCapacity?: number;
+}
+
+### build/index.d.ts#Hash
+export type Hash<T> = (value: T) => number;
+
+### build/index.d.ts#HashMap
+export declare class HashMap<K, V> implements MapLike<K, V> {
+  constructor(options?: HashMapOptions<K, V>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get keyEq(): Eq<K>;
+  get valueEq(): Eq<V>;
+  has(key: K): boolean;
+  get(key: K): V;
+  getOrUndefined(key: K): V | undefined;
+  getOrDefault(key: K, defaultValue: V): V;
+  containsValue(value: V): boolean;
+  set(key: K, value: V): V | undefined;
+  setIfAbsent(key: K, value: V): V;
+  delete(key: K): V | undefined;
+  deleteEntry(key: K, value: V): boolean;
+  replace(key: K, value: V): V | undefined;
+  replaceEntry(key: K, oldValue: V, newValue: V): boolean;
+  computeIfAbsent(key: K, mappingFunction: (key: K) => V): V;
+  computeIfPresent(key: K, remappingFunction: (key: K, value: V) => V | undefined): V | undefined;
+  compute(key: K, remappingFunction: (key: K, value: V | undefined) => V | undefined): V | undefined;
+  merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V) => V | undefined): V | undefined;
+  putAll(other: MapLike<K, V> | Iterable<Entry<K, V>>): void;
+  clear(): void;
+  keys(): IterableIterator<K>;
+  values(): IterableIterator<V>;
+  entries(): IterableIterator<Entry<K, V>>;
+  [Symbol.iterator](): Iterator<Entry<K, V>>;
+  forEach(action: (value: V, key: K, map: this) => void): void;
+  get capacity(): number;
+  get loadFactor(): number;
+  getStats(): {
+    size: number;
+    capacity: number;
+    loadFactor: number;
+    avgChainLength: number;
+    maxChainLength: number;
+    emptyBuckets: number;
+  };
+}
+
+### build/index.d.ts#HashMapOptions
+export interface HashMapOptions<K, V> {
+  initialCapacity?: number;
+  loadFactor?: number;
+  keyEq?: Eq<K>;
+  keyHash?: Hash<K>;
+  valueEq?: Eq<V>;
+}
+
+### build/index.d.ts#HashProvider
+export interface HashProvider<T> {
+  readonly hash: Hash<T>;
+}
+
+### build/index.d.ts#HashSet
+export declare class HashSet<T> implements Set$1<T> {
+  constructor(options?: HashSetOptions<T>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get eq(): Eq<T>;
+  add(element: T): boolean;
+  remove(element: T): boolean;
+  contains(element: T): boolean;
+  addAll(other: Iterable<T>): boolean;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+  containsAll(other: Iterable<T>): boolean;
+  clear(): void;
+  union(other: Iterable<T>): HashSet<T>;
+  intersection(other: Iterable<T>): HashSet<T>;
+  difference(other: Iterable<T>): HashSet<T>;
+  symmetricDifference(other: Iterable<T>): HashSet<T>;
+  isSubsetOf(other: Iterable<T>): boolean;
+  isSupersetOf(other: Iterable<T>): boolean;
+  isDisjointFrom(other: Iterable<T>): boolean;
+  [Symbol.iterator](): Iterator<T>;
+  forEach(action: (element: T, index: number) => void): void;
+  toArray(): T[];
+  clone(): HashSet<T>;
+  getStats(): ReturnType<HashMap<T, symbol>["getStats"]>;
+  toString(): string;
+}
+
+### build/index.d.ts#HashSetOptions
+export interface HashSetOptions<T> {
+  initialCapacity?: number;
+  loadFactor?: number;
+  eq?: Eq<T>;
+  hash?: Hash<T>;
+}
+
+### build/index.d.ts#IsReadonly
+export type IsReadonly<C> = C extends ReadonlyCollection<any> ? C extends Collection<any> ? false : true : false;
+
+### build/index.d.ts#KEY_DIGITS
+export declare const KEY_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+### build/index.d.ts#KeyCheckOptions
+interface KeyCheckOptions {
+  readonly maxLength?: number;
+}
+
+### build/index.d.ts#KeyedItem
+interface KeyedItem {
+  readonly id: string;
+  readonly key: string;
+}
+
+### build/index.d.ts#LRUCache
+export declare class LRUCache<K, V> {
+  constructor(capacity: number, onEvict?: (key: K, value: V) => void);
+  get size(): number;
+  get isFull(): boolean;
+  get(key: K): V | undefined;
+  set(key: K, value: V): void;
+  has(key: K): boolean;
+  delete(key: K): boolean;
+  clear(): void;
+  keys(): IterableIterator<K>;
+  entries(): IterableIterator<[K, V]>;
+}
+
+### build/index.d.ts#LRUOptions
+export interface LRUOptions {
+  capacity: number;
+  onEvict?: (info: {
+    key: any;
+    value: any;
+    timestamp: number;
+  }) => void;
+}
+
+### build/index.d.ts#LinkedHashMap
+export declare class LinkedHashMap<K, V> implements MapLike<K, V> {
+  constructor(options?: LinkedHashMapOptions<K, V>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get eq(): Eq<K>;
+  get keyEq(): Eq<K>;
+  get valueEq(): Eq<V>;
+  get hash(): Hash<K>;
+  has(key: K): boolean;
+  containsKey(key: K): boolean;
+  containsValue(value: V): boolean;
+  get(key: K): V;
+  getOrUndefined(key: K): V | undefined;
+  getOrDefault(key: K, defaultValue: V): V;
+  set(key: K, value: V): V | undefined;
+  setIfAbsent(key: K, value: V): V;
+  replace(key: K, value: V): V | undefined;
+  replaceEntry(key: K, oldValue: V, newValue: V): boolean;
+  delete(key: K): V | undefined;
+  deleteEntry(key: K, value: V): boolean;
+  clear(): void;
+  putAll(other: MapLike<K, V> | Iterable<Entry<K, V>>): void;
+  computeIfAbsent(key: K, mappingFunction: (key: K) => V): V;
+  computeIfPresent(key: K, remappingFunction: (key: K, value: V) => V | undefined): V | undefined;
+  compute(key: K, remappingFunction: (key: K, value: V | undefined) => V | undefined): V | undefined;
+  merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V) => V | undefined): V | undefined;
+  keys(): IterableIterator<K>;
+  values(): IterableIterator<V>;
+  entries(): IterableIterator<Entry<K, V>>;
+  [Symbol.iterator](): Iterator<Entry<K, V>>;
+  forEach(action: (value: V, key: K, map: this) => void): void;
+  toArray(): Entry<K, V>[];
+  toString(): string;
+}
+
+### build/index.d.ts#LinkedHashMapOptions
+export interface LinkedHashMapOptions<K, V> {
+  initialCapacity?: number;
+  loadFactor?: number;
+  eq?: Eq<K>;
+  hash?: Hash<K>;
+  valueEq?: Eq<V>;
+  accessOrder?: boolean;
+}
+
+### build/index.d.ts#LinkedList
+export declare class LinkedList<T> implements List<T>, Deque<T> {
+  constructor(options?: LinkedListOptions<T>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get eq(): Eq<T>;
+  addFirst(element: T): void;
+  addLast(element: T): void;
+  removeFirst(): T;
+  removeLast(): T;
+  pollFirst(): T | undefined;
+  pollLast(): T | undefined;
+  peekFirst(): T;
+  peekLast(): T;
+  peekFirstOrUndefined(): T | undefined;
+  peekLastOrUndefined(): T | undefined;
+  offerFirst(element: T): boolean;
+  offerLast(element: T): boolean;
+  push(element: T): void;
+  pop(): T;
+  offer(element: T): boolean;
+  poll(): T;
+  peek(): T;
+  peekOrUndefined(): T | undefined;
+  pollOrUndefined(): T | undefined;
+  enqueue(element: T): boolean;
+  dequeue(): T;
+  get(index: number): T;
+  set(index: number, element: T): T;
+  insert(index: number, element: T): void;
+  insertAll(index: number, other: Iterable<T>): boolean;
+  removeAt(index: number): T;
+  removeRange(fromIndex: number, toIndex: number): void;
+  indexOf(element: T, fromIndex?: number): number;
+  lastIndexOf(element: T, fromIndex?: number): number;
+  first(): T;
+  last(): T;
+  shift(): T;
+  unshift(element: T): void;
+  add(element: T): boolean;
+  addAll(other: Iterable<T>): boolean;
+  contains(element: T): boolean;
+  containsAll(other: Iterable<T>): boolean;
+  remove(element: T): boolean;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+  clear(): void;
+  sort(compare?: Compare<T>): void;
+  reverse(): void;
+  subList(fromIndex: number, toIndex: number): List<T>;
+  [Symbol.iterator](): Iterator<T>;
+  forEach(action: (element: T, index: number) => void): void;
+  toArray(): T[];
+  toString(): string;
+}
+
+### build/index.d.ts#LinkedListOptions
+export interface LinkedListOptions<T> {
+  eq?: Eq<T>;
+}
+
+### build/index.d.ts#List
+export interface List<T> extends ReadonlyList<T>, Collection<T> {
+  set(index: number, element: T): T;
+  insert(index: number, element: T): void;
+  insertAll(index: number, other: Iterable<T>): boolean;
+  removeAt(index: number): T;
+  removeRange(fromIndex: number, toIndex: number): void;
+  sort(compare?: Compare<T>): void;
+  reverse(): void;
+  subList(fromIndex: number, toIndex: number): List<T>;
+  push(element: T): void;
+  pop(): T;
+  shift(): T;
+  unshift(element: T): void;
+}
+
+### build/index.d.ts#ListEvents
+export interface ListEvents<T> {
+  add: {
+    value: T;
+    index?: number;
+  };
+  remove: {
+    value: T;
+    index?: number;
+  };
+  set: {
+    oldValue: T;
+    newValue: T;
+    index: number;
+  };
+  clear: {};
+  sort: {};
+  reverse: {};
+}
+
+### build/index.d.ts#Listener
+export type Listener<P> = (payload: P) => void;
+
+### build/index.d.ts#ListenerErrorHandler
+type ListenerErrorHandler = (error: unknown) => void;
+
+### build/index.d.ts#MapEvents
+export interface MapEvents<K, V> {
+  set: {
+    key: K;
+    value: V;
+    oldValue?: V;
+  };
+  delete: {
+    key: K;
+    value: V;
+  };
+  clear: {};
+}
+
+### build/index.d.ts#MapLike
+export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
+  set(key: K, value: V): V | undefined;
+  setIfAbsent(key: K, value: V): V;
+  delete(key: K): V | undefined;
+  deleteEntry(key: K, value: V): boolean;
+  replace(key: K, value: V): V | undefined;
+  replaceEntry(key: K, oldValue: V, newValue: V): boolean;
+  computeIfAbsent(key: K, mappingFunction: (key: K) => V): V;
+  computeIfPresent(key: K, remappingFunction: (key: K, value: V) => V | undefined): V | undefined;
+  compute(key: K, remappingFunction: (key: K, value: V | undefined) => V | undefined): V | undefined;
+  merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V) => V | undefined): V | undefined;
+  putAll(other: ReadonlyMapLike<K, V> | Iterable<Entry<K, V>>): void;
+  clear(): void;
+}
+
+### build/index.d.ts#MergeFunction
+export type MergeFunction<T> = (current: T, incoming: T) => T;
+
+### build/index.d.ts#Middleware
+export type Middleware<In = any, Out extends In = In> = (next: In) => Out;
+
+### build/index.d.ts#MultiMap
+export interface MultiMap<K, V> {
+  readonly size: number;
+  readonly isEmpty: boolean;
+  has(key: K): boolean;
+  get(key: K): ReadonlyCollection<V>;
+  put(key: K, value: V): boolean;
+  putAll(key: K, values: Iterable<V>): boolean;
+  remove(key: K, value: V): boolean;
+  removeAll(key: K): ReadonlyCollection<V>;
+  replaceAll(key: K, values: Iterable<V>): ReadonlyCollection<V>;
+  keys(): Iterable<K>;
+  entries(): Iterable<Entry<K, V>>;
+  clear(): void;
+}
+
+### build/index.d.ts#MutableCollectionBase
+export interface MutableCollectionBase<T> extends ReadonlyCollectionBase<T>, Clearable {}
+
+### build/index.d.ts#NavigableMap
+export interface NavigableMap<K, V> extends SortedMap<K, V> {
+  floorKey(key: K): K | undefined;
+  ceilingKey(key: K): K | undefined;
+  lowerKey(key: K): K | undefined;
+  higherKey(key: K): K | undefined;
+  floorEntry(key: K): Entry<K, V> | undefined;
+  ceilingEntry(key: K): Entry<K, V> | undefined;
+  lowerEntry(key: K): Entry<K, V> | undefined;
+  higherEntry(key: K): Entry<K, V> | undefined;
+  firstEntry(): Entry<K, V> | undefined;
+  lastEntry(): Entry<K, V> | undefined;
+  pollFirstEntry(): Entry<K, V> | undefined;
+  pollLastEntry(): Entry<K, V> | undefined;
+  descendingMap(): NavigableMap<K, V>;
+  descendingKeys(): Iterable<K>;
+}
+
+### build/index.d.ts#NavigableSet
+export interface NavigableSet<T> extends SortedSet<T> {
+  floor(element: T): T | undefined;
+  ceiling(element: T): T | undefined;
+  lower(element: T): T | undefined;
+  higher(element: T): T | undefined;
+  pollFirst(): T | undefined;
+  pollLast(): T | undefined;
+  descendingSet(): NavigableSet<T>;
+  descendingIterator(): Iterator<T>;
+}
+
+### build/index.d.ts#None
+export interface None {
+  readonly _tag: "None";
+}
+export declare const None: None;
+
+### build/index.d.ts#Ok
+export interface Ok<T> {
+  readonly _tag: "Ok";
+  readonly value: T;
+}
+export declare const Ok: <T>(value: T) => Ok<T>;
+
+### build/index.d.ts#Option
+export type Option<T> = None | Some<T>;
+
+### build/index.d.ts#OverflowContext
+export interface OverflowContext<T> {
+  readonly newElement: T;
+  readonly currentSize: number;
+  readonly capacity: number;
+  readonly timestamp: number;
+}
+
+### build/index.d.ts#OverflowHandler
+export type OverflowHandler<T> = (context: OverflowContext<T>) => void;
+
+### build/index.d.ts#OverflowPolicy
+export type OverflowPolicy = "throw" | "drop-oldest" | "drop-newest" | "reject" | "grow" | "block";
+
+### build/index.d.ts#Point
+interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
+### build/index.d.ts#PriorityQueue
+interface PriorityQueue<T> extends Queue<T> {
+  readonly compare: Compare<T>;
+  readonly comparator: Compare<T> | undefined;
+}
+
+### build/index.d.ts#PriorityQueue$1
+declare class PriorityQueue$1<T> implements PriorityQueue<T> {
+  constructor(options?: PriorityQueueOptions<T>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get eq(): Eq<T>;
+  get compare(): Compare<T>;
+  get comparator(): Compare<T>;
+  offer(element: T): boolean;
+  poll(): T;
+  pollOrUndefined(): T | undefined;
+  peek(): T;
+  peekOrUndefined(): T | undefined;
+  enqueue(element: T): boolean;
+  dequeue(): T;
+  add(element: T): boolean;
+  addAll(other: Iterable<T>): boolean;
+  contains(element: T): boolean;
+  containsAll(other: Iterable<T>): boolean;
+  remove(element: T): boolean;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+  clear(): void;
+  [Symbol.iterator](): Iterator<T>;
+  forEach(action: (element: T, index: number) => void): void;
+  toArray(): T[];
+  toSortedArray(): T[];
+  clone(): PriorityQueue$1<T>;
+  validate(): boolean;
+  toString(): string;
+}
+
+### build/index.d.ts#PriorityQueueOptions
+export interface PriorityQueueOptions<T> {
+  initialCapacity?: number;
+  compare?: Compare<T>;
+  eq?: Eq<T>;
+}
+
+### build/index.d.ts#Queue
+interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
+  offer(element: T): boolean;
+  poll(): T;
+  pollOrUndefined(): T | undefined;
+  enqueue(element: T): boolean;
+  dequeue(): T;
+}
+
+### build/index.d.ts#QueueEvents
+export interface QueueEvents<T> {
+  enqueue: {
+    value: T;
+  };
+  dequeue: {
+    value: T;
+  };
+  clear: {};
+}
+
+### build/index.d.ts#RandomAccess
+export interface RandomAccess {
+  readonly supportsRandomAccess: true;
+}
+
+### build/index.d.ts#Readonly
+export type Readonly<C extends Collection<any>> = C extends Collection<infer T> ? ReadonlyCollection<T> : never;
+
+### build/index.d.ts#ReadonlyCollection
+export interface ReadonlyCollection<T> extends Iterable<T> {
+  readonly size: number;
+  readonly isEmpty: boolean;
+  contains(element: T): boolean;
+  containsAll(other: Iterable<T>): boolean;
+  toArray(): T[];
+  forEach(action: (element: T, index: number) => void): void;
+  readonly eq: Eq<T>;
+}
+
+### build/index.d.ts#ReadonlyCollectionBase
+export interface ReadonlyCollectionBase<T> extends Sized, Emptiable, Iterable<T>, ArrayConvertible<T> {}
+
+### build/index.d.ts#ReadonlyList
+export interface ReadonlyList<T> extends ReadonlyCollection<T> {
+  get(index: number): T;
+  indexOf(element: T, fromIndex?: number): number;
+  lastIndexOf(element: T, fromIndex?: number): number;
+  subList(fromIndex: number, toIndex: number): ReadonlyList<T>;
+  first(): T;
+  last(): T;
+}
+
+### build/index.d.ts#ReadonlyMapLike
+export interface ReadonlyMapLike<K, V> extends Iterable<Entry<K, V>> {
+  readonly size: number;
+  readonly isEmpty: boolean;
+  has(key: K): boolean;
+  get(key: K): V;
+  getOrUndefined(key: K): V | undefined;
+  getOrDefault(key: K, defaultValue: V): V;
+  containsValue(value: V): boolean;
+  keys(): Iterable<K>;
+  values(): Iterable<V>;
+  entries(): Iterable<Entry<K, V>>;
+  forEach(action: (value: V, key: K, map: this) => void): void;
+  readonly keyEq: Eq<K>;
+  readonly valueEq: Eq<V>;
+}
+
+### build/index.d.ts#ReadonlyOptions
+export interface ReadonlyOptions {
+  errorMessage?: string;
+}
+
+### build/index.d.ts#ReadonlyQueue
+interface ReadonlyQueue<T> extends ReadonlyCollection<T> {
+  peek(): T;
+  peekOrUndefined(): T | undefined;
+}
+
+### build/index.d.ts#ReadonlySet
+export interface ReadonlySet<T> extends ReadonlyCollection<T> {
+  contains(element: T): boolean;
+  containsAll(other: Iterable<T>): boolean;
+}
+
+### build/index.d.ts#Result
+export type Result<T, E> = Ok<T> | Err<E>;
+
+### build/index.d.ts#RetryContext
+export interface RetryContext {
+  readonly attempt: number;
+  readonly error: unknown;
+  readonly elapsedMs: number;
+}
+
+### build/index.d.ts#RetryPolicy
+export interface RetryPolicy {
+  readonly maxAttempts: number;
+  readonly initialDelay: number;
+  readonly backoff: "none" | "linear" | "exponential";
+  readonly maxDelay?: number;
+  readonly jitter?: boolean;
+}
+
+### build/index.d.ts#RetryPredicate
+export type RetryPredicate = (context: RetryContext) => boolean;
+
+### build/index.d.ts#SafeCollection
+export interface SafeCollection {
+  readonly safe: unknown;
+}
+
+### build/index.d.ts#SafeDequeOperations
+export interface SafeDequeOperations<T> extends SafeQueueOperations<T> {
+  peekFirst(): Option<T>;
+  peekLast(): Option<T>;
+  pollFirst(): Option<T>;
+  pollLast(): Option<T>;
+  pop(): Option<T>;
+}
+
+### build/index.d.ts#SafeListOperations
+export interface SafeListOperations<T> {
+  get(index: number): Option<T>;
+  set(index: number, element: T): Result<T, string>;
+  removeAt(index: number): Result<T, string>;
+  first(): Option<T>;
+  last(): Option<T>;
+  pop(): Option<T>;
+  shift(): Option<T>;
+}
+
+### build/index.d.ts#SafeMapOperations
+export interface SafeMapOperations<K, V> {
+  get(key: K): Option<V>;
+  set(key: K, value: V): Result<V | undefined, string>;
+  delete(key: K): Result<V | undefined, string>;
+}
+
+### build/index.d.ts#SafeQueueOperations
+export interface SafeQueueOperations<T> {
+  peek(): Option<T>;
+  poll(): Option<T>;
+  dequeue(): Option<T>;
+}
+
+### build/index.d.ts#SelectCase
+export interface SelectCase<R> {
+  channel: Channel<any>;
+  handler: (value: any) => R;
+  tryReceive: () => any;
+  receive: () => Promise<any>;
+  wait?: (onValue: (value: any) => void, onClosed: (error: Error) => void) => () => boolean;
+}
+
+### build/index.d.ts#Set$1
+interface Set$1<T> extends ReadonlySet<T>, Collection<T> {
+  add(element: T): boolean;
+  remove(element: T): boolean;
+  addAll(other: Iterable<T>): boolean;
+  removeAll(other: Iterable<T>): boolean;
+  retainAll(other: Iterable<T>): boolean;
+}
+
+### build/index.d.ts#Settled
+export type Settled<T> = {
+  readonly index: number;
+} & PromiseSettledResult<T>;
+
+### build/index.d.ts#Sized
+export interface Sized {
+  readonly size: number;
+}
+
+### build/index.d.ts#Some
+export interface Some<T> {
+  readonly _tag: "Some";
+  readonly value: T;
+}
+export declare const Some: <T>(value: T) => Some<T>;
+
+### build/index.d.ts#SortedMap
+export interface SortedMap<K, V> extends MapLike<K, V> {
+  readonly comparator: Compare<K>;
+  firstKey(): K;
+  lastKey(): K;
+  headMap(toKey: K): SortedMap<K, V>;
+  tailMap(fromKey: K): SortedMap<K, V>;
+  subMap(fromKey: K, toKey: K): SortedMap<K, V>;
+}
+
+### build/index.d.ts#SortedSet
+export interface SortedSet<T> extends Set$1<T> {
+  readonly comparator: Compare<T>;
+  first(): T;
+  last(): T;
+  headSet(toElement: T): SortedSet<T>;
+  tailSet(fromElement: T): SortedSet<T>;
+  subSet(fromElement: T, toElement: T): SortedSet<T>;
+}
+
+### build/index.d.ts#Stack
+export interface Stack<T> extends Iterable<T> {
+  readonly size: number;
+  readonly isEmpty: boolean;
+  push(element: T): void;
+  pop(): T;
+  peek(): T;
+  clear(): void;
+  search(element: T): number;
+}
+
+### build/index.d.ts#StorageListeners
+export declare class StorageListeners<E> {
+  constructor(onError?: ListenerErrorHandler);
+  get size(): number;
+  add(listener: (event: E) => void): () => void;
+  emit(event: E): void;
+  clear(): void;
+}
+
+### build/index.d.ts#SummaryLocation
+interface SummaryLocation<Leaf> {
+  readonly index: number;
+  readonly leaf: Leaf;
+  readonly offset: number;
+}
+
+### build/index.d.ts#SummaryMonoid
+interface SummaryMonoid<Summary> {
+  readonly empty: Summary;
+  readonly combine: (left: Summary, right: Summary) => Summary;
+}
+
+### build/index.d.ts#SummarySearch
+interface SummarySearch<Leaf, Summary> {
+  readonly index: number;
+  readonly leaf: Leaf;
+  readonly before: Summary;
+  readonly through: Summary;
+}
+
+### build/index.d.ts#SummarySpec
+interface SummarySpec<Leaf, Summary> {
+  readonly monoid: SummaryMonoid<Summary>;
+  readonly measure: (leaf: Leaf) => Summary;
+  readonly merge?: (left: Leaf, right: Leaf) => Leaf | undefined;
+}
+
+### build/index.d.ts#SummaryStatistics
+export interface SummaryStatistics {
+  count: number;
+  sum: number;
+  min: number;
+  max: number;
+  average: number;
+}
+
+### build/index.d.ts#SummaryTree
+export declare class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
+  private constructor();
+  static of<Leaf, Summary>(spec: SummarySpec<Leaf, Summary>, leaves?: Iterable<Leaf>): SummaryTree<Leaf, Summary>;
+  get spec(): SummarySpec<Leaf, Summary>;
+  get size(): number;
+  get isEmpty(): boolean;
+  get summary(): Summary;
+  get height(): number;
+  at(index: number): Leaf | undefined;
+  summaryOf(start?: number, end?: number): Summary;
+  concat(other: SummaryTree<Leaf, Summary> | Iterable<Leaf>): SummaryTree<Leaf, Summary>;
+  splitAt(index: number): [SummaryTree<Leaf, Summary>, SummaryTree<Leaf, Summary>];
+  split(predicate: (prefix: Summary) => boolean): [SummaryTree<Leaf, Summary>, SummaryTree<Leaf, Summary>];
+  search(predicate: (prefix: Summary) => boolean): SummarySearch<Leaf, Summary> | undefined;
+  locate(key: (summary: Summary) => number, target: number): SummaryLocation<Leaf> | undefined;
+  slice(start?: number, end?: number): SummaryTree<Leaf, Summary>;
+  splice(start: number, deleteCount?: number, inserted?: SummaryTree<Leaf, Summary> | Iterable<Leaf>): SummaryTree<Leaf, Summary>;
+  insert(index: number, inserted: SummaryTree<Leaf, Summary> | Iterable<Leaf>): SummaryTree<Leaf, Summary>;
+  remove(start: number, end?: number): SummaryTree<Leaf, Summary>;
+  set(index: number, leaf: Leaf): SummaryTree<Leaf, Summary>;
+  append(...leaves: Leaf[]): SummaryTree<Leaf, Summary>;
+  prepend(...leaves: Leaf[]): SummaryTree<Leaf, Summary>;
+  [Symbol.iterator](): Iterator<Leaf>;
+  toArray(): Leaf[];
+}
+
+### build/index.d.ts#TTLCache
+export declare class TTLCache<K, V> {
+  constructor(ttl: number, checkInterval?: number, onExpire?: (key: K, value: V) => void);
+  get size(): number;
+  get(key: K): V | undefined;
+  set(key: K, value: V, customTTL?: number): void;
+  has(key: K): boolean;
+  delete(key: K): boolean;
+  clear(): void;
+  cleanup(): void;
+  getTTL(key: K): number | undefined;
+  touch(key: K, customTTL?: number): boolean;
+  dispose(): void;
+  keys(): IterableIterator<K>;
+  values(): IterableIterator<V>;
+  entries(): IterableIterator<[K, V]>;
+}
+
+### build/index.d.ts#TTLOptions
+export interface TTLOptions {
+  ttl: number;
+  checkInterval?: number;
+  onExpire?: (info: {
+    key: any;
+    value: any;
+    createdAt: number;
+    expiredAt: number;
+  }) => void;
+}
+
+### build/index.d.ts#TransferQueue
+interface TransferQueue<T> extends BlockingQueue<T> {
+  transfer(element: T): Promise<void>;
+  tryTransfer(element: T, timeoutMs?: number): Promise<boolean>;
+  readonly hasWaitingConsumer: boolean;
+  readonly waitingConsumerCount: number;
+}
+
+### build/index.d.ts#TreeMap
+export declare class TreeMap<K, V> implements NavigableMap<K, V> {
+  constructor(options?: TreeMapOptions<K, V>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get comparator(): Compare<K>;
+  get keyEq(): Eq<K>;
+  get valueEq(): Eq<V>;
+  has(key: K): boolean;
+  containsKey(key: K): boolean;
+  containsValue(value: V): boolean;
+  get(key: K): V;
+  getOrUndefined(key: K): V | undefined;
+  getOrDefault(key: K, defaultValue: V): V;
+  set(key: K, value: V): V | undefined;
+  setIfAbsent(key: K, value: V): V;
+  replace(key: K, value: V): V | undefined;
+  replaceEntry(key: K, oldValue: V, newValue: V): boolean;
+  delete(key: K): V | undefined;
+  deleteEntry(key: K, value: V): boolean;
+  clear(): void;
+  putAll(other: NavigableMap<K, V> | Iterable<Entry<K, V>>): void;
+  computeIfAbsent(key: K, mappingFunction: (key: K) => V): V;
+  computeIfPresent(key: K, remappingFunction: (key: K, value: V) => V | undefined): V | undefined;
+  compute(key: K, remappingFunction: (key: K, value: V | undefined) => V | undefined): V | undefined;
+  merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V) => V | undefined): V | undefined;
+  firstKey(): K;
+  lastKey(): K;
+  headMap(toKey: K): SortedMap<K, V>;
+  tailMap(fromKey: K): SortedMap<K, V>;
+  subMap(fromKey: K, toKey: K): SortedMap<K, V>;
+  floorKey(key: K): K | undefined;
+  ceilingKey(key: K): K | undefined;
+  lowerKey(key: K): K | undefined;
+  higherKey(key: K): K | undefined;
+  floorEntry(key: K): Entry<K, V> | undefined;
+  ceilingEntry(key: K): Entry<K, V> | undefined;
+  lowerEntry(key: K): Entry<K, V> | undefined;
+  higherEntry(key: K): Entry<K, V> | undefined;
+  firstEntry(): Entry<K, V> | undefined;
+  lastEntry(): Entry<K, V> | undefined;
+  pollFirstEntry(): Entry<K, V> | undefined;
+  pollLastEntry(): Entry<K, V> | undefined;
+  descendingMap(): NavigableMap<K, V>;
+  descendingKeys(): IterableIterator<K>;
+  keys(): IterableIterator<K>;
+  values(): IterableIterator<V>;
+  entries(): IterableIterator<Entry<K, V>>;
+  [Symbol.iterator](): Iterator<Entry<K, V>>;
+  forEach(action: (value: V, key: K, map: this) => void): void;
+  toArray(): Entry<K, V>[];
+  toString(): string;
+}
+
+### build/index.d.ts#TreeMapOptions
+export interface TreeMapOptions<K, V> {
+  compare?: Compare<K>;
+  eq?: Eq<K>;
+  valueEq?: Eq<V>;
+}
+
+### build/index.d.ts#TreeSet
+export declare class TreeSet<T> implements NavigableSet<T> {
+  constructor(options?: TreeSetOptions<T>);
+  get size(): number;
+  get isEmpty(): boolean;
+  get comparator(): Compare<T>;
+  get eq(): Eq<T>;
+  has(element: T): boolean;
+  contains(element: T): boolean;
+  containsAll(other: Iterable<T>): boolean;
+  add(element: T): boolean;
+  remove(element: T): boolean;
+  clear(): void;
+  addAll(elements: Iterable<T>): boolean;
+  removeAll(elements: Iterable<T>): boolean;
+  retainAll(elements: Iterable<T>): boolean;
+  union(other: Iterable<T>): TreeSet<T>;
+  intersection(other: Iterable<T>): TreeSet<T>;
+  difference(other: Iterable<T>): TreeSet<T>;
+  symmetricDifference(other: Iterable<T>): TreeSet<T>;
+  isSubsetOf(other: Iterable<T>): boolean;
+  isSupersetOf(other: Iterable<T>): boolean;
+  isDisjointFrom(other: Iterable<T>): boolean;
+  first(): T;
+  last(): T;
+  headSet(toElement: T): SortedSet<T>;
+  tailSet(fromElement: T): SortedSet<T>;
+  subSet(fromElement: T, toElement: T): SortedSet<T>;
+  floor(element: T): T | undefined;
+  ceiling(element: T): T | undefined;
+  lower(element: T): T | undefined;
+  higher(element: T): T | undefined;
+  pollFirst(): T | undefined;
+  pollLast(): T | undefined;
+  descendingSet(): NavigableSet<T>;
+  descendingIterator(): IterableIterator<T>;
+  [Symbol.iterator](): Iterator<T>;
+  forEach(action: (element: T, index: number) => void): void;
+  toArray(): T[];
+  toString(): string;
+}
+
+### build/index.d.ts#TreeSetOptions
+export interface TreeSetOptions<T> {
+  compare?: Compare<T>;
+  eq?: Eq<T>;
+}
+
+### build/index.d.ts#UnderflowContext
+export interface UnderflowContext {
+  readonly operation: string;
+  readonly timestamp: number;
+}
+
+### build/index.d.ts#UnderflowHandler
+export type UnderflowHandler = (context: UnderflowContext) => void;
+
+### build/index.d.ts#UnderflowPolicy
+export type UnderflowPolicy = "throw" | "return-none" | "return-default" | "block";
+
+### build/index.d.ts#Unsubscribe
+export type Unsubscribe = () => void;
+
+### build/index.d.ts#ValidationContext
+export interface ValidationContext<T> {
+  readonly element: T;
+  readonly error: unknown;
+  readonly operation: string;
+}
+
+### build/index.d.ts#ValidationHandler
+export type ValidationHandler<T> = (context: ValidationContext<T>) => void;
+
+### build/index.d.ts#ValidationPolicy
+export type ValidationPolicy = "throw" | "drop" | "coerce" | "log";
+
+### build/index.d.ts#Vector
+export interface Vector<T> extends List<T> {
+  readonly capacity: number;
+  trimToSize(): void;
+  ensureCapacity(minCapacity: number): void;
+}
+
+### build/index.d.ts#WeakMapLike
+export interface WeakMapLike<K extends object, V> {
+  has(key: K): boolean;
+  get(key: K): V | undefined;
+  set(key: K, value: V): this;
+  delete(key: K): boolean;
+}
+
+### build/index.d.ts#WithCapability
+export type WithCapability<C, Cap> = C & Cap;
+
+### build/index.d.ts#arrayContains
+export declare function arrayContains<T>(array: T[], element: T, eq: Eq<T>): boolean;
+
+### build/index.d.ts#arrayDeque
+export declare function arrayDeque<T>(optionsOrElements?: ArrayDequeOptions<T> | Iterable<T>): ArrayDeque<T>;
+
+### build/index.d.ts#arrayIterator
+export declare function arrayIterator<T>(array: T[]): Iterator<T>;
+
+### build/index.d.ts#arrayList
+export declare function arrayList<T>(optionsOrElements?: ArrayListOptions<T> | Iterable<T>): ArrayList<T>;
+
+### build/index.d.ts#arrayRemove
+export declare function arrayRemove<T>(array: T[], element: T, eq: Eq<T>): boolean;
+
+### build/index.d.ts#arrayRemoveAll
+export declare function arrayRemoveAll<T>(array: T[], element: T, eq: Eq<T>): number;
+
+### build/index.d.ts#asSettled
+export declare function asSettled<T>(promises: Iterable<Promise<T>>): AsyncGenerator<Settled<T>, void, undefined>;
+
+### build/index.d.ts#asyncQueue
+export declare function asyncQueue<T>(options?: AsyncQueueOptions): AsyncQueue<T>;
+
+### build/index.d.ts#average
+export declare function average(iterable: Iterable<number>): number | undefined;
+
+### build/index.d.ts#averagingNumber
+export declare function averagingNumber<T>(mapper: (element: T) => number): Collector<T, {
+  sum: number;
+  count: number;
+}, number>;
+
+### build/index.d.ts#blockMethods
+export declare const blockMethods: <C extends object>(target: C, mutatingMethods: Set<string | symbol>, errorMessage?: string) => C;
+
+### build/index.d.ts#booleanCompare
+export declare const booleanCompare: Compare<boolean>;
+
+### build/index.d.ts#bounded
+export declare function bounded<C extends Collection<any>>(options: BoundedOptions<any>): Middleware<C, C & BoundedCollection$1>;
+
+### build/index.d.ts#boundedDeque
+export declare function boundedDeque<T>(options: BoundedOptions<T>): Middleware<Deque<T>, Deque<T> & BoundedCollection$1>;
+
+### build/index.d.ts#boundedList
+export declare function boundedList<T>(options: BoundedOptions<T>): Middleware<List<T>, List<T> & BoundedCollection$1>;
+
+### build/index.d.ts#boundedMap
+export declare function boundedMap<K, V>(options: Omit<BoundedOptions<V>, "onOverflow"> & {
+  onOverflow?: (context: Omit<OverflowContext<V>, "newElement"> & {
+    key: K;
+    value: V;
+  }) => void;
+}): Middleware<MapLike<K, V>, MapLike<K, V> & BoundedCollection$1>;
+
+### build/index.d.ts#boundedQueue
+export declare function boundedQueue<T>(options: BoundedOptions<T>): Middleware<Queue<T>, Queue<T> & BoundedCollection$1>;
+
+### build/index.d.ts#buffered
+export declare function buffered<T>(capacity: number): Channel<T>;
+
+### build/index.d.ts#buildList
+export declare function buildList<T>(builder: (list: ArrayList<T>) => void): ArrayList<T>;
+
+### build/index.d.ts#buildMap
+export declare function buildMap<K, V>(builder: (map: HashMap<K, V>) => void): HashMap<K, V>;
+
+### build/index.d.ts#bundle
+export declare function bundle<C, R1 extends C>(m1: Middleware<C, R1>): Middleware<C, R1>;
+export declare function bundle<C, R1 extends C, R2 extends R1>(m1: Middleware<R1, R2>, m2: Middleware<C, R1>): Middleware<C, R2>;
+export declare function bundle<C, R1 extends C, R2 extends R1, R3 extends R2>(m1: Middleware<R2, R3>, m2: Middleware<R1, R2>, m3: Middleware<C, R1>): Middleware<C, R3>;
+export declare function bundle<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3>(m1: Middleware<R3, R4>, m2: Middleware<R2, R3>, m3: Middleware<R1, R2>, m4: Middleware<C, R1>): Middleware<C, R4>;
+export declare function bundle<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3, R5 extends R4>(m1: Middleware<R4, R5>, m2: Middleware<R3, R4>, m3: Middleware<R2, R3>, m4: Middleware<R1, R2>, m5: Middleware<C, R1>): Middleware<C, R5>;
+export declare function bundle<C>(...middleware: Middleware<any, any>[]): Middleware<C, any>;
+
+### build/index.d.ts#channel
+export declare function channel<T>(bufferSize?: number): Channel<T>;
+
+### build/index.d.ts#checkBounds
+export declare function checkBounds(index: number, size: number, collectionName?: string): void;
+
+### build/index.d.ts#checkInsertBounds
+export declare function checkInsertBounds(index: number, size: number, collectionName?: string): void;
+
+### build/index.d.ts#checkRangeBounds
+export declare function checkRangeBounds(start: number, end: number, size: number, collectionName?: string): void;
+
+### build/index.d.ts#chunk
+export declare function chunk<T>(iterable: Iterable<T>, size: number): Generator<T[]>;
+
+### build/index.d.ts#clamp
+export declare function clamp(value: number, min: number, max: number): number;
+
+### build/index.d.ts#collect
+export declare function collect<T, A, R>(iterable: Iterable<T>, collector: Collector<T, A, R>): R;
+
+### build/index.d.ts#combineHashes
+export declare const combineHashes: (...hashes: number[]) => number;
+
+### build/index.d.ts#compareKeys
+export declare function compareKeys(a: string, b: string): number;
+
+### build/index.d.ts#comparing
+export declare const comparing: <T, K extends keyof T = keyof T>(keyOrFn: K | ((value: T) => any), compare?: Compare<any>) => Compare<T>;
+
+### build/index.d.ts#comparingKey
+export declare const comparingKey: <T, K>(keyExtractor: (value: T) => K, keyCompare?: Compare<K>) => Compare<T>;
+
+### build/index.d.ts#compose
+export declare function compose<C, R1 extends C>(m1: Middleware<C, R1>): (base: C) => R1;
+export declare function compose<C, R1 extends C, R2 extends R1>(m1: Middleware<R1, R2>, m2: Middleware<C, R1>): (base: C) => R2;
+export declare function compose<C, R1 extends C, R2 extends R1, R3 extends R2>(m1: Middleware<R2, R3>, m2: Middleware<R1, R2>, m3: Middleware<C, R1>): (base: C) => R3;
+export declare function compose<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3>(m1: Middleware<R3, R4>, m2: Middleware<R2, R3>, m3: Middleware<R1, R2>, m4: Middleware<C, R1>): (base: C) => R4;
+export declare function compose<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3, R5 extends R4>(m1: Middleware<R4, R5>, m2: Middleware<R3, R4>, m3: Middleware<R2, R3>, m4: Middleware<R1, R2>, m5: Middleware<C, R1>): (base: C) => R5;
+export declare function compose<C>(...layers: Middleware<any, any>[]): (base: C) => any;
+
+### build/index.d.ts#concat
+export declare function concat<T>(...iterables: Iterable<T>[]): Generator<T>;
+
+### build/index.d.ts#count
+export declare function count<T>(iterable: Iterable<T>, predicate?: (value: T) => boolean): number;
+
+### build/index.d.ts#counting
+export declare function counting<T>(): Collector<T, number, number>;
+
+### build/index.d.ts#createEmitter
+export declare const createEmitter: <E extends EventMap>() => Emitter<E>;
+
+### build/index.d.ts#dateCompare
+export declare const dateCompare: Compare<Date>;
+
+### build/index.d.ts#declare module "../core/effects.js"
+declare module "../core/effects.js" {
+  interface Ok<T> {
+    match<U>(cases: {
+      Ok: (value: T) => U;
+      Err: (error: never) => U;
+    }): U;
+  }
+  interface Err<E> {
+    match<U>(cases: {
+      Ok: (value: never) => U;
+      Err: (error: E) => U;
+    }): U;
+  }
+}
+
+### build/index.d.ts#deepEq
+export declare const deepEq: Eq<any>;
+
+### build/index.d.ts#defaultCompare
+export declare const defaultCompare: Compare<any>;
+
+### build/index.d.ts#defaultEq
+export declare const defaultEq: Eq<any>;
+
+### build/index.d.ts#defaultHash
+export declare const defaultHash: Hash<any>;
+
+### build/index.d.ts#delegate
+export declare const delegate: <C extends object, T extends C>(target: T, wrapper: Partial<C>) => C;
+
+### build/index.d.ts#distinct
+export declare function distinct<T, K = T>(iterable: Iterable<T>, keyFn?: (value: T) => K): Generator<T>;
+
+### build/index.d.ts#distinctConsecutive
+export declare function distinctConsecutive<T, K = T>(iterable: Iterable<T>, keyFn?: (value: T) => K): Generator<T>;
+
+### build/index.d.ts#dropIndex
+export declare function dropIndex(point: Point, centers: readonly Point[], rowTolerance?: number): number;
+
+### build/index.d.ts#emptyList
+export declare function emptyList<T>(): List<T>;
+
+### build/index.d.ts#emptyMap
+export declare function emptyMap<K, V>(): MapLike<K, V>;
+
+### build/index.d.ts#emptyQueue
+export declare function emptyQueue<T>(): Queue<T>;
+
+### build/index.d.ts#enhanceMethod
+export declare const enhanceMethod: <C extends object, K extends keyof C & string>(methodName: K, enhancer: (original: C[K] extends ((...args: infer Args) => infer R) ? (...args: Args) => R : never, args: C[K] extends ((...args: infer Args) => any) ? Args : never) => C[K] extends ((...args: any[]) => infer R) ? R : never) => Middleware<C>;
+
+### build/index.d.ts#enumerate
+export declare function enumerate<T>(iterable: Iterable<T>): Generator<[number, T]>;
+
+### build/index.d.ts#eqBy
+export declare const eqBy: <T, K extends keyof T = keyof T>(keyOrFn: K | ((value: T) => any)) => Eq<T>;
+
+### build/index.d.ts#evented
+export declare function evented<T>(): Middleware<Collection<T>, Collection<T> & {
+  on<E extends keyof CollectionEvents<T>>(event: E, listener: (payload: CollectionEvents<T>[E]) => void): Unsubscribe;
+}>;
+
+### build/index.d.ts#eventedDeque
+export declare function eventedDeque<T>(): Middleware<Deque<T>, Deque<T> & {
+  on<E extends keyof DequeEvents<T>>(event: E, listener: (payload: DequeEvents<T>[E]) => void): Unsubscribe;
+}>;
+
+### build/index.d.ts#eventedList
+export declare function eventedList<T>(): Middleware<List<T>, List<T> & {
+  on<E extends keyof ListEvents<T>>(event: E, listener: (payload: ListEvents<T>[E]) => void): Unsubscribe;
+}>;
+
+### build/index.d.ts#eventedMap
+export declare function eventedMap<K, V>(): Middleware<MapLike<K, V>, MapLike<K, V> & {
+  on<E extends keyof MapEvents<K, V>>(event: E, listener: (payload: MapEvents<K, V>[E]) => void): Unsubscribe;
+}>;
+
+### build/index.d.ts#eventedQueue
+export declare function eventedQueue<T>(): Middleware<Queue<T>, Queue<T> & {
+  on<E extends keyof QueueEvents<T>>(event: E, listener: (payload: QueueEvents<T>[E]) => void): Unsubscribe;
+}>;
+
+### build/index.d.ts#every
+export declare function every<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): boolean;
+
+### build/index.d.ts#fanIn
+export declare function fanIn<T>(...inputs: Channel<T>[]): Channel<T>;
+
+### build/index.d.ts#fanOut
+export declare function fanOut<T>(input: Channel<T>, count: number, bufferSize?: number): Channel<T>[];
+
+### build/index.d.ts#filter
+export declare function filter<T>(iterable: Iterable<T>, predicate: (value: T, index: number) => boolean): Generator<T>;
+
+### build/index.d.ts#filtering
+export declare function filtering<T, A, R>(predicate: (element: T) => boolean, downstream: Collector<T, A, R>): Collector<T, A, R>;
+
+### build/index.d.ts#find
+export declare function find<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): T | undefined;
+
+### build/index.d.ts#findIndex
+export declare function findIndex<T>(array: T[], element: T, eq: Eq<T>): number;
+
+### build/index.d.ts#findLastIndex
+export declare function findLastIndex<T>(array: T[], element: T, eq: Eq<T>): number;
+
+### build/index.d.ts#first
+export declare function first<T>(): Collector<T, T | undefined, T | undefined>;
+
+### build/index.d.ts#flatMap
+export declare function flatMap<T, U>(iterable: Iterable<T>, fn: (value: T, index: number) => Iterable<U>): Generator<U>;
+
+### build/index.d.ts#flatMapOption
+export declare const flatMapOption: <T, U>(opt: Option<T>, f: (value: T) => Option<U>) => Option<U>;
+
+### build/index.d.ts#flatMapResult
+export declare const flatMapResult: <T, U, E>(result: Result<T, E>, f: (value: T) => Result<U, E>) => Result<U, E>;
+
+### build/index.d.ts#flatMapping
+export declare function flatMapping<T, U, A, R>(mapper: (element: T) => Iterable<U>, downstream: Collector<U, A, R>): Collector<T, A, R>;
+
+### build/index.d.ts#flatten
+export declare function flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T>;
+
+### build/index.d.ts#forwardEvent
+export declare const forwardEvent: <E1 extends EventMap, E2 extends EventMap, K1 extends keyof E1, K2 extends keyof E2>(source: Emitter<E1>, target: Emitter<E2>, sourceEvent: K1, targetEvent: K2, transform?: (payload: E1[K1]) => E2[K2]) => Unsubscribe;
+
+### build/index.d.ts#fromNullable
+export declare const fromNullable: <T>(value: T | null | undefined) => Option<T>;
+
+### build/index.d.ts#getOrElse
+export declare const getOrElse: <T>(opt: Option<T>, defaultValue: T) => T;
+
+### build/index.d.ts#getOrElseResult
+export declare const getOrElseResult: <T, E>(result: Result<T, E>, defaultValue: T) => T;
+
+### build/index.d.ts#groupBy
+export declare function groupBy<T, K>(iterable: Iterable<T>, keyExtractor: (value: T) => K): HashMap<K, ArrayList<T>>;
+
+### build/index.d.ts#groupingBy
+export declare function groupingBy<T, K>(classifier: (element: T) => K): Collector<T, HashMap<K, ArrayList<T>>, HashMap<K, ArrayList<T>>>;
+
+### build/index.d.ts#groupingByWith
+export declare function groupingByWith<T, K, A, D>(classifier: (element: T) => K, downstream: Collector<T, A, D>): Collector<T, HashMap<K, A>, HashMap<K, D>>;
+
+### build/index.d.ts#hasCapability
+export declare const hasCapability: <C extends Collection<any>, K extends keyof any>(collection: C, capability: K) => collection is C & Record<K, unknown>;
+
+### build/index.d.ts#hashBy
+export declare const hashBy: <T>(accessor: (value: T) => any) => Hash<T>;
+
+### build/index.d.ts#hashMap
+export declare function hashMap<K, V>(optionsOrEntries?: HashMapOptions<K, V> | Iterable<readonly [K, V]>): HashMap<K, V>;
+
+### build/index.d.ts#hashNumber
+export declare const hashNumber: (num: number) => number;
+
+### build/index.d.ts#hashSet
+export declare function hashSet<T>(optionsOrElements?: HashSetOptions<T> | Iterable<T>): HashSet<T>;
+
+### build/index.d.ts#hashString
+export declare const hashString: (str: string) => number;
+
+### build/index.d.ts#immutableListOf
+export declare function immutableListOf<T>(...elements: T[]): List<T>;
+
+### build/index.d.ts#immutableMapOf
+export declare function immutableMapOf<K, V>(...entries: [K, V][]): MapLike<K, V>;
+
+### build/index.d.ts#interceptMethods
+export declare const interceptMethods: <C extends object>(target: C, interceptor: (target: C, method: keyof C, args: unknown[]) => unknown) => C;
+
+### build/index.d.ts#isErr
+export declare const isErr: <T, E>(result: Result<T, E>) => result is Err<E>;
+
+### build/index.d.ts#isNone
+export declare const isNone: <T>(opt: Option<T>) => opt is None;
+
+### build/index.d.ts#isOk
+export declare const isOk: <T, E>(result: Result<T, E>) => result is Ok<T>;
+
+### build/index.d.ts#isSome
+export declare const isSome: <T>(opt: Option<T>) => opt is Some<T>;
+
+### build/index.d.ts#isValidKey
+export declare function isValidKey(key: unknown, options?: KeyCheckOptions): key is string;
+
+### build/index.d.ts#joining
+export declare function joining<T>(delimiter?: string, prefix?: string, suffix?: string): Collector<T, string[], string>;
+
+### build/index.d.ts#keyBetween
+export declare function keyBetween(prev: string | null | undefined, next: string | null | undefined): string;
+
+### build/index.d.ts#keysBetween
+export declare function keysBetween(prev: string | null | undefined, next: string | null | undefined, count: number): string[];
+
+### build/index.d.ts#keysForDrop
+export declare function keysForDrop(items: readonly KeyedItem[], index: number, movingId: string): Array<{
+  id: string;
+  key: string;
+}>;
+
+### build/index.d.ts#last
+export declare function last<T>(): Collector<T, T | undefined, T | undefined>;
+
+### build/index.d.ts#linkedHashMap
+export declare function linkedHashMap<K, V>(optionsOrEntries?: LinkedHashMapOptions<K, V> | Iterable<[K, V]>): LinkedHashMap<K, V>;
+
+### build/index.d.ts#linkedList
+export declare function linkedList<T>(optionsOrElements?: LinkedListOptions<T> | Iterable<T>): LinkedList<T>;
+
+### build/index.d.ts#listOf
+export declare function listOf<T>(...elements: T[]): ArrayList<T>;
+
+### build/index.d.ts#lruCache
+export declare function lruCache<K, V>(capacity: number, onEvict?: (key: K, value: V) => void): LRUCache<K, V>;
+
+### build/index.d.ts#lruMap
+export declare function lruMap<K, V>(options: LRUOptions): Middleware<MapLike<K, V>, MapLike<K, V> & {
+  readonly isFull: boolean;
+}>;
+
+### build/index.d.ts#map
+export declare function map<T, U>(iterable: Iterable<T>, fn: (value: T, index: number) => U): Generator<U>;
+
+### build/index.d.ts#mapAsyncOption
+export declare const mapAsyncOption: <T, U>(opt: AsyncOption<T>, f: (value: T) => U | Promise<U>) => AsyncOption<U>;
+
+### build/index.d.ts#mapAsyncResult
+export declare const mapAsyncResult: <T, U, E>(result: AsyncResult<T, E>, f: (value: T) => U | Promise<U>) => AsyncResult<U, E>;
+
+### build/index.d.ts#mapError
+export declare const mapError: <T, E, F>(result: Result<T, E>, f: (error: E) => F) => Result<T, F>;
+
+### build/index.d.ts#mapOf
+export declare function mapOf<K, V>(...entries: [K, V][]): HashMap<K, V>;
+
+### build/index.d.ts#mapOption
+export declare const mapOption: <T, U>(opt: Option<T>, f: (value: T) => U) => Option<U>;
+
+### build/index.d.ts#mapResult
+export declare const mapResult: <T, U, E>(result: Result<T, E>, f: (value: T) => U) => Result<U, E>;
+
+### build/index.d.ts#mapping
+export declare function mapping<T, U, A, R>(mapper: (element: T) => U, downstream: Collector<U, A, R>): Collector<T, A, R>;
+
+### build/index.d.ts#max
+export declare function max<T>(iterable: Iterable<T>, compare?: (a: T, b: T) => number): T | undefined;
+
+### build/index.d.ts#maxBy
+export declare function maxBy<T>(comparator: (a: T, b: T) => number): Collector<T, T | undefined, T | undefined>;
+
+### build/index.d.ts#merge
+export declare function merge<T>(...inputs: Channel<T>[]): Channel<T>;
+
+### build/index.d.ts#min
+export declare function min<T>(iterable: Iterable<T>, compare?: (a: T, b: T) => number): T | undefined;
+
+### build/index.d.ts#minBy
+export declare function minBy<T>(comparator: (a: T, b: T) => number): Collector<T, T | undefined, T | undefined>;
+
+### build/index.d.ts#mutableListOf
+export declare function mutableListOf<T>(...elements: T[]): ArrayList<T>;
+
+### build/index.d.ts#mutableMapOf
+export declare function mutableMapOf<K, V>(...entries: [K, V][]): HashMap<K, V>;
+
+### build/index.d.ts#nCopies
+export declare function nCopies<T>(n: number, element: T): List<T>;
+
+### build/index.d.ts#none
+export declare function none<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): boolean;
+
+### build/index.d.ts#nullsFirst
+export declare const nullsFirst: <T>(compare: Compare<T>) => Compare<T | null | undefined>;
+
+### build/index.d.ts#nullsLast
+export declare const nullsLast: <T>(compare: Compare<T>) => Compare<T | null | undefined>;
+
+### build/index.d.ts#numberCompare
+export declare const numberCompare: Compare<number>;
+
+### build/index.d.ts#onWhen
+export declare const onWhen: <E extends EventMap, K extends keyof E>(emitter: Emitter<E>, event: K, predicate: (payload: E[K]) => boolean, listener: Listener<E[K]>) => Unsubscribe;
+
+### build/index.d.ts#optionToResult
+export declare const optionToResult: <T, E>(opt: Option<T>, error: E) => Result<T, E>;
+
+### build/index.d.ts#partition
+export declare function partition<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): [T[], T[]];
+
+### build/index.d.ts#partitioningBy
+export declare function partitioningBy<T>(predicate: (element: T) => boolean): Collector<T, HashMap<boolean, ArrayList<T>>, HashMap<boolean, ArrayList<T>>>;
+
+### build/index.d.ts#pipe
+export declare function pipe<T>(value: T, ...fns: Array<(value: any) => any>): any;
+
+### build/index.d.ts#pipeline
+export declare function pipeline<T, U>(input: Channel<T>, transform: (value: T) => U | Promise<U>, bufferSize?: number): Channel<U>;
+
+### build/index.d.ts#priorityQueue
+export declare function priorityQueue<T>(optionsOrElementsOrComparator?: PriorityQueueOptions<T> | Iterable<T> | Compare<T>): PriorityQueue$1<T>;
+
+### build/index.d.ts#queueOf
+export declare function queueOf<T>(...elements: T[]): ArrayDeque<T>;
+
+### build/index.d.ts#range
+export declare function range(start: number, end: number, step?: number): ArrayList<number>;
+
+### build/index.d.ts#rangeTo
+export declare function rangeTo(n: number): ArrayList<number>;
+
+### build/index.d.ts#readWriteLock
+export declare function readWriteLock<C extends object>(): Middleware<C>;
+
+### build/index.d.ts#readonly
+export declare function readonly<C extends object>(options?: ReadonlyOptions): Middleware<C>;
+
+### build/index.d.ts#readonlyCollection
+export declare function readonlyCollection<T>(options?: ReadonlyOptions): Middleware<ReadonlyCollection<T>>;
+
+### build/index.d.ts#readonlyList
+export declare function readonlyList<T>(options?: ReadonlyOptions): Middleware<ReadonlyList<T>>;
+
+### build/index.d.ts#readonlyMap
+export declare function readonlyMap<K, V>(options?: ReadonlyOptions): Middleware<ReadonlyMapLike<K, V>>;
+
+### build/index.d.ts#readonlyQueue
+export declare function readonlyQueue<T>(options?: ReadonlyOptions): Middleware<ReadonlyQueue<T>>;
+
+### build/index.d.ts#reduce
+export declare function reduce<T, U>(iterable: Iterable<T>, fn: (acc: U, value: T, index: number) => U, initial: U): U;
+
+### build/index.d.ts#reducing
+export declare function reducing<T>(identity: T, reducer: (acc: T, element: T) => T): Collector<T, T, T>;
+
+### build/index.d.ts#reducingWith
+export declare function reducingWith<T, U>(identity: U, mapper: (element: T) => U, reducer: (acc: U, mapped: U) => U): Collector<T, U, U>;
+
+### build/index.d.ts#reentrantSynchronized
+export declare function reentrantSynchronized<C extends object>(): Middleware<C>;
+
+### build/index.d.ts#reportListenerError
+export declare const reportListenerError: ListenerErrorHandler;
+
+### build/index.d.ts#requireNonEmpty
+export declare function requireNonEmpty(size: number, collectionName?: string): void;
+
+### build/index.d.ts#requireNonNull
+export declare function requireNonNull<T>(value: T | null | undefined, message?: string): T;
+
+### build/index.d.ts#resultToOption
+export declare const resultToOption: <T, E>(result: Result<T, E>) => Option<T>;
+
+### build/index.d.ts#reverse
+export declare function reverse<T>(iterable: Iterable<T>): Generator<T>;
+
+### build/index.d.ts#reverseArrayIterator
+export declare function reverseArrayIterator<T>(array: T[]): Iterator<T>;
+
+### build/index.d.ts#reversed
+export declare const reversed: <T>(compare: Compare<T>) => Compare<T>;
+
+### build/index.d.ts#safe
+export declare function safe<C extends object>(): Middleware<C>;
+
+### build/index.d.ts#safeDeque
+export declare function safeDeque<T>(): Middleware<Deque<T>, Deque<T> & {
+  safe: SafeDequeOperations<T>;
+}>;
+
+### build/index.d.ts#safeList
+export declare function safeList<T>(): Middleware<List<T>, List<T> & {
+  safe: SafeListOperations<T>;
+}>;
+
+### build/index.d.ts#safeMap
+export declare function safeMap<K, V>(): Middleware<MapLike<K, V>, MapLike<K, V> & {
+  safe: SafeMapOperations<K, V>;
+}>;
+
+### build/index.d.ts#safeQueue
+export declare function safeQueue<T>(): Middleware<Queue<T>, Queue<T> & {
+  safe: SafeQueueOperations<T>;
+}>;
+
+### build/index.d.ts#scan
+export declare function scan<T, U>(iterable: Iterable<T>, fn: (acc: U, value: T) => U, initial: U): Generator<U>;
+
+### build/index.d.ts#select
+export declare function select<R>(...cases: SelectCase<R>[]): Promise<R>;
+
+### build/index.d.ts#sequence
+export declare const sequence: <T>(opts: Option<T>[]) => Option<T[]>;
+
+### build/index.d.ts#sequenceResults
+export declare const sequenceResults: <T, E>(results: Result<T, E>[]) => Result<T[], E>;
+
+### build/index.d.ts#shallowEq
+export declare const shallowEq: Eq<any>;
+
+### build/index.d.ts#singletonList
+export declare function singletonList<T>(element: T): List<T>;
+
+### build/index.d.ts#singletonMap
+export declare function singletonMap<K, V>(key: K, value: V): MapLike<K, V>;
+
+### build/index.d.ts#skip
+export declare function skip<T>(iterable: Iterable<T>, n: number): Generator<T>;
+
+### build/index.d.ts#skipWhile
+export declare function skipWhile<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): Generator<T>;
+
+### build/index.d.ts#some
+export declare function some<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): boolean;
+
+### build/index.d.ts#sort
+export declare function sort<T>(iterable: Iterable<T>, compare?: (a: T, b: T) => number): Generator<T>;
+
+### build/index.d.ts#stringCompare
+export declare const stringCompare: Compare<string>;
+
+### build/index.d.ts#stringCompareIgnoreCase
+export declare const stringCompareIgnoreCase: Compare<string>;
+
+### build/index.d.ts#stringHashCode
+export declare function stringHashCode(str: string): number;
+
+### build/index.d.ts#sum
+export declare function sum(iterable: Iterable<number>): number;
+
+### build/index.d.ts#summarizingNumber
+export declare function summarizingNumber<T>(mapper: (element: T) => number): Collector<T, Partial<SummaryStatistics>, SummaryStatistics>;
+
+### build/index.d.ts#summaryTree
+export declare function summaryTree<Leaf, Summary>(spec: SummarySpec<Leaf, Summary>, leaves?: Iterable<Leaf>): SummaryTree<Leaf, Summary>;
+
+### build/index.d.ts#summingNumber
+export declare function summingNumber<T>(mapper: (element: T) => number): Collector<T, number, number>;
+
+### build/index.d.ts#synchronized
+export declare function synchronized<C extends object>(): Middleware<C>;
+
+### build/index.d.ts#synchronizedCollection
+export declare const synchronizedCollection: typeof synchronized;
+
+### build/index.d.ts#synchronizedList
+export declare const synchronizedList: typeof synchronized;
+
+### build/index.d.ts#synchronizedMap
+export declare const synchronizedMap: typeof synchronized;
+
+### build/index.d.ts#synchronizedSet
+export declare const synchronizedSet: typeof synchronized;
+
+### build/index.d.ts#take
+export declare function take<T>(iterable: Iterable<T>, n: number): Generator<T>;
+
+### build/index.d.ts#takeWhile
+export declare function takeWhile<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): Generator<T>;
+
+### build/index.d.ts#tap
+export declare function tap<T>(iterable: Iterable<T>, fn: (value: T, index: number) => void): Generator<T>;
+
+### build/index.d.ts#teeing
+export declare function teeing<T, A1, A2, R1, R2, R>(collector1: Collector<T, A1, R1>, collector2: Collector<T, A2, R2>, combiner: (r1: R1, r2: R2) => R): Collector<T, [A1, A2], R>;
+
+### build/index.d.ts#thenComparing
+export declare const thenComparing: <T>(...comparators: Compare<T>[]) => Compare<T>;
+
+### build/index.d.ts#ticker
+export declare function ticker(ms: number): Channel<number> & {
+  stop: () => void;
+};
+
+### build/index.d.ts#timeout
+export declare function timeout(ms: number): Channel<void>;
+
+### build/index.d.ts#toArray
+declare function toArray<T>(): Collector<T, T[], T[]>;
+
+### build/index.d.ts#toArray$1
+declare function toArray$1<T>(iterable: Iterable<T>): T[];
+
+### build/index.d.ts#toList
+declare function toList<T>(): Collector<T, ArrayList<T>, ArrayList<T>>;
+
+### build/index.d.ts#toList$1
+declare function toList$1<T>(iterable: Iterable<T>): ArrayList<T>;
+
+### build/index.d.ts#toMap
+declare function toMap<T, K, V>(keyExtractor: (element: T) => K, valueExtractor: (element: T) => V): Collector<T, HashMap<K, V>, HashMap<K, V>>;
+
+### build/index.d.ts#toMap$1
+declare function toMap$1<T, K, V>(iterable: Iterable<T>, keyFn: (value: T) => K, valueFn: (value: T) => V): Map<K, V>;
+
+### build/index.d.ts#toMap$2
+declare function toMap$2<T, K>(iterable: Iterable<T>, keyExtractor: (value: T) => K): HashMap<K, T>;
+declare function toMap$2<T, K, V>(iterable: Iterable<T>, keyExtractor: (value: T) => K, valueExtractor: (value: T) => V): HashMap<K, V>;
+
+### build/index.d.ts#toNullable
+export declare const toNullable: <T>(opt: Option<T>) => T | undefined;
+
+### build/index.d.ts#toSet
+declare function toSet<T>(): Collector<T, HashSet<T>, HashSet<T>>;
+
+### build/index.d.ts#toSet$1
+declare function toSet$1<T>(iterable: Iterable<T>): Set<T>;
+
+### build/index.d.ts#treeMap
+export declare function treeMap<K, V>(optionsOrEntries?: TreeMapOptions<K, V> | Iterable<[K, V]>): TreeMap<K, V>;
+
+### build/index.d.ts#treeSet
+export declare function treeSet<T>(optionsOrElements?: TreeSetOptions<T> | Iterable<T>): TreeSet<T>;
+
+### build/index.d.ts#tryCatch
+export declare const tryCatch: <T, E = unknown>(fn: () => T, onError?: (error: unknown) => E) => Result<T, E>;
+
+### build/index.d.ts#tryCatchAsync
+export declare const tryCatchAsync: <T, E = unknown>(fn: () => Promise<T>, onError?: (error: unknown) => E) => Promise<Result<T, E>>;
+
+### build/index.d.ts#ttlCache
+export declare function ttlCache<K, V>(ttl: number, options?: {
+  checkInterval?: number;
+  onExpire?: (key: K, value: V) => void;
+}): TTLCache<K, V>;
+
+### build/index.d.ts#ttlCollection
+export declare function ttlCollection<T>(options: Omit<TTLOptions, "onExpire"> & {
+  onExpire?: (info: {
+    element: T;
+    createdAt: number;
+    expiredAt: number;
+  }) => void;
+}): Middleware<Collection<T>, Collection<T> & {
+  readonly dispose: () => void;
+}>;
+
+### build/index.d.ts#ttlMap
+export declare function ttlMap<K, V>(options: TTLOptions): Middleware<MapLike<K, V>, MapLike<K, V> & {
+  readonly dispose: () => void;
+}>;
+
+### build/index.d.ts#unbuffered
+export declare function unbuffered<T>(): Channel<T>;
+
+### build/index.d.ts#unmodifiableCollection
+export declare const unmodifiableCollection: typeof readonlyCollection;
+
+### build/index.d.ts#unmodifiableList
+export declare const unmodifiableList: typeof readonlyList;
+
+### build/index.d.ts#unmodifiableMap
+export declare const unmodifiableMap: typeof readonlyMap;
+
+### build/index.d.ts#unwrap
+export declare const unwrap: <T>(opt: Option<T>) => T;
+
+### build/index.d.ts#unwrapResult
+export declare const unwrapResult: <T, E>(result: Result<T, E>) => T;
+
+### build/index.d.ts#window
+export declare function window<T>(iterable: Iterable<T>, size: number): Generator<T[]>;
+
+### build/index.d.ts#workerPool
+export declare function workerPool<T, R>(jobs: Channel<T>, worker: (job: T) => Promise<R>, options?: {
+  workers: number;
+  bufferSize?: number;
+}): Channel<R>;
+
+### build/index.d.ts#zip
+export declare function zip<T extends any[]>(...iterables: { [K in keyof T]: Iterable<T[K]>; }): Generator<T>;
+
+### build/testing/index.d.ts#ContractViolation
+export declare class ContractViolation extends Error {
+  override readonly name = "ContractViolation";
+}
+
+### build/testing/index.d.ts#deepEqual
+export declare function deepEqual(actual: unknown, expected: unknown): boolean;
+
+### build/testing/index.d.ts#holds
+export declare function holds(condition: boolean, what: string): void;
+
+### build/testing/index.d.ts#rejects
+export declare function rejects(start: () => Promise<unknown>, what: string): Promise<unknown>;
+
+### build/testing/index.d.ts#same
+export declare function same(actual: unknown, expected: unknown, what: string): void;
+
+### build/testing/index.d.ts#show
+export declare function show(value: unknown): string;

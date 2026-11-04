@@ -73,6 +73,7 @@ The entry `./testing` gives the small checks of a contract suite: `holds`, `same
 | `@mark1russell7/collections/dag` | Levels, topological order, a run with a limit of concurrency, filters |
 | `@mark1russell7/collections/graph` | `hubBreadthFirstOrder` |
 | `@mark1russell7/collections/testing` | The checks of a contract suite |
+| `@mark1russell7/collections/layers` | `compose` and the types of a stack of layers, in one file with no imports |
 
 ## License
 

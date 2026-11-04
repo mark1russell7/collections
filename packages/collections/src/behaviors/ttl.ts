@@ -6,7 +6,7 @@
  *
  * @example
  * const cache = compose(
- *   ttlMap({ ttl: 60000 }) // 60 seconds
+ *   ttlMap<string, Data>({ ttl: 60000 }) // 60 seconds
  * )(hashMap<string, Data>())
  *
  * cache.set('key', data)

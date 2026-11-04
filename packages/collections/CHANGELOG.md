@@ -1,12 +1,31 @@
 # Changelog
 
-## 0.3.1
+## 0.4.1
 
 PATCH: an internal change with no effect on the public API.
 
 ### Changed
 
 - `defaultHash` takes less time on plain objects. It reads their keys directly, and it uses its memo only after 65536 visits. The hash of each value stays the same.
+
+## 0.4.0
+
+The entry `./layers` holds one fold for a stack of layers, and `compose` keeps the type of each layer. MINOR: before 1.0.0 a breaking change raises MINOR. A call of `compose` with an explicit type argument no longer compiles.
+
+### Added
+
+- The new entry `@mark1russell7/collections/layers` gives `compose`, `Layer`, `Chain`, `Composed`, `Stacked`, `InnerOf`, `OuterOf` and `Outers`. The entry has no imports, and it does no work at load.
+- Tests hold the 4 laws of the fold. A test holds the rule that a collection layer keeps each capability of the layers under it.
+
+### Changed
+
+- `compose` and `bundle` now check each neighbor pair, and a test compiles a chain of 100 layers. They stopped at 5 layers and then gave `any`.
+- The result of `compose` now has the type of each layer. It had only the type of the outermost layer, so `on` and `dispose` were compile errors under another layer.
+- `bundle` is now the same function as `compose`.
+
+### Fixed
+
+- The doc examples of `compose` did not compile, because the layers had no type arguments.
 
 ## 0.3.0
 

@@ -6,7 +6,7 @@
  *
  * @example
  * const list = compose(
- *   safeList()
+ *   safeList<number>()
  * )(arrayList<number>())
  *
  * const value = list.safe.get(10) // Option<number> instead of throwing

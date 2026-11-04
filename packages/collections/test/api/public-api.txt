@@ -390,6 +390,17 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 
+## ./layers (build/core/layers.d.ts): 8 names
+
+Chain: build/layers.d.ts#Chain
+Composed: build/layers.d.ts#Composed
+InnerOf: build/layers.d.ts#InnerOf
+Layer: build/layers.d.ts#Layer
+OuterOf: build/layers.d.ts#OuterOf
+Outers: build/layers.d.ts#Outers
+Stacked: build/layers.d.ts#Stacked
+compose: build/layers.d.ts#compose
+
 ## ./testing (build/testing/index.d.ts): 6 names
 
 ContractViolation: build/testing/index.d.ts#ContractViolation
@@ -1959,12 +1970,7 @@ export declare function buildList<T>(builder: (list: ArrayList<T>) => void): Arr
 export declare function buildMap<K, V>(builder: (map: HashMap<K, V>) => void): HashMap<K, V>;
 
 ### build/index.d.ts#bundle
-export declare function bundle<C, R1 extends C>(m1: Middleware<C, R1>): Middleware<C, R1>;
-export declare function bundle<C, R1 extends C, R2 extends R1>(m1: Middleware<R1, R2>, m2: Middleware<C, R1>): Middleware<C, R2>;
-export declare function bundle<C, R1 extends C, R2 extends R1, R3 extends R2>(m1: Middleware<R2, R3>, m2: Middleware<R1, R2>, m3: Middleware<C, R1>): Middleware<C, R3>;
-export declare function bundle<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3>(m1: Middleware<R3, R4>, m2: Middleware<R2, R3>, m3: Middleware<R1, R2>, m4: Middleware<C, R1>): Middleware<C, R4>;
-export declare function bundle<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3, R5 extends R4>(m1: Middleware<R4, R5>, m2: Middleware<R3, R4>, m3: Middleware<R2, R3>, m4: Middleware<R1, R2>, m5: Middleware<C, R1>): Middleware<C, R5>;
-export declare function bundle<C>(...middleware: Middleware<any, any>[]): Middleware<C, any>;
+export declare const bundle: typeof compose;
 
 ### build/index.d.ts#channel
 export declare function channel<T>(bufferSize?: number): Channel<T>;
@@ -2000,12 +2006,7 @@ export declare const comparing: <T, K extends keyof T = keyof T>(keyOrFn: K | ((
 export declare const comparingKey: <T, K>(keyExtractor: (value: T) => K, keyCompare?: Compare<K>) => Compare<T>;
 
 ### build/index.d.ts#compose
-export declare function compose<C, R1 extends C>(m1: Middleware<C, R1>): (base: C) => R1;
-export declare function compose<C, R1 extends C, R2 extends R1>(m1: Middleware<R1, R2>, m2: Middleware<C, R1>): (base: C) => R2;
-export declare function compose<C, R1 extends C, R2 extends R1, R3 extends R2>(m1: Middleware<R2, R3>, m2: Middleware<R1, R2>, m3: Middleware<C, R1>): (base: C) => R3;
-export declare function compose<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3>(m1: Middleware<R3, R4>, m2: Middleware<R2, R3>, m3: Middleware<R1, R2>, m4: Middleware<C, R1>): (base: C) => R4;
-export declare function compose<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3, R5 extends R4>(m1: Middleware<R4, R5>, m2: Middleware<R3, R4>, m3: Middleware<R2, R3>, m4: Middleware<R1, R2>, m5: Middleware<C, R1>): (base: C) => R5;
-export declare function compose<C>(...layers: Middleware<any, any>[]): (base: C) => any;
+export declare function compose<const L extends readonly Layer[]>(...layers: L & Chain<L>): Stacked<L>;
 
 ### build/index.d.ts#concat
 export declare function concat<T>(...iterables: Iterable<T>[]): Generator<T>;
@@ -2579,6 +2580,30 @@ export declare function workerPool<T, R>(jobs: Channel<T>, worker: (job: T) => P
 
 ### build/index.d.ts#zip
 export declare function zip<T extends any[]>(...iterables: { [K in keyof T]: Iterable<T[K]>; }): Generator<T>;
+
+### build/layers.d.ts#Chain
+type Chain<L extends readonly unknown[], Done extends readonly unknown[] = readonly []> = L extends readonly [infer A, infer B, ...infer R] ? [OuterOf<B>] extends [InnerOf<A>] ? Chain<readonly [B, ...R], readonly [...Done, A]> : readonly [...Done, A, Layer<any, InnerOf<A>>, ...R] : readonly [...Done, ...L];
+
+### build/layers.d.ts#Composed
+type Composed<L extends readonly unknown[]> = L extends readonly [] ? <B>(base: B) => B : L extends readonly [infer First, ...unknown[]] ? L extends readonly [...unknown[], infer Last] ? (base: InnerOf<Last>) => OuterOf<First> : never : L extends readonly (infer E)[] ? (base: InnerOf<E>) => OuterOf<E> : never;
+
+### build/layers.d.ts#InnerOf
+type InnerOf<L> = L extends ((next: infer I) => any) ? I : never;
+
+### build/layers.d.ts#Layer
+type Layer<Inner = any, Outer = Inner> = (next: Inner) => Outer;
+
+### build/layers.d.ts#OuterOf
+type OuterOf<L> = L extends ((next: any) => infer O) ? O : never;
+
+### build/layers.d.ts#Outers
+type Outers<L extends readonly unknown[], Sum = unknown> = L extends readonly [infer First, ...infer Rest] ? Outers<Rest, Sum & OuterOf<First>> : Sum;
+
+### build/layers.d.ts#Stacked
+type Stacked<L extends readonly unknown[]> = L extends readonly [...unknown[], infer Last] ? (base: InnerOf<Last>) => Outers<L> & InnerOf<Last> : Composed<L>;
+
+### build/layers.d.ts#compose
+declare function compose<const L extends readonly Layer[]>(...layers: L & Chain<L>): Composed<L>;
 
 ### build/testing/index.d.ts#ContractViolation
 export declare class ContractViolation extends Error {

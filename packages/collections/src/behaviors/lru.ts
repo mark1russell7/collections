@@ -6,7 +6,7 @@
  *
  * @example
  * const cache = compose(
- *   lruMap({ capacity: 100 })
+ *   lruMap<string, Data>({ capacity: 100 })
  * )(hashMap<string, Data>())
  *
  * cache.set('key1', data1) // Accessed

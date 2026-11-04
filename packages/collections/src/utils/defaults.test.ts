@@ -357,6 +357,19 @@ describe("defaultHash follows deepEq", () => {
     expect(defaultHash(nodes)).toBe(defaultHash(nodes));
   });
 
+  it("gives one hash to two equal graphs that share their parts in different ways", () => {
+    const layers = (copies: number): unknown => {
+      let layer: unknown[] = Array.from({ length: copies }, () => [1]);
+      for (let level = 0; level < 20; level++) {
+        const below = layer;
+        layer = Array.from({ length: copies }, () => [below[0], below[copies - 1], below[0]]);
+      }
+      return layer[0];
+    };
+    expect(deepEq(layers(1), layers(2))).toBe(true);
+    expect(defaultHash(layers(1))).toBe(defaultHash(layers(2)));
+  });
+
   it("does not exhaust the stack on a very deep value", () => {
     let list: unknown = null;
     for (let i = 0; i < 200_000; i++) list = { next: list };

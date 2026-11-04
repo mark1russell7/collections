@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+
+PATCH: an internal change with no effect on the public API.
+
+### Changed
+
+- `defaultHash` takes less time on plain objects. It reads their keys directly, and it uses its memo only after 65536 visits. The hash of each value stays the same.
+
 ## 0.3.0
 
 `defaultHash` now agrees with `deepEq`: two equal values have one hash. MINOR: before 1.0.0 a change of behavior that a caller can see raises MINOR.

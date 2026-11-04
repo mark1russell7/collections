@@ -8,6 +8,8 @@ describe("the home page", () => {
   it("names the package and gives the install command", () => {
     expect(page).toContain("<title>collections</title>");
     expect(page).toContain("pnpm add @mark1russell7/collections");
+    expect(page).toContain("https://www.npmjs.com/package/@mark1russell7/collections");
+    expect(page).not.toContain("no release on npm");
   });
 
   it("links to the pages of site-pages and to the repository", () => {

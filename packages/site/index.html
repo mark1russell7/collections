@@ -27,12 +27,66 @@
   <h1>collections</h1>
   <p class="lead">Collections with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.</p>
 
+  <section class="demo" aria-labelledby="cache-title">
+    <h2 id="cache-title">Press a key. Watch the oldest one leave.</h2>
+    <p>This is <code>lruCache</code> from the package, running in this page. A full cache drops the key that waited longest.</p>
+    <div id="cache-keys" class="keys" role="group" aria-label="Keys to read"></div>
+    <ol id="cache-slots" class="slots" aria-label="The cache, newest key first"></ol>
+    <p class="ends"><span>Newest</span><span>Leaves next</span></p>
+    <p id="cache-log" class="log" role="status">Press a key to read it.</p>
+    <div class="row">
+      <span>Hits <strong id="cache-hits">0</strong></span>
+      <span>Misses <strong id="cache-misses">0</strong></span>
+      <span class="stepper">Size
+        <button id="cache-fewer" type="button" aria-label="A smaller cache">−</button>
+        <strong id="cache-capacity">3</strong>
+        <button id="cache-more" type="button" aria-label="A larger cache">+</button>
+      </span>
+    </div>
+  </section>
+
   <h2>Install</h2>
   <div class="command">
     <code id="install">pnpm add @mark1russell7/collections</code>
     <button id="copy" type="button">Copy</button>
   </div>
   <p class="note">This package has no release on npm yet. <a href="./releases/">Releases</a> shows each version, and <a href="./status/">Status</a> shows the open work.</p>
+
+  <section class="demo" aria-labelledby="tree-title">
+    <h2 id="tree-title">Change a list. Keep each old version.</h2>
+    <p>This is <code>summaryTree</code>. Press a bar to change it. Each edit gives a new tree, and each old tree stays whole. Go back and edit from there.</p>
+    <div id="tree-bars" class="bars"></div>
+    <div class="row">
+      <span>Sum <strong id="tree-sum">0</strong></span>
+      <span>Largest <strong id="tree-max">0</strong></span>
+      <span>Leaves <strong id="tree-size">0</strong></span>
+    </div>
+    <div class="row">
+      <button id="tree-older" type="button">Older</button>
+      <span id="tree-version" role="status"></span>
+      <button id="tree-newer" type="button">Newer</button>
+      <button id="tree-add" type="button">Add a leaf</button>
+      <button id="tree-remove" type="button">Remove the last</button>
+    </div>
+  </section>
+
+  <section class="demo" aria-labelledby="graph-title">
+    <h2 id="graph-title">Tasks that wait for each other.</h2>
+    <p>This is <code>buildLeveledDAG</code> and <code>executeDAG</code> from the entry <code>./dag</code>. Select a task, change what it needs, then run the graph.</p>
+    <ol id="graph-levels" class="levels" aria-label="The steps of the graph"></ol>
+    <p id="graph-error" class="error" role="alert" hidden></p>
+    <p class="needs-title"><strong id="graph-selected">build</strong> needs:</p>
+    <div id="graph-needs" class="needs" role="group" aria-label="What the selected task needs"></div>
+    <div class="row">
+      <button id="graph-run" type="button" class="primary">Run</button>
+      <span class="stepper">At a time
+        <button id="graph-fewer" type="button" aria-label="Fewer tasks at a time">−</button>
+        <strong id="graph-limit">2</strong>
+        <button id="graph-more" type="button" aria-label="More tasks at a time">+</button>
+      </span>
+    </div>
+    <p id="graph-log" class="log" role="status"></p>
+  </section>
 </main>
 
 <script type="module" src="./src/index.ts"></script>

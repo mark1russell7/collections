@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The GitHub Pages site of collections: the name, one line, the install command and the links to the Releases page and the Status page.",
+  "description": "The GitHub Pages site of collections: live demos of the LRU cache, the summary tree and the dependency graph, with the real package.",
   "main": "./src/index.ts",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
+  },
+  "dependencies": {
+    "@mark1russell7/collections": "workspace:*"
   },
   "devDependencies": {
     "@mark1russell7/cue": "^2.0.0",

@@ -165,7 +165,11 @@ describe("deepEq objects with internal state", () => {
 
 describe("deepEq plain objects and arrays", () => {
   class Point {
-    constructor(readonly x: number) {}
+    readonly x: number;
+
+    constructor(x: number) {
+      this.x = x;
+    }
   }
 
   it("needs the same prototype on both sides", () => {

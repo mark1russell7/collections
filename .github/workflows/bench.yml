@@ -1,12 +1,17 @@
-# The hash bench: defaultHash against the hash of versions 0.2.0 and earlier, on small and large
-# object keys. Each arm of each case and round runs in a fresh process, and an A/A pair gives the
+# The benches of collections. The suite hash compares defaultHash with the hash of versions 0.2.0
+# and earlier. The suite layers compares compose with the fold of version 0.3.0. Each arm of each case and round runs in a fresh process, and an A/A pair gives the
 # noise of the same run (@mark1russell7/rigor-bench). A person starts a run after a commit adds its
 # prediction. The report goes to packages/collections/bench/records in a pull request.
-name: Hash bench
+name: Bench
 
 on:
   workflow_dispatch:
     inputs:
+      suite:
+        description: The suite to run.
+        type: choice
+        options: [hash, layers]
+        required: true
       prediction:
         description: The id of the prediction of the run. A commit adds the prediction before the run.
         type: string
@@ -46,7 +51,7 @@ jobs:
 
   bench:
     needs: plan
-    name: hash bench (job ${{ matrix.job }})
+    name: ${{ inputs.suite }} bench (job ${{ matrix.job }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -68,12 +73,13 @@ jobs:
       - name: Run the job
         working-directory: packages/collections
         env:
+          SUITE: ${{ inputs.suite }}
           JOB: ${{ matrix.job }}
           ROUNDS: ${{ inputs.rounds }}
-        run: node --import tsx bench/hash-run.ts --job "$JOB" --rounds "$ROUNDS" --out "bench-out/job-$JOB.json"
+        run: node --import tsx bench/run.ts --suite "$SUITE" --job "$JOB" --rounds "$ROUNDS" --out "bench-out/job-$JOB.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: hash-bench-job-${{ matrix.job }}
+          name: bench-job-${{ matrix.job }}
           path: packages/collections/bench-out/job-${{ matrix.job }}.json
           if-no-files-found: error
 
@@ -93,7 +99,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          pattern: hash-bench-job-*
+          pattern: bench-job-*
           merge-multiple: true
           path: packages/collections/bench-out
       - name: Pool the jobs
@@ -102,10 +108,10 @@ jobs:
           RUN: ${{ github.run_id }}
           PREDICTION: ${{ inputs.prediction }}
         run: |
-          node --import tsx bench/hash-report.ts --jobs bench-out --out hash-report.json --run "$RUN"
-          { echo "Prediction: $PREDICTION"; echo '```json'; cat hash-report.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node --import tsx bench/report.ts --jobs bench-out --out bench-report.json --run "$RUN"
+          { echo "Prediction: $PREDICTION"; echo '```json'; cat bench-report.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: hash-bench-report
-          path: packages/collections/hash-report.json
+          name: bench-report
+          path: packages/collections/bench-report.json
           if-no-files-found: error

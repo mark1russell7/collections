@@ -1,5 +1,5 @@
 /**
- * The report of the hash bench: `--jobs <folder> --out <file> [--run <id>]`. This script pools the
+ * The report of a bench: `--jobs <folder> --out <file> [--run <id>]`. This script pools the
  * records of the jobs, and writes the ratio new/old of each case with the A/A band of the same run.
  *
  * The field `bound` is the factor to defend: the high end of the 95 % interval of the ratio, times
@@ -56,7 +56,7 @@ const cases = caseIntervals(pool.candidate).map((entry) => {
 });
 
 const report = {
-  schema: "hash-bench/1",
+  schema: "bench/1",
   run: values.run ?? "",
   aa: { noise: round(band.noise, 4), high: round(band.high, 3), median: round(band.median, 3), cases: band.cases },
   verdict: { outcome: verdict.outcome, reason: verdict.reason },

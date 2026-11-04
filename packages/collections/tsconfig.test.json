@@ -14,6 +14,7 @@
   },
   "include": [
     "src/**/*",
+    "bench/**/*",
     "*.config.ts"
   ],
   "exclude": []

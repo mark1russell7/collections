@@ -205,18 +205,12 @@ importers:
 
   packages/site:
     devDependencies:
-      '@mark1russell7/conventions':
-        specifier: ^0.26.0
-        version: 0.26.0
       '@mark1russell7/cue':
         specifier: ^2.0.0
         version: 2.1.1
       '@mark1russell7/site-pages':
         specifier: ^0.1.10
         version: 0.1.10
-      '@mark1russell7/template-cli':
-        specifier: ^0.1.4
-        version: 0.1.4
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.6

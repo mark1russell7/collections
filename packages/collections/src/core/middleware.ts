@@ -9,13 +9,14 @@
  *
  * @example
  * const list = compose(
- *   safeList(),
- *   eventedList(),
- *   boundedList({ capacity: 100 })
+ *   safeList<number>(),
+ *   eventedList<number>(),
+ *   boundedList<number>({ capacity: 100 })
  * )(arrayList<number>())
  */
 
 import type { Collection } from "../interfaces/collection.js";
+import { compose as fold, type Chain, type Layer, type Stacked } from "./layers.js";
 
 /**
  * A middleware is a function that takes a collection and gives
@@ -52,9 +53,9 @@ export type Middleware<In = any, Out extends In = In> = (next: In) => Out;
  * // 3. bounded - enforces capacity limits
  * // 4. base - the underlying ArrayList
  * const enhancer = compose(
- *   safeList(),
- *   eventedList(),
- *   boundedList({ capacity: 100 })
+ *   safeList<number>(),
+ *   eventedList<number>(),
+ *   boundedList<number>({ capacity: 100 })
  * )
  * const list = enhancer(arrayList<number>())
  * // Type: List<number> & SafeCollection & EventedCollection & BoundedCollection
@@ -62,49 +63,8 @@ export type Middleware<In = any, Out extends In = In> = (next: In) => Out;
  * @param layers The middleware layers to compose
  * @returns A function that applies all layers to a base collection
  */
-
-// Overload for 1 middleware
-export function compose<C, R1 extends C>(
-  m1: Middleware<C, R1>
-): (base: C) => R1;
-
-// Overload for 2 middleware
-export function compose<C, R1 extends C, R2 extends R1>(
-  m1: Middleware<R1, R2>,
-  m2: Middleware<C, R1>
-): (base: C) => R2;
-
-// Overload for 3 middleware
-export function compose<C, R1 extends C, R2 extends R1, R3 extends R2>(
-  m1: Middleware<R2, R3>,
-  m2: Middleware<R1, R2>,
-  m3: Middleware<C, R1>
-): (base: C) => R3;
-
-// Overload for 4 middleware
-export function compose<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3>(
-  m1: Middleware<R3, R4>,
-  m2: Middleware<R2, R3>,
-  m3: Middleware<R1, R2>,
-  m4: Middleware<C, R1>
-): (base: C) => R4;
-
-// Overload for 5 middleware
-export function compose<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3, R5 extends R4>(
-  m1: Middleware<R4, R5>,
-  m2: Middleware<R3, R4>,
-  m3: Middleware<R2, R3>,
-  m4: Middleware<R1, R2>,
-  m5: Middleware<C, R1>
-): (base: C) => R5;
-
-// General fallback for any number of middleware
-export function compose<C>(...layers: Middleware<any, any>[]): (base: C) => any;
-
-// Implementation
-export function compose(...layers: Middleware<any, any>[]) {
-  return (base: any): any =>
-    layers.reduceRight((acc, layer) => layer(acc), base);
+export function compose<const L extends readonly Layer[]>(...layers: L & Chain<L>): Stacked<L> {
+  return fold(...(layers as readonly Layer[])) as unknown as Stacked<L>;
 }
 
 /**
@@ -361,53 +321,11 @@ export const enhanceMethod = <C extends object, K extends keyof C & string>(
  *
  * @example
  * const standardBehaviors = bundle(
- *   boundedList({ capacity: 1000 }),
- *   eventedList(),
- *   safeList()
+ *   boundedList<number>({ capacity: 1000 }),
+ *   eventedList<number>(),
+ *   safeList<number>()
  * )
  *
  * const list = compose(standardBehaviors)(arrayList<number>())
  */
-
-// Overload for 1 middleware
-export function bundle<C, R1 extends C>(
-  m1: Middleware<C, R1>
-): Middleware<C, R1>;
-
-// Overload for 2 middleware
-export function bundle<C, R1 extends C, R2 extends R1>(
-  m1: Middleware<R1, R2>,
-  m2: Middleware<C, R1>
-): Middleware<C, R2>;
-
-// Overload for 3 middleware
-export function bundle<C, R1 extends C, R2 extends R1, R3 extends R2>(
-  m1: Middleware<R2, R3>,
-  m2: Middleware<R1, R2>,
-  m3: Middleware<C, R1>
-): Middleware<C, R3>;
-
-// Overload for 4 middleware
-export function bundle<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3>(
-  m1: Middleware<R3, R4>,
-  m2: Middleware<R2, R3>,
-  m3: Middleware<R1, R2>,
-  m4: Middleware<C, R1>
-): Middleware<C, R4>;
-
-// Overload for 5 middleware
-export function bundle<C, R1 extends C, R2 extends R1, R3 extends R2, R4 extends R3, R5 extends R4>(
-  m1: Middleware<R4, R5>,
-  m2: Middleware<R3, R4>,
-  m3: Middleware<R2, R3>,
-  m4: Middleware<R1, R2>,
-  m5: Middleware<C, R1>
-): Middleware<C, R5>;
-
-// General fallback for any number of middleware
-export function bundle<C>(...middleware: Middleware<any, any>[]): Middleware<C, any>;
-
-// Implementation
-export function bundle(...middleware: Middleware<any, any>[]): Middleware<any, any> {
-  return (next: any): any => compose(...middleware)(next);
-}
+export const bundle: typeof compose = compose;

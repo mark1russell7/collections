@@ -6,7 +6,7 @@
  *
  * @example
  * const list = compose(
- *   boundedList({ capacity: 100, policy: 'drop-oldest' })
+ *   boundedList<number>({ capacity: 100, policy: 'drop-oldest' })
  * )(arrayList<number>())
  *
  * // Add 101 elements - first element will be dropped

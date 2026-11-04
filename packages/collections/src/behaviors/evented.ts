@@ -6,7 +6,7 @@
  *
  * @example
  * const list = compose(
- *   eventedList()
+ *   eventedList<number>()
  * )(arrayList<number>())
  *
  * list.on('add', ({ value, index }) => {

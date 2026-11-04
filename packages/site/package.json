@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/package",
-  "name": "@template/site",
+  "name": "@collections/site",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The GitHub Pages site of the template: a preview of the files of each preset of the CLI, and an explorer of the shared workflows.",
+  "description": "The GitHub Pages site of collections: the name, one line, the install command and the links to the Releases page and the Status page.",
   "main": "./src/index.ts",
   "scripts": {
     "dev": "vite",
@@ -15,10 +15,8 @@
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
   },
   "devDependencies": {
-    "@mark1russell7/conventions": "^0.26.0",
     "@mark1russell7/cue": "^2.0.0",
     "@mark1russell7/site-pages": "^0.1.10",
-    "@mark1russell7/template-cli": "^0.1.4",
     "@types/node": "^26.6.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",

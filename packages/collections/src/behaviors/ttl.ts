@@ -309,7 +309,7 @@ export class TTLCache<K, V> {
   private map = new Map<K, TTLEntry<V>>();
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  constructor(ttl: number, checkInterval: number = 1000, onExpire?: (key: K, value: V) => void) {
+  constructor(ttl: number, checkInterval: number = 1000, onExpire?: ((key: K, value: V) => void) | undefined) {
     this.ttl = ttl;
     this.checkInterval = checkInterval;
     this.onExpire = onExpire;

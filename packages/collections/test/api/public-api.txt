@@ -1067,7 +1067,7 @@ interface KeyedItem {
 
 ### build/index.d.ts#LRUCache
 export declare class LRUCache<K, V> {
-  constructor(capacity: number, onEvict?: (key: K, value: V) => void);
+  constructor(capacity: number, onEvict?: ((key: K, value: V) => void) | undefined);
   get size(): number;
   get isFull(): boolean;
   get(key: K): V | undefined;
@@ -1692,7 +1692,7 @@ export declare class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
 
 ### build/index.d.ts#TTLCache
 export declare class TTLCache<K, V> {
-  constructor(ttl: number, checkInterval?: number, onExpire?: (key: K, value: V) => void);
+  constructor(ttl: number, checkInterval?: number, onExpire?: ((key: K, value: V) => void) | undefined);
   get size(): number;
   get(key: K): V | undefined;
   set(key: K, value: V, customTTL?: number): void;

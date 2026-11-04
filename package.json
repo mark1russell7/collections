@@ -10,9 +10,7 @@
   "scripts": {
     "package": "template package",
     "template": "template repo",
-    "test": "pnpm -r run test && pnpm run test:homes && pnpm run test:actions",
-    "test:homes": "node --test \"scripts/homes/*.test.ts\"",
-    "homes:exports": "node scripts/homes/exports.ts",
+    "test": "pnpm -r run test && pnpm run test:actions",
     "test:actions": "node --test \".github/actions/*.test.ts\"",
     "typecheck": "pnpm -r run typecheck && pnpm run typecheck:scripts",
     "typecheck:scripts": "tsc -p tsconfig.scripts.json",

@@ -39,37 +39,135 @@ export const shallowEq: Eq<any> = (a, b) => {
   return true;
 };
 
-/**
- * Deep structural equality (recursive comparison).
- * This function handles nested objects and arrays.
- */
-export const deepEq: Eq<any> = (a, b): boolean => {
-  if (a === b) return true;
-  if (typeof a !== typeof b) return false;
-  if (typeof a !== "object" || a === null || b === null) return false;
+/** SameValueZero: the meaning of `===`, and NaN equals NaN. */
+const sameValueZero = (a: unknown, b: unknown): boolean => a === b || (Number.isNaN(a) && Number.isNaN(b));
 
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
+const isObject = (value: unknown): value is object => typeof value === "object" && value !== null;
+
+/** The pairs that one comparison holds equal. The log lets a failed try remove its pairs. */
+interface HeldPairs {
+  readonly partners: Map<object, Set<object>>;
+  readonly log: [object, object][];
+}
+
+function releasePairs(held: HeldPairs, mark: number): void {
+  while (held.log.length > mark) {
+    const [a, b] = held.log.pop()!;
+    held.partners.get(a)?.delete(b);
+  }
+}
+
+function equalElements(a: ArrayLike<unknown>, b: ArrayLike<unknown>): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (!sameValueZero(a[i], b[i])) return false;
+  }
+  return true;
+}
+
+function bytesOf(value: ArrayBufferLike | DataView): Uint8Array {
+  return ArrayBuffer.isView(value) ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength) : new Uint8Array(value);
+}
+
+function enumerableKeys(value: object): (string | symbol)[] {
+  return Reflect.ownKeys(value).filter((key) => Object.prototype.propertyIsEnumerable.call(value, key));
+}
+
+function equalKeys(a: any, b: any, held: HeldPairs): boolean {
+  const keys = enumerableKeys(a);
+  if (keys.length !== enumerableKeys(b).length) return false;
+  return keys.every((key) => Object.prototype.propertyIsEnumerable.call(b, key) && equalValues(a[key], b[key], held));
+}
+
+/**
+ * The comparison of the entries of two maps, or of the members of two sets. A primitive key finds
+ * its partner by `has`. An object key tries each object key of `b` that is not taken yet. The first
+ * partner is correct, because the relation is an equivalence.
+ */
+function equalEntries(a: Map<unknown, unknown> | Set<unknown>, b: Map<unknown, unknown> | Set<unknown>, held: HeldPairs): boolean {
+  if (a.size !== b.size) return false;
+  const valueAt = (key: unknown): unknown => (b instanceof Map ? b.get(key) : key);
+  const free = [...b.entries()].filter(([key]) => isObject(key));
+  for (const [key, value] of a.entries()) {
+    if (!isObject(key)) {
+      if (!b.has(key) || !equalValues(value, valueAt(key), held)) return false;
+      continue;
+    }
+    const at = free.findIndex(([otherKey, otherValue]) => {
+      const mark = held.log.length;
+      if (equalValues(key, otherKey, held) && equalValues(value, otherValue, held)) return true;
+      releasePairs(held, mark);
+      return false;
+    });
+    if (at < 0) return false;
+    free.splice(at, 1);
+  }
+  return true;
+}
+
+/** The comparison of two objects with the same prototype. */
+function equalObjects(a: any, b: any, held: HeldPairs): boolean {
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) {
-      if (!deepEq(a[i], b[i])) return false;
+      if (!equalValues(a[i], b[i], held)) return false;
     }
     return true;
   }
-
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
-
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
-
-  if (keysA.length !== keysB.length) return false;
-
-  for (const key of keysA) {
-    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
-    if (!deepEq(a[key], b[key])) return false;
+  if (a instanceof DataView || a instanceof ArrayBuffer || (typeof SharedArrayBuffer !== "undefined" && a instanceof SharedArrayBuffer)) {
+    return equalElements(bytesOf(a), bytesOf(b));
   }
+  if (ArrayBuffer.isView(a)) return equalElements(a as unknown as ArrayLike<unknown>, b);
+  if (a instanceof Promise || a instanceof WeakMap || a instanceof WeakSet || a instanceof WeakRef) return false;
+  if (a instanceof Date && !sameValueZero(a.getTime(), b.getTime())) return false;
+  if (a instanceof RegExp && (a.source !== b.source || a.flags !== b.flags)) return false;
+  if (a instanceof Error && !(a.name === b.name && a.message === b.message && equalValues(a.cause, b.cause, held))) return false;
+  const boxed = a instanceof Number || a instanceof String || a instanceof Boolean || a instanceof BigInt || a instanceof Symbol;
+  if (boxed && !sameValueZero(a.valueOf(), b.valueOf())) return false;
+  if ((a instanceof Map || a instanceof Set) && !equalEntries(a, b, held)) return false;
+  return equalKeys(a, b, held);
+}
 
-  return true;
-};
+/**
+ * The comparison of two values. A pair stays held after it passes, so a shared or cyclic part
+ * costs one visit. A failure ends the whole comparison, or the try in `equalEntries`, which
+ * releases its pairs.
+ */
+function equalValues(a: unknown, b: unknown, held: HeldPairs): boolean {
+  if (sameValueZero(a, b)) return true;
+  if (!isObject(a) || !isObject(b)) return false;
+  if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) return false;
+  let partners = held.partners.get(a);
+  if (partners?.has(b)) return true;
+  if (partners === undefined) {
+    partners = new Set();
+    held.partners.set(a, partners);
+  }
+  partners.add(b);
+  held.log.push([a, b]);
+  return equalObjects(a, b, held);
+}
+
+/**
+ * Deep structural equality. This relation is an equivalence: it is reflexive, symmetric and
+ * transitive, for each value.
+ *
+ * - Primitives compare by SameValueZero: NaN equals NaN, and 0 equals -0.
+ * - Two objects must have the same prototype. So `{}` differs from `Object.create(null)`, from an
+ *   instance of a class with the same keys, and from an object of another realm.
+ * - Arrays compare by length and by index. A hole equals `undefined`.
+ * - Typed arrays compare by element. `ArrayBuffer`, `SharedArrayBuffer` and `DataView` compare by byte.
+ * - `Date` compares by time, `RegExp` by source and flags, and `Error` by name, message and cause.
+ * - A boxed primitive compares by its value. `Map` and `Set` compare by entries, in any order. An object key
+ *   matches a deep-equal key.
+ * - Each other object compares by its own enumerable keys, strings and symbols, in any order. The objects above do too,
+ *   except arrays and binary data.
+ * - Functions, `Promise`, `WeakMap`, `WeakSet` and `WeakRef` compare by identity.
+ * - Cycles are safe: two cyclic values are equal when they unfold to the same infinite tree.
+ *
+ * The recursion follows the depth of the data, so a very deep value can exhaust the stack.
+ */
+export const deepEq: Eq<any> = (a, b): boolean => equalValues(a, b, { partners: new Map(), log: [] });
 
 /**
  * Equality by comparing a specific property.

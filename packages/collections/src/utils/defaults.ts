@@ -218,8 +218,14 @@ function hashPrimitive(value: unknown): number {
 /** The levels of an object that `defaultHash` reads. A cyclic value unfolds to this depth and stops. */
 const HASH_DEPTH = 16;
 
-/** The hashes of one call, by object and by remaining depth. A shared part costs one visit per depth. */
-type HashMemo = Map<object, number[]>;
+/** The visits of one call without the memo. A value of ordinary size does not pay for a memo. */
+const HASH_FREE_VISITS = 65_536;
+
+/** The state of one call. After the free visits, `memo` holds each hash by object and by remaining depth. */
+interface HashState {
+  freeVisits: number;
+  memo: Map<object, number[]> | undefined;
+}
 
 /** This function adds one hash to a running hash. The result depends on the order. */
 const mix = (hash: number, part: number): number => (Math.imul(hash, 31) + part) | 0;
@@ -236,8 +242,8 @@ function scramble(hash: number): number {
 /** The start values of the kinds. Two kinds do not compare equal, so their hashes can differ. */
 const KIND = { array: 3, binary: 5, elements: 7, opaque: 11, record: 13 } as const;
 
-const hashAt = (value: unknown, depth: number, memo: HashMemo): number =>
-  isObject(value) ? hashObject(value, depth, memo) : hashPrimitive(value);
+const hashAt = (value: unknown, depth: number, state: HashState): number =>
+  isObject(value) ? hashObject(value, depth, state) : hashPrimitive(value);
 
 function hashElements(start: number, elements: ArrayLike<unknown>): number {
   let hash = start;
@@ -246,26 +252,31 @@ function hashElements(start: number, elements: ArrayLike<unknown>): number {
 }
 
 /** The sum of the entries of a map or a set. A sum does not depend on the order of the entries. */
-function hashEntries(value: Map<unknown, unknown> | Set<unknown>, depth: number, memo: HashMemo): number {
+function hashEntries(value: Map<unknown, unknown> | Set<unknown>, depth: number, state: HashState): number {
   let sum = 0;
-  for (const [key, entry] of value.entries()) sum = (sum + scramble(mix(hashAt(key, depth, memo), hashAt(entry, depth, memo)))) | 0;
+  for (const [key, entry] of value.entries()) sum = (sum + scramble(mix(hashAt(key, depth, state), hashAt(entry, depth, state)))) | 0;
   return sum;
 }
 
 /** The sum of the own enumerable keys and their values, as `equalKeys` reads them. */
-function hashKeys(value: any, depth: number, memo: HashMemo): number {
+function hashKeys(value: any, depth: number, state: HashState): number {
   let sum = 0;
-  for (const key of enumerableKeys(value)) sum = (sum + scramble(mix(hashPrimitive(key), hashAt(value[key], depth, memo)))) | 0;
+  for (const key of Object.keys(value)) sum = (sum + scramble(mix(hashString(key), hashAt(value[key], depth, state)))) | 0;
+  for (const key of Object.getOwnPropertySymbols(value)) {
+    if (Object.prototype.propertyIsEnumerable.call(value, key)) sum = (sum + scramble(mix(hashPrimitive(key), hashAt(value[key], depth, state)))) | 0;
+  }
   return sum;
 }
 
 /** The hash of the fields of one object. This function reads only what `equalObjects` reads. */
-function hashFields(value: any, depth: number, memo: HashMemo): number {
+function hashFields(value: any, depth: number, state: HashState): number {
   if (Array.isArray(value)) {
     let hash: number = KIND.array;
-    for (let i = 0; i < value.length; i++) hash = mix(hash, hashAt(value[i], depth, memo));
+    for (let i = 0; i < value.length; i++) hash = mix(hash, hashAt(value[i], depth, state));
     return hash;
   }
+  const prototype: unknown = Object.getPrototypeOf(value);
+  if (prototype === Object.prototype || prototype === null) return mix(KIND.record, hashKeys(value, depth, state));
   if (isBinary(value)) return hashElements(KIND.binary, bytesOf(value));
   if (ArrayBuffer.isView(value)) return hashElements(KIND.elements, value as unknown as ArrayLike<unknown>);
   if (isOpaque(value)) return KIND.opaque;
@@ -273,16 +284,21 @@ function hashFields(value: any, depth: number, memo: HashMemo): number {
   if (value instanceof Date) hash = mix(hash, hashNumber(value.getTime()));
   if (value instanceof RegExp) hash = mix(mix(hash, hashString(value.source)), hashString(value.flags));
   if (value instanceof Error) {
-    hash = mix(mix(mix(hash, hashAt(value.name, depth, memo)), hashAt(value.message, depth, memo)), hashAt(value.cause, depth, memo));
+    hash = mix(mix(mix(hash, hashAt(value.name, depth, state)), hashAt(value.message, depth, state)), hashAt(value.cause, depth, state));
   }
   if (isBoxed(value)) hash = mix(hash, hashPrimitive(value.valueOf()));
-  if (value instanceof Map || value instanceof Set) hash = mix(hash, hashEntries(value, depth, memo));
-  return mix(hash, hashKeys(value, depth, memo));
+  if (value instanceof Map || value instanceof Set) hash = mix(hash, hashEntries(value, depth, state));
+  return mix(hash, hashKeys(value, depth, state));
 }
 
 /** The hash of one object at one depth. The depth falls with each level, so a cycle ends. */
-function hashObject(value: object, depth: number, memo: HashMemo): number {
+function hashObject(value: object, depth: number, state: HashState): number {
   if (depth === 0) return 0;
+  if (state.freeVisits > 0) {
+    state.freeVisits--;
+    return hashFields(value, depth - 1, state);
+  }
+  const memo = (state.memo ??= new Map());
   let byDepth = memo.get(value);
   if (byDepth === undefined) {
     byDepth = [];
@@ -290,7 +306,7 @@ function hashObject(value: object, depth: number, memo: HashMemo): number {
   }
   const known = byDepth[depth];
   if (known !== undefined) return known;
-  const hash = hashFields(value, depth - 1, memo);
+  const hash = hashFields(value, depth - 1, state);
   byDepth[depth] = hash;
   return hash;
 }
@@ -303,11 +319,11 @@ function hashObject(value: object, depth: number, memo: HashMemo): number {
  *   and of the entries of a `Map` or a `Set`, has no effect.
  * - The hash reads 16 levels, so a cyclic or very deep value ends. Two values that differ only
  *   below that depth have one hash, and `deepEq` then tells them apart.
- * - A shared part costs one visit per level, so a dense graph ends.
+ * - After 65536 visits, a shared part costs one visit per level, so a dense graph ends.
  * - The hash of an object can change in a new version. Do not store it.
  */
 export const defaultHash: Hash<any> = (value: any): number =>
-  isObject(value) ? hashObject(value, HASH_DEPTH, new Map()) : hashPrimitive(value);
+  isObject(value) ? hashObject(value, HASH_DEPTH, { freeVisits: HASH_FREE_VISITS, memo: undefined }) : hashPrimitive(value);
 
 /**
  * Hash function for strings using djb2 algorithm.

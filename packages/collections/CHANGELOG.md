@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1
+
+PATCH: an internal change with no effect on the public API.
+
+### Changed
+
+- `defaultHash` takes less time on plain objects. It reads their keys directly, and it uses its memo only after 65536 visits. The hash of each value stays the same.
+
 ## 0.4.0
 
 The entry `./layers` holds one fold for a stack of layers, and `compose` keeps the type of each layer. MINOR: before 1.0.0 a breaking change raises MINOR. A call of `compose` with an explicit type argument no longer compiles.

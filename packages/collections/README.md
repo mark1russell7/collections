@@ -11,17 +11,20 @@ npm i @mark1russell7/collections
 ## Lists, maps and behaviors
 
 ```ts
+import assert from "node:assert/strict";
 import { arrayList, compose, hashMap, lruMap } from "@mark1russell7/collections";
 
 const list = arrayList<number>();
 list.add(1);
 list.add(2);
+assert.equal(list.size, 2);
 
 const cache = compose(lruMap<string, number>({ capacity: 2 }))(hashMap<string, number>());
 cache.set("a", 1);
 cache.set("b", 2);
 cache.set("c", 3);
-cache.has("a"); // false: the map removed the oldest key
+// The map removed the oldest key
+assert.equal(cache.has("a"), false);
 ```
 
 ## The summary tree
@@ -29,6 +32,7 @@ cache.has("a"); // false: the map removed the oldest key
 A summary tree is a persistent sequence. Each node keeps the sum of its leaves in a monoid. Each change gives a new tree in logarithmic time, and the old tree stays the same.
 
 ```ts
+import assert from "node:assert/strict";
 import { summaryTree, type SummarySpec } from "@mark1russell7/collections";
 
 const text: SummarySpec<string, string> = {
@@ -36,7 +40,7 @@ const text: SummarySpec<string, string> = {
   measure: (leaf) => leaf,
 };
 const tree = summaryTree(text, ["a", "b", "c"]);
-tree.summary; // "abc"
+assert.equal(tree.summary, "abc");
 ```
 
 ## Dependency graphs
@@ -44,26 +48,38 @@ tree.summary; // "abc"
 The entry `./dag` gives the levels of a graph, and a run of each level with a limit of concurrency.
 
 ```ts
+import assert from "node:assert/strict";
 import { buildLeveledDAG, getTopologicalOrder } from "@mark1russell7/collections/dag";
 
 const nodes = new Map([
   ["app", { id: "app", dependencies: ["lib"] }],
   ["lib", { id: "lib", dependencies: [] }],
 ]);
-getTopologicalOrder(buildLeveledDAG(nodes)).map((node) => node.id); // ["lib", "app"]
+assert.deepEqual(getTopologicalOrder(buildLeveledDAG(nodes)).map((node) => node.id), ["lib", "app"]);
 ```
 
 The entry `./graph` gives `hubBreadthFirstOrder`: the order of a weighted graph, from its largest hub, with no other imports.
 
 ```ts
+import assert from "node:assert/strict";
 import { hubBreadthFirstOrder } from "@mark1russell7/collections/graph";
 
-hubBreadthFirstOrder(3, [{ a: 0, b: 1 }, { a: 1, b: 2 }]); // [1, 0, 2]
+assert.deepEqual(hubBreadthFirstOrder(3, [{ a: 0, b: 1 }, { a: 1, b: 2 }]), [1, 0, 2]);
 ```
 
 ## Contract checks
 
 The entry `./testing` gives the small checks of a contract suite: `holds`, `same`, `rejects`, `deepEqual`, `show` and `ContractViolation`. These checks import no test framework.
+
+## Guides
+
+Each guide has examples that the tests of the package run.
+
+- [Collections and behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/collections.md)
+- [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md)
+- [Dependency graphs](https://github.com/mark1russell7/collections/blob/main/docs/guides/dag.md)
+- [Graph order](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md)
+- [Contract checks](https://github.com/mark1russell7/collections/blob/main/docs/guides/testing.md)
 
 ## Entries
 

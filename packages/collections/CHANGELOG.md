@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.5.0
+
+The LRU and bounded layers check their capacity, and `LRUCache` gets `deleteWhere`. MINOR: before 1.0.0 a breaking change raises MINOR. A capacity that is not a positive whole number now throws.
+
+### Added
+
+- `LRUCache.deleteWhere(matches)` deletes each entry for which `matches` gives true, and gives their number. It is not a use, and it does not start `onEvict`.
+
+### Changed
+
+- `LRUCache`, `lruCache`, `lruMap`, `boundedList`, `boundedQueue`, `boundedDeque` and `boundedMap` throw `RangeError` when the capacity is not a positive whole number.
+
+### Fixed
+
+- A capacity of `NaN` made these structures grow without a limit, because the comparison `size >= capacity` was always false.
+
 ## 0.4.0
 
 The entry `./layers` holds one fold for a stack of layers, and `compose` keeps the type of each layer. MINOR: before 1.0.0 a breaking change raises MINOR. A call of `compose` with an explicit type argument no longer compiles.

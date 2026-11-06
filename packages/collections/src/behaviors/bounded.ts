@@ -15,6 +15,7 @@
  * }
  */
 
+import { checkCapacity } from "../core/capacity.js";
 import type { Middleware } from "../core/middleware.js";
 import type { List } from "../interfaces/list.js";
 import type { Queue, Deque } from "../interfaces/queue.js";
@@ -66,7 +67,8 @@ export interface BoundedCollection {
 export function boundedList<T>(
   options: BoundedOptions<T>
 ): Middleware<List<T>, List<T> & BoundedCollection> {
-  const { capacity, policy = "throw", onOverflow } = options;
+  const { policy = "throw", onOverflow } = options;
+  const capacity = checkCapacity(options.capacity, "boundedList");
 
   return (next: List<T>): List<T> & BoundedCollection => {
     // An unshift puts the element at the front, so drop-oldest drops the last element for it
@@ -235,7 +237,8 @@ export function boundedList<T>(
 export function boundedQueue<T>(
   options: BoundedOptions<T>
 ): Middleware<Queue<T>, Queue<T> & BoundedCollection> {
-  const { capacity, policy = "throw", onOverflow } = options;
+  const { policy = "throw", onOverflow } = options;
+  const capacity = checkCapacity(options.capacity, "boundedQueue");
 
   return (next: Queue<T>): Queue<T> & BoundedCollection => {
     const handleOverflow = (element: T): void => {
@@ -306,7 +309,8 @@ export function boundedQueue<T>(
 export function boundedDeque<T>(
   options: BoundedOptions<T>
 ): Middleware<Deque<T>, Deque<T> & BoundedCollection> {
-  const { capacity, policy = "throw", onOverflow } = options;
+  const { policy = "throw", onOverflow } = options;
+  const capacity = checkCapacity(options.capacity, "boundedDeque");
 
   return (next: Deque<T>): Deque<T> & BoundedCollection => {
     const handleOverflow = (element: T): void => {
@@ -383,7 +387,8 @@ export function boundedMap<K, V>(
     onOverflow?: (context: Omit<OverflowContext<V>, "newElement"> & { key: K; value: V }) => void;
   }
 ): Middleware<MapLike<K, V>, MapLike<K, V> & BoundedCollection> {
-  const { capacity, policy = "throw", onOverflow } = options;
+  const { policy = "throw", onOverflow } = options;
+  const capacity = checkCapacity(options.capacity, "boundedMap");
 
   return (next: MapLike<K, V>): MapLike<K, V> & BoundedCollection => {
     let insertionOrder: K[] = []; // Track insertion order for drop-oldest

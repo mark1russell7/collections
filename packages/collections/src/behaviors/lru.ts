@@ -14,6 +14,7 @@
  * // When full, least recently accessed keys are evicted
  */
 
+import { checkCapacity } from "../core/capacity.js";
 import type { Middleware } from "../core/middleware.js";
 import type { MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
@@ -23,7 +24,8 @@ import { compositeMapMethod } from "./composite.js";
  */
 export interface LRUOptions {
   /**
-   * Maximum capacity. When exceeded, least recently used items are evicted.
+   * The maximum number of entries, a positive whole number. When the map is full, a new key
+   * evicts the least recently used entry.
    */
   capacity: number;
 
@@ -50,11 +52,14 @@ interface LRUNode<K, V> {
  * This function maintains a doubly-linked list to track access order.
  * Most recently accessed items are at the head.
  * When capacity is exceeded, items at the tail are evicted.
+ *
+ * @throws RangeError when `options.capacity` is not a positive whole number.
  */
 export function lruMap<K, V>(
   options: LRUOptions
 ): Middleware<MapLike<K, V>, MapLike<K, V> & { readonly isFull: boolean }> {
-  const { capacity, onEvict } = options;
+  const { onEvict } = options;
+  const capacity = checkCapacity(options.capacity, "lruMap");
 
   return (next: MapLike<K, V>): MapLike<K, V> & { readonly isFull: boolean } => {
     // Doubly-linked list for LRU tracking
@@ -290,8 +295,13 @@ export class LRUCache<K, V> {
   private head: LRUNode<K, V> | null = null;
   private tail: LRUNode<K, V> | null = null;
 
+  /**
+   * @param capacity - The maximum number of entries, a positive whole number.
+   * @param onEvict - The function that this cache starts for each entry that it evicts.
+   * @throws RangeError when `capacity` is not a positive whole number.
+   */
   constructor(capacity: number, onEvict?: ((key: K, value: V) => void) | undefined) {
-    this.capacity = capacity;
+    this.capacity = checkCapacity(capacity, "LRUCache");
     this.onEvict = onEvict;
   }
 
@@ -357,6 +367,32 @@ export class LRUCache<K, V> {
     this.removeNode(entry.node);
     this.map.delete(key);
     return true;
+  }
+
+  /**
+   * This method deletes each entry for which `matches` gives true, and it gives the number of
+   * deleted entries. It is not a use: the order of the other entries does not change, and it
+   * does not start `onEvict`. It starts `matches` once for each entry, the most recent first. If
+   * `matches` throws, the entries that it matched before stay deleted.
+   *
+   * @param matches - The test of an entry.
+   * @returns The number of deleted entries.
+   */
+  deleteWhere(matches: (value: V, key: K) => boolean): number {
+    const nodes: LRUNode<K, V>[] = [];
+    for (let node = this.head; node; node = node.next) nodes.push(node);
+    let deleted = 0;
+    for (const node of nodes) {
+      // The function `matches` can change the cache. Skip each node that is not in it now.
+      if (this.map.get(node.key)?.node !== node) continue;
+      if (!matches(node.value, node.key)) continue;
+      // The function `matches` can delete this node itself, so check again.
+      if (this.map.get(node.key)?.node !== node) continue;
+      this.removeNode(node);
+      this.map.delete(node.key);
+      deleted++;
+    }
+    return deleted;
   }
 
   clear(): void {
@@ -439,7 +475,9 @@ export class LRUCache<K, V> {
 }
 
 /**
- * Factory function to make an LRU cache.
+ * This function makes an LRU cache.
+ *
+ * @throws RangeError when `capacity` is not a positive whole number.
  */
 export function lruCache<K, V>(
   capacity: number,

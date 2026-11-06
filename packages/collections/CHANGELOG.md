@@ -13,6 +13,7 @@
 ### Changed
 
 - With `failFast: false`, `executeDAG` started each node of each level, also when a dependency of the node failed. So a node used the work of a failed node. Now the node does not start.
+
 ## 0.5.0
 
 The LRU and bounded layers check their capacity, and `LRUCache` gets `deleteWhere`. MINOR: before 1.0.0 a breaking change raises MINOR. A capacity that is not a positive whole number now throws.

@@ -22,6 +22,31 @@ import type { Queue, Deque } from "../interfaces/queue.js";
 import type { MapLike } from "../interfaces/map.js";
 import type { Collection } from "../interfaces/collection.js";
 import { Emitter, type Unsubscribe } from "../core/events.js";
+import { removalsOf, type ElementRemoval, type MapRemoval, type RemovalReason } from "../core/removals.js";
+
+/** The number of removals that a layer heard from the layers below it, and the number from the first end. */
+interface Heard {
+  all: number;
+  first: number;
+}
+
+/**
+ * This function gives each removal below `next` to `listener` and counts the removals.
+ * With the counts, a layer tells a refused add (the size did not grow) from an add that caused a drop.
+ */
+function hear<R extends ElementRemoval<unknown> | MapRemoval<unknown, unknown>>(next: object, listener: (removal: R) => void): Heard {
+  const heard: Heard = { all: 0, first: 0 };
+  removalsOf<R>(next)?.on((removal) => {
+    heard.all++;
+    if ("end" in removal && removal.end === "first") heard.first++;
+    listener(removal);
+  });
+  return heard;
+}
+
+/** This function tells if a call added an element: the size grew, after the removals of the layers below. */
+const added = (size: number, sizeBefore: number, heard: Heard, heardBefore: number): boolean =>
+  size - sizeBefore + heard.all - heardBefore > 0;
 
 // ============================================================================
 // Event type definitions
@@ -33,8 +58,8 @@ import { Emitter, type Unsubscribe } from "../core/events.js";
 export interface ListEvents<T> {
   /** Element was added */
   add: { value: T; index?: number };
-  /** Element was removed */
-  remove: { value: T; index?: number };
+  /** Element was removed. A removal by a layer below (a drop) has a `reason`. */
+  remove: { value: T; index?: number; reason?: RemovalReason };
   /** Element was replaced */
   set: { oldValue: T; newValue: T; index: number };
   /** Collection was cleared */
@@ -51,8 +76,8 @@ export interface ListEvents<T> {
 export interface QueueEvents<T> {
   /** Element was added to queue */
   enqueue: { value: T };
-  /** Element was removed from queue */
-  dequeue: { value: T };
+  /** Element was removed from queue. A removal by a layer below (a drop) has a `reason`. */
+  dequeue: { value: T; reason?: RemovalReason };
   /** Collection was cleared */
   clear: {};
 }
@@ -65,10 +90,10 @@ export interface DequeEvents<T> {
   addFirst: { value: T };
   /** Element was added to back */
   addLast: { value: T };
-  /** Element was removed from front */
-  removeFirst: { value: T };
-  /** Element was removed from back */
-  removeLast: { value: T };
+  /** Element was removed from front. A removal by a layer below (a drop) has a `reason`. */
+  removeFirst: { value: T; reason?: RemovalReason };
+  /** Element was removed from back. A removal by a layer below (a drop) has a `reason`. */
+  removeLast: { value: T; reason?: RemovalReason };
   /** Collection was cleared */
   clear: {};
 }
@@ -79,8 +104,8 @@ export interface DequeEvents<T> {
 export interface MapEvents<K, V> {
   /** Key-value pair was set */
   set: { key: K; value: V; oldValue?: V };
-  /** Key was deleted */
-  delete: { key: K; value: V };
+  /** Key was deleted. A removal by a layer below (a drop, an eviction or an expiry) has a `reason`. */
+  delete: { key: K; value: V; reason?: RemovalReason };
   /** Collection was cleared */
   clear: {};
 }
@@ -91,8 +116,8 @@ export interface MapEvents<K, V> {
 export interface CollectionEvents<T> {
   /** Element was added */
   add: { value: T };
-  /** Element was removed */
-  remove: { value: T };
+  /** Element was removed. A removal by a layer below has a `reason`. */
+  remove: { value: T; reason?: RemovalReason };
   /** Collection was cleared */
   clear: {};
 }
@@ -117,6 +142,10 @@ export function eventedList<T>(): Middleware<
 > {
   return (next: List<T>) => {
     const emitter = new Emitter<ListEvents<T>>();
+    // A removal from the last end left the index that is now the size
+    const heard = hear<ElementRemoval<T>>(next, ({ value, end, reason }) =>
+      emitter.emit("remove", end === undefined ? { value, reason } : { value, index: end === "first" ? 0 : next.size, reason }),
+    );
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -129,24 +158,34 @@ export function eventedList<T>(): Middleware<
 
         if (typeof value === "function") {
           switch (prop) {
+            // A layer below can refuse the element (reject, drop-newest): then no event
             case "add":
             case "push":
               return function (element: T): any {
+                const size = target.size;
+                const all = heard.all;
                 const result = (value as Function).call(target, element);
-                emitter.emit("add", { value: element });
+                if (added(target.size, size, heard, all)) emitter.emit("add", { value: element });
                 return result;
               };
 
             case "unshift":
               return function (element: T): void {
+                const size = target.size;
+                const all = heard.all;
                 (value as Function).call(target, element);
-                emitter.emit("add", { value: element, index: 0 });
+                if (added(target.size, size, heard, all)) emitter.emit("add", { value: element, index: 0 });
               };
 
             case "insert":
               return function (index: number, element: T): void {
+                const size = target.size;
+                const all = heard.all;
+                const first = heard.first;
                 (value as Function).call(target, index, element);
-                emitter.emit("add", { value: element, index });
+                if (!added(target.size, size, heard, all)) return;
+                // A drop of the first element below moved each later index one place lower
+                emitter.emit("add", { value: element, index: heard.first > first ? Math.max(0, index - 1) : index });
               };
 
             case "set":
@@ -175,7 +214,8 @@ export function eventedList<T>(): Middleware<
             case "pop":
               return function (): T {
                 const removed = (value as Function).call(target);
-                emitter.emit("remove", { value: removed });
+                // The last element had the index that is now the size
+                emitter.emit("remove", { value: removed, index: target.size });
                 return removed;
               };
 
@@ -226,6 +266,7 @@ export function eventedQueue<T>(): Middleware<
 > {
   return (next: Queue<T>) => {
     const emitter = new Emitter<QueueEvents<T>>();
+    hear<ElementRemoval<T>>(next, ({ value, reason }) => emitter.emit("dequeue", { value, reason }));
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -284,6 +325,9 @@ export function eventedDeque<T>(): Middleware<
 > {
   return (next: Deque<T>) => {
     const emitter = new Emitter<DequeEvents<T>>();
+    const heard = hear<ElementRemoval<T>>(next, ({ value, end, reason }) =>
+      emitter.emit(end === "last" ? "removeLast" : "removeFirst", { value, reason }),
+    );
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -295,22 +339,21 @@ export function eventedDeque<T>(): Middleware<
 
         if (typeof value === "function") {
           switch (prop) {
+            // push of a deque adds at the end (see Deque.push). A layer below can refuse the element.
             case "addFirst":
             case "offerFirst":
-            case "push":
-              return function (element: T): any {
-                const result = (value as Function).call(target, element);
-                emitter.emit("addFirst", { value: element });
-                return result;
-              };
-
             case "addLast":
             case "offerLast":
             case "offer":
             case "add":
+            case "push":
               return function (element: T): any {
+                const size = target.size;
+                const all = heard.all;
                 const result = (value as Function).call(target, element);
-                emitter.emit("addLast", { value: element });
+                if (added(target.size, size, heard, all)) {
+                  emitter.emit(prop === "addFirst" || prop === "offerFirst" ? "addFirst" : "addLast", { value: element });
+                }
                 return result;
               };
 
@@ -365,6 +408,7 @@ export function eventedMap<K, V>(): Middleware<
 > {
   return (next: MapLike<K, V>) => {
     const emitter = new Emitter<MapEvents<K, V>>();
+    const heard = hear<MapRemoval<K, V>>(next, ({ key, value, reason }) => emitter.emit("delete", { key, value, reason }));
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -378,8 +422,13 @@ export function eventedMap<K, V>(): Middleware<
           switch (prop) {
             case "set":
               return function (key: K, val: V): V | undefined {
+                const size = target.size;
+                const all = heard.all;
                 const oldValue = (value as Function).call(target, key, val);
-                emitter.emit("set", { key, value: val, oldValue });
+                // A new key that a layer below refused (reject, drop-newest) gives no event
+                if (oldValue !== undefined || added(target.size, size, heard, all)) {
+                  emitter.emit("set", { key, value: val, oldValue });
+                }
                 return oldValue;
               };
 
@@ -420,6 +469,7 @@ export function evented<T>(): Middleware<
 > {
   return (next: Collection<T>) => {
     const emitter = new Emitter<CollectionEvents<T>>();
+    hear<ElementRemoval<T>>(next, ({ value, reason }) => emitter.emit("remove", { value, reason }));
 
     return new Proxy(next, {
       get(target, prop, receiver) {

@@ -14,6 +14,7 @@ export * from "./core/effects.js";
 export * from "./core/policies.js";
 export * from "./core/middleware.js";
 export * from "./core/events.js";
+export * from "./core/removals.js";
 // ============================================================================
 // Interfaces
 // ============================================================================

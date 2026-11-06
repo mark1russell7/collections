@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 358 names
+## . (build/index.d.ts): 366 names
 
 ArrayConvertible: build/index.d.ts#ArrayConvertible
 ArrayDeque: build/index.d.ts#ArrayDeque
@@ -47,6 +47,7 @@ type Deque: build/index.d.ts#Deque
 DequeEvents: build/index.d.ts#DequeEvents
 Disposable: build/index.d.ts#Disposable
 ElementOf: build/index.d.ts#ElementOf
+ElementRemoval: build/index.d.ts#ElementRemoval
 ElementType: build/index.d.ts#ElementType
 Emitter: build/index.d.ts#Emitter
 Emptiable: build/index.d.ts#Emptiable
@@ -87,6 +88,7 @@ Listener: build/index.d.ts#Listener
 type ListenerErrorHandler: build/index.d.ts#ListenerErrorHandler
 MapEvents: build/index.d.ts#MapEvents
 MapLike: build/index.d.ts#MapLike
+MapRemoval: build/index.d.ts#MapRemoval
 MergeFunction: build/index.d.ts#MergeFunction
 Middleware: build/index.d.ts#Middleware
 MultiMap: build/index.d.ts#MultiMap
@@ -113,6 +115,9 @@ ReadonlyMapLike: build/index.d.ts#ReadonlyMapLike
 ReadonlyOptions: build/index.d.ts#ReadonlyOptions
 type ReadonlyQueue: build/index.d.ts#ReadonlyQueue
 ReadonlySet: build/index.d.ts#ReadonlySet
+RemovalChannel: build/index.d.ts#RemovalChannel
+RemovalReason: build/index.d.ts#RemovalReason
+RemovalSource: build/index.d.ts#RemovalSource
 Result: build/index.d.ts#Result
 RetryContext: build/index.d.ts#RetryContext
 RetryPolicy: build/index.d.ts#RetryPolicy
@@ -301,6 +306,9 @@ reduce: build/index.d.ts#reduce
 reducing: build/index.d.ts#reducing
 reducingWith: build/index.d.ts#reducingWith
 reentrantSynchronized: build/index.d.ts#reentrantSynchronized
+removalSource: build/index.d.ts#removalSource
+removals: build/index.d.ts#removals
+removalsOf: build/index.d.ts#removalsOf
 reportListenerError: build/index.d.ts#reportListenerError
 requireNonEmpty: build/index.d.ts#requireNonEmpty
 requireNonNull: build/index.d.ts#requireNonNull
@@ -768,6 +776,7 @@ export interface CollectionEvents<T> {
   };
   remove: {
     value: T;
+    reason?: RemovalReason;
   };
   clear: {};
 }
@@ -853,9 +862,11 @@ export interface DequeEvents<T> {
   };
   removeFirst: {
     value: T;
+    reason?: RemovalReason;
   };
   removeLast: {
     value: T;
+    reason?: RemovalReason;
   };
   clear: {};
 }
@@ -867,6 +878,13 @@ export interface Disposable {
 
 ### build/index.d.ts#ElementOf
 export type ElementOf<C> = C extends ReadonlyCollection<infer T> ? T : never;
+
+### build/index.d.ts#ElementRemoval
+export interface ElementRemoval<T> {
+  readonly value: T;
+  readonly end?: "first" | "last";
+  readonly reason: RemovalReason;
+}
 
 ### build/index.d.ts#ElementType
 export type ElementType<C> = C extends {
@@ -1239,6 +1257,7 @@ export interface ListEvents<T> {
   remove: {
     value: T;
     index?: number;
+    reason?: RemovalReason;
   };
   set: {
     oldValue: T;
@@ -1266,6 +1285,7 @@ export interface MapEvents<K, V> {
   delete: {
     key: K;
     value: V;
+    reason?: RemovalReason;
   };
   clear: {};
 }
@@ -1284,6 +1304,13 @@ export interface MapLike<K, V> extends ReadonlyMapLike<K, V> {
   merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V) => V | undefined): V | undefined;
   putAll(other: ReadonlyMapLike<K, V> | Iterable<Entry<K, V>>): void;
   clear(): void;
+}
+
+### build/index.d.ts#MapRemoval
+export interface MapRemoval<K, V> {
+  readonly key: K;
+  readonly value: V;
+  readonly reason: RemovalReason;
 }
 
 ### build/index.d.ts#MergeFunction
@@ -1442,6 +1469,7 @@ export interface QueueEvents<T> {
   };
   dequeue: {
     value: T;
+    reason?: RemovalReason;
   };
   clear: {};
 }
@@ -1510,6 +1538,20 @@ interface ReadonlyQueue<T> extends ReadonlyCollection<T> {
 export interface ReadonlySet<T> extends ReadonlyCollection<T> {
   contains(element: T): boolean;
   containsAll(other: Iterable<T>): boolean;
+}
+
+### build/index.d.ts#RemovalChannel
+export interface RemovalChannel<R> {
+  on(listener: Listener<R>): Unsubscribe;
+}
+
+### build/index.d.ts#RemovalReason
+export type RemovalReason = "drop" | "evict" | "expire";
+
+### build/index.d.ts#RemovalSource
+export interface RemovalSource<R> {
+  readonly channel: RemovalChannel<R>;
+  emit(removal: R): void;
 }
 
 ### build/index.d.ts#Result
@@ -2353,6 +2395,15 @@ export declare function reducingWith<T, U>(identity: U, mapper: (element: T) => 
 
 ### build/index.d.ts#reentrantSynchronized
 export declare function reentrantSynchronized<C extends object>(): Middleware<C>;
+
+### build/index.d.ts#removalSource
+export declare function removalSource<R>(next: object, below?: (removal: R) => void): RemovalSource<R>;
+
+### build/index.d.ts#removals
+export declare const removals: unique symbol;
+
+### build/index.d.ts#removalsOf
+export declare function removalsOf<R>(collection: object): RemovalChannel<R> | undefined;
 
 ### build/index.d.ts#reportListenerError
 export declare const reportListenerError: ListenerErrorHandler;

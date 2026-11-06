@@ -170,10 +170,19 @@ type Evented = MapLike<number, string> & {
 };
 type R = { sut: MapLike<number, string>; replay: Map<number, string>; dispose: () => void };
 
+/** This function calls `run`. A throw (the policy "throw" of a full map) is a refusal: the events must show no change. */
+function refusable(run: () => unknown): void {
+  try {
+    run();
+  } catch {
+    // refused
+  }
+}
+
 const replaySteps: fc.Arbitrary<Step<R, null>> = fc.oneof(
   fc.integer({ min: 0, max: TTL + 2 }).map((ms) => step<R, null>(`advance(${ms})`, () => void vi.advanceTimersByTime(ms))),
-  { arbitrary: fc.tuple(key, letter).map(([k, v]) => step<R, null>(`set(${k}, ${v})`, ({ sut }) => void sut.set(k, v))), weight: 4 },
-  fc.tuple(key, letter).map(([k, v]) => step<R, null>(`setIfAbsent(${k}, ${v})`, ({ sut }) => void sut.setIfAbsent(k, v))),
+  { arbitrary: fc.tuple(key, letter).map(([k, v]) => step<R, null>(`set(${k}, ${v})`, ({ sut }) => refusable(() => sut.set(k, v)))), weight: 4 },
+  fc.tuple(key, letter).map(([k, v]) => step<R, null>(`setIfAbsent(${k}, ${v})`, ({ sut }) => refusable(() => sut.setIfAbsent(k, v)))),
   key.map((k) => step<R, null>(`get(${k})`, ({ sut }) => void sut.getOrUndefined(k))),
   key.map((k) => step<R, null>(`has(${k})`, ({ sut }) => void sut.has(k))),
   key.map((k) => step<R, null>(`delete(${k})`, ({ sut }) => void sut.delete(k))),
@@ -207,6 +216,68 @@ describe("eventedMap at the bottom of a stack", () => {
       check: ({ sut, replay }) => {
         const entries = [...sut].map((e) => [e.key, e.value]).sort(([a], [b]) => (a as number) - (b as number));
         expect([...replay].sort(([a], [b]) => a - b)).toEqual(entries);
+      },
+      dispose: (s) => s.dispose(),
+      maxSteps: 60,
+      numRuns: 100,
+    });
+  });
+});
+
+describe("eventedMap above a removing layer", () => {
+  // Before 0.8.0 an evented layer above these layers did not see their removals (C23)
+  const disposable = <M extends MapLike<number, string>>(m: M, dispose: () => void = () => {}): { map: M; dispose: () => void } => ({ map: m, dispose });
+  const stacks: [string, () => { map: MapLike<number, string>; dispose: () => void }][] = [
+    ...(["drop-oldest", "drop-newest", "reject", "throw"] as const).map(
+      (policy) => [`boundedMap (${policy})`, () => disposable(boundedMap<number, string>({ capacity: 3, policy })(hashMap<number, string>()))] as [string, () => { map: MapLike<number, string>; dispose: () => void }],
+    ),
+    ["lruMap", () => disposable(lruMap<number, string>({ capacity: 3 })(hashMap<number, string>()))],
+    [
+      "ttlMap",
+      () => {
+        const ttl = ttlMap<number, string>({ ttl: TTL, checkInterval: 4 })(hashMap<number, string>());
+        return disposable(ttl, () => ttl.dispose());
+      },
+    ],
+    [
+      "lruMap over ttlMap",
+      () => {
+        const ttl = ttlMap<number, string>({ ttl: TTL, checkInterval: 4 })(hashMap<number, string>());
+        return disposable(lruMap<number, string>({ capacity: 3 })(ttl), () => ttl.dispose());
+      },
+    ],
+    [
+      "boundedMap (drop-oldest) over ttlMap",
+      () => {
+        const ttl = ttlMap<number, string>({ ttl: TTL, checkInterval: 1000 })(hashMap<number, string>());
+        return disposable(boundedMap<number, string>({ capacity: 3, policy: "drop-oldest" })(ttl), () => ttl.dispose());
+      },
+    ],
+    [
+      "ttlMap over lruMap",
+      () => {
+        const ttl = ttlMap<number, string>({ ttl: TTL, checkInterval: 4 })(lruMap<number, string>({ capacity: 3 })(hashMap<number, string>()));
+        return disposable(ttl, () => ttl.dispose());
+      },
+    ],
+  ];
+  it.each(stacks)("gives events whose replay is the entries of the stack (%s)", (name, make) => {
+    runModel<R, null>({
+      create: () => {
+        const { map, dispose } = make();
+        const evented = eventedMap<number, string>()(map) as unknown as Evented;
+        const replay = new Map<number, string>();
+        evented.on("set", ({ key: k, value: v }) => void replay.set(k, v));
+        evented.on("delete", ({ key: k }) => void replay.delete(k));
+        evented.on("clear", () => replay.clear());
+        return { sut: { sut: evented, replay, dispose }, model: null };
+      },
+      steps: replaySteps,
+      check: ({ sut, replay }) => {
+        const entries = [...sut].map((e) => [e.key, e.value]).sort(([a], [b]) => (a as number) - (b as number));
+        expect([...replay].sort(([a], [b]) => a - b)).toEqual(entries);
+        // Each stack but ttlMap alone has the capacity 3
+        if (name !== "ttlMap") expect(sut.size).toBeLessThanOrEqual(3);
       },
       dispose: (s) => s.dispose(),
       maxSteps: 60,

@@ -120,7 +120,8 @@ for (const [name, create, order] of [
         check: (s, m) => checkEntries(s, m, order),
         maxSteps: 150,
       });
-    });
+      // The sequences have the size "medium" since 0.7.0: on a loaded machine the first base took 5.2 s of 5 s
+    }, 15_000);
   });
 }
 

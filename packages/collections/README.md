@@ -27,7 +27,13 @@ cache.has("a"); // false: the map removed the oldest key
 `compose` applies its layers from right to left, so the last layer is next to the base. The order of the layers is important:
 
 - Put `ttlMap` below `lruMap`: `compose(lruMap(...), ttlMap(...))`. Then an expired entry is not an eviction.
-- Put an evented layer next to the base. Then its events include each drop, eviction and expiry of the layers above it. A layer above `boundedMap`, `lruMap` or `ttlMap` does not see their removals.
+- An evented layer can go at each place. Below a removing layer, it gets each removal as a call. Above it, it gets each removal from the removal channel, with a `reason`.
+
+The bounded layers, `lruMap` and `ttlMap` remove entries by themselves. Each of them sends its removals on a removal channel, and each layer above it gets them. `removalsOf(collection)` gives the channel:
+
+```typescript
+removalsOf<MapRemoval<string, User>>(cache)?.on(({ key, reason }) => console.log(key, reason)); // "evict" or "expire"
+```
 
 ## The summary tree
 

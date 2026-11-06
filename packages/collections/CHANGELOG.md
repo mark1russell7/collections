@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0
+
+`executeDAG` does not start a node whose dependency failed. MINOR: before 1.0.0 a breaking change raises MINOR. With `failFast: false`, such a node now gets a skipped result.
+
+### Added
+
+- The option `skipDependents` of `executeDAG`. The default is true. Give false to start each node, as before.
+- `NodeResult.skipped` is true for a node that did not start. Its error names the dependencies that failed or were skipped.
+- `DAGResult.skippedNodes` has the ids of the skipped nodes. `failedNodes` has only the nodes whose processor failed.
+
+### Changed
+
+- With `failFast: false`, `executeDAG` started each node of each level, also when a dependency of the node failed. So a node used the work of a failed node. Now the node does not start.
 ## 0.5.0
 
 The LRU and bounded layers check their capacity, and `LRUCache` gets `deleteWhere`. MINOR: before 1.0.0 a breaking change raises MINOR. A capacity that is not a positive whole number now throws.

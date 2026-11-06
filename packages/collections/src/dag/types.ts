@@ -41,6 +41,11 @@ export interface DAGExecutionOptions<TNode extends DAGNode = DAGNode> {
   concurrency?: number;
   /** When this value is true, the run stops on the first error. The default is true. */
   failFast?: boolean;
+  /**
+   * When this value is true, a node whose dependency failed or was skipped does not start. Its result has `skipped: true`.
+   * The default is true. Give false only when the nodes do not use the work of their dependencies.
+   */
+  skipDependents?: boolean;
   /** Callback for progress reporting */
   onNodeStart?: (node: TNode) => void;
   /** Callback when a node completes */
@@ -63,6 +68,8 @@ export interface NodeResult<TNode extends DAGNode = DAGNode> {
   logs: string[];
   /** Optional output from the processor */
   output?: unknown | undefined;
+  /** This value is true when the node did not start, because a dependency failed or was skipped. */
+  skipped?: boolean | undefined;
 }
 
 /**
@@ -73,8 +80,10 @@ export interface DAGResult<TNode extends DAGNode = DAGNode> {
   success: boolean;
   /** Results for each node */
   results: Map<string, NodeResult<TNode>>;
-  /** Names of failed nodes */
+  /** The ids of the nodes whose processor failed */
   failedNodes: string[];
+  /** The ids of the nodes that did not start, because a dependency failed or was skipped */
+  skippedNodes: string[];
   /** Total duration in milliseconds */
   totalDuration: number;
 }

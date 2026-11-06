@@ -1088,6 +1088,7 @@ export declare class LRUCache<K, V> {
   set(key: K, value: V): void;
   has(key: K): boolean;
   delete(key: K): boolean;
+  deleteWhere(matches: (value: V, key: K) => boolean): number;
   clear(): void;
   keys(): IterableIterator<K>;
   entries(): IterableIterator<[K, V]>;

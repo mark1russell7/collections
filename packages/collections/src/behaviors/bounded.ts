@@ -232,6 +232,19 @@ export function boundedList<T>(
 }
 
 /**
+ * This function adds each element with `add`, one after the other, until `add` refuses one.
+ * It gives true when one element goes in. A throw of `add` stops it, and the earlier elements stay.
+ */
+function addEach<T>(elements: Iterable<T>, add: (element: T) => boolean): boolean {
+  let added = false;
+  for (const element of Array.from(elements)) {
+    if (!add(element)) break;
+    added = true;
+  }
+  return added;
+}
+
+/**
  * This function makes a bounded Queue middleware.
  */
 export function boundedQueue<T>(
@@ -294,6 +307,12 @@ export function boundedQueue<T>(
                 }
                 return (value as Function).call(target, element);
               };
+
+            // The base addAll goes past the bound, so each element goes through add of this proxy (C10)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => (receiver as Queue<T>).add(element));
+              };
           }
         }
 
@@ -313,7 +332,8 @@ export function boundedDeque<T>(
   const capacity = checkCapacity(options.capacity, "boundedDeque");
 
   return (next: Deque<T>): Deque<T> & BoundedCollection => {
-    const handleOverflow = (element: T): void => {
+    // An insert at the front drops the last element, as unshift of boundedList does (C10)
+    const handleOverflow = (element: T, dropFrom: "first" | "last"): void => {
       if (onOverflow) {
         const context: OverflowContext<T> = {
           newElement: element,
@@ -329,7 +349,8 @@ export function boundedDeque<T>(
           throw new Error(`Deque is full (capacity: ${capacity})`);
         case "drop-oldest":
           if (!next.isEmpty) {
-            next.removeFirst();
+            if (dropFrom === "last") next.removeLast();
+            else next.removeFirst();
           }
           break;
         case "drop-newest":
@@ -363,12 +384,18 @@ export function boundedDeque<T>(
             case "add":
               return function (element: T): any {
                 if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element);
+                  handleOverflow(element, prop === "addFirst" || prop === "offerFirst" ? "last" : "first");
                   if (policy === "reject" || policy === "drop-newest") {
                     return prop.startsWith("offer") || prop === "add" ? false : undefined;
                   }
                 }
                 return (value as Function).call(target, element);
+              };
+
+            // The base addAll goes past the bound, so each element goes through add of this proxy (C10)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => (receiver as Deque<T>).add(element));
               };
           }
         }

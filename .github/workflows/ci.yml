@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@bda0a6c75cc907873ce391db8161073c305c8f39 # ci/mutation-coverage (template#213)
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@9b714969f36b4756157530d339309651e9f37f7c # ci/mutation-coverage (template#213)
     with:
       # The tests of each package again, with coverage: a table in the summary and the artifact coverage (no floor yet).
       coverage: true

@@ -79,7 +79,7 @@ function insertMany(m: Seq, xs: readonly number[], at: "back" | number): boolean
  * This function runs one insert on the implementation and on the model. A model throw needs a throw of the
  * implementation. `result` is the expected result for a refused insert (false for an offer, undefined for a push).
  */
-function both<S>(s: S, m: Seq, onModel: () => boolean, onSut: (s: S) => unknown, refused: unknown, accepted: unknown): void {
+function both<S>(s: S, onModel: () => boolean, onSut: (s: S) => unknown, refused: unknown, accepted: unknown): void {
   let outcome: boolean;
   try {
     outcome = onModel();
@@ -114,22 +114,22 @@ interface LS {
 }
 
 const listSteps: fc.Arbitrary<Step<LS, Seq>> = fc.oneof(
-  smallInt.map((x) => step<LS, Seq>(`add(${x})`, ({ sut }, m) => both(sut, m, () => insert(m, x, "back"), (s) => s.add(x), false, true))),
-  smallInt.map((x) => step<LS, Seq>(`push(${x})`, ({ sut }, m) => both(sut, m, () => insert(m, x, "back"), (s) => s.push(x), undefined, undefined))),
+  smallInt.map((x) => step<LS, Seq>(`add(${x})`, ({ sut }, m) => both(sut, () => insert(m, x, "back"), (s) => s.add(x), false, true))),
+  smallInt.map((x) => step<LS, Seq>(`push(${x})`, ({ sut }, m) => both(sut, () => insert(m, x, "back"), (s) => s.push(x), undefined, undefined))),
   smallInt.map((x) =>
-    step<LS, Seq>(`unshift(${x})`, ({ sut }, m) => both(sut, m, () => insert(m, x, "front"), (s) => s.unshift(x), undefined, undefined)),
+    step<LS, Seq>(`unshift(${x})`, ({ sut }, m) => both(sut, () => insert(m, x, "front"), (s) => s.unshift(x), undefined, undefined)),
   ),
   fc.tuple(fc.nat(), smallInt).map(([i, x]) =>
     step<LS, Seq>(`insert(${i}, ${x})`, ({ sut }, m) => {
       const index = i % (m.items.length + 1);
-      both(sut, m, () => insert(m, x, index), (s) => s.insert(index, x), undefined, undefined);
+      both(sut, () => insert(m, x, index), (s) => s.insert(index, x), undefined, undefined);
     }),
   ),
-  few.map((xs) => step<LS, Seq>(`addAll(${xs})`, ({ sut }, m) => both(sut, m, () => insertMany(m, xs, "back"), (s) => s.addAll(xs), false, true))),
+  few.map((xs) => step<LS, Seq>(`addAll(${xs})`, ({ sut }, m) => both(sut, () => insertMany(m, xs, "back"), (s) => s.addAll(xs), false, true))),
   fc.tuple(fc.nat(), few).map(([i, xs]) =>
     step<LS, Seq>(`insertAll(${i}, ${xs})`, ({ sut }, m) => {
       const index = i % (m.items.length + 1);
-      both(sut, m, () => insertMany(m, xs, index), (s) => s.insertAll(index, xs), false, true);
+      both(sut, () => insertMany(m, xs, index), (s) => s.insertAll(index, xs), false, true);
     }),
   ),
   fc.nat().map((i) =>
@@ -196,10 +196,10 @@ function takeSteps<T extends Queue<number>>(): fc.Arbitrary<Step<QS<T>, Seq>>[] 
 }
 
 const queueSteps: fc.Arbitrary<Step<QS<Q>, Seq>> = fc.oneof(
-  smallInt.map((x) => step<QS<Q>, Seq>(`offer(${x})`, ({ sut }, m) => both(sut, m, () => insert(m, x, "back"), (s) => s.offer(x), false, true))),
-  smallInt.map((x) => step<QS<Q>, Seq>(`enqueue(${x})`, ({ sut }, m) => both(sut, m, () => insert(m, x, "back"), (s) => s.enqueue(x), false, true))),
-  smallInt.map((x) => step<QS<Q>, Seq>(`add(${x})`, ({ sut }, m) => both(sut, m, () => insert(m, x, "back"), (s) => s.add(x), false, true))),
-  few.map((xs) => step<QS<Q>, Seq>(`addAll(${xs})`, ({ sut }, m) => both(sut, m, () => insertMany(m, xs, "back"), (s) => s.addAll(xs), false, true))),
+  smallInt.map((x) => step<QS<Q>, Seq>(`offer(${x})`, ({ sut }, m) => both(sut, () => insert(m, x, "back"), (s) => s.offer(x), false, true))),
+  smallInt.map((x) => step<QS<Q>, Seq>(`enqueue(${x})`, ({ sut }, m) => both(sut, () => insert(m, x, "back"), (s) => s.enqueue(x), false, true))),
+  smallInt.map((x) => step<QS<Q>, Seq>(`add(${x})`, ({ sut }, m) => both(sut, () => insert(m, x, "back"), (s) => s.add(x), false, true))),
+  few.map((xs) => step<QS<Q>, Seq>(`addAll(${xs})`, ({ sut }, m) => both(sut, () => insertMany(m, xs, "back"), (s) => s.addAll(xs), false, true))),
   ...takeSteps<Q>(),
 );
 
@@ -207,7 +207,7 @@ const dequeSteps: fc.Arbitrary<Step<QS<D>, Seq>> = fc.oneof(
   ...(["addFirst", "offerFirst"] as const).map((op) =>
     smallInt.map((x) =>
       step<QS<D>, Seq>(`${op}(${x})`, ({ sut }, m) =>
-        both(sut, m, () => insert(m, x, "front"), (s) => s[op](x), op === "offerFirst" ? false : undefined, op === "offerFirst" ? true : undefined),
+        both(sut, () => insert(m, x, "front"), (s) => s[op](x), op === "offerFirst" ? false : undefined, op === "offerFirst" ? true : undefined),
       ),
     ),
   ),
@@ -215,11 +215,11 @@ const dequeSteps: fc.Arbitrary<Step<QS<D>, Seq>> = fc.oneof(
     smallInt.map((x) =>
       step<QS<D>, Seq>(`${op}(${x})`, ({ sut }, m) => {
         const offer = op === "offerLast" || op === "offer" || op === "add";
-        both(sut, m, () => insert(m, x, "back"), (s) => s[op](x), offer ? false : undefined, offer ? true : undefined);
+        both(sut, () => insert(m, x, "back"), (s) => s[op](x), offer ? false : undefined, offer ? true : undefined);
       }),
     ),
   ),
-  few.map((xs) => step<QS<D>, Seq>(`addAll(${xs})`, ({ sut }, m) => both(sut, m, () => insertMany(m, xs, "back"), (s) => s.addAll(xs), false, true))),
+  few.map((xs) => step<QS<D>, Seq>(`addAll(${xs})`, ({ sut }, m) => both(sut, () => insertMany(m, xs, "back"), (s) => s.addAll(xs), false, true))),
   fc.constant(step<QS<D>, Seq>("pollLast()", ({ sut }, m) => expect(sut.pollLast()).toBe(m.items.pop()))),
   ...takeSteps<D>(),
 );

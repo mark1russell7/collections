@@ -24,16 +24,22 @@ export function runModel<S, M>(options: {
   check: (sut: S, model: M) => void;
   maxSteps?: number;
   numRuns?: number;
+  /** This function releases the implementation after each sequence, for example its timers. */
+  dispose?: (sut: S) => void;
 }): void {
   fc.assert(
     // fast-check gives arrays of about 10 elements by default ("small"), whatever maxLength is. "medium" gives sequences
     // up to maxSteps long, so a failure that needs many steps (an eviction after uses, a resize) comes up (C10).
     fc.property(fc.array(options.steps, { maxLength: options.maxSteps ?? 120, size: "medium" }), (steps) => {
       const { sut, model } = options.create();
-      options.check(sut, model);
-      for (const step of steps) {
-        step.run(sut, model);
+      try {
         options.check(sut, model);
+        for (const step of steps) {
+          step.run(sut, model);
+          options.check(sut, model);
+        }
+      } finally {
+        options.dispose?.(sut);
       }
     }),
     { numRuns: options.numRuns ?? 200 },

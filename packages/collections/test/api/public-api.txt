@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 358 names
+## . (build/index.d.ts): names
 
 ArrayConvertible: build/index.d.ts#ArrayConvertible
 ArrayDeque: build/index.d.ts#ArrayDeque
@@ -365,7 +365,7 @@ window: build/index.d.ts#window
 workerPool: build/index.d.ts#workerPool
 zip: build/index.d.ts#zip
 
-## ./dag (build/dag/index.d.ts): 17 names
+## ./dag (build/dag/index.d.ts): names
 
 type DAGExecutionOptions: build/dag/index.d.ts#DAGExecutionOptions
 type DAGNode: build/dag/index.d.ts#DAGNode
@@ -385,12 +385,12 @@ getDescendants: build/dag/index.d.ts#getDescendants
 getTopologicalOrder: build/dag/index.d.ts#getTopologicalOrder
 visualizeDAG: build/dag/index.d.ts#visualizeDAG
 
-## ./graph (build/graph/index.d.ts): 2 names
+## ./graph (build/graph/index.d.ts): names
 
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 
-## ./layers (build/core/layers.d.ts): 8 names
+## ./layers (build/core/layers.d.ts): names
 
 Chain: build/layers.d.ts#Chain
 Composed: build/layers.d.ts#Composed
@@ -401,7 +401,7 @@ Outers: build/layers.d.ts#Outers
 Stacked: build/layers.d.ts#Stacked
 compose: build/layers.d.ts#compose
 
-## ./testing (build/testing/index.d.ts): 6 names
+## ./testing (build/testing/index.d.ts): names
 
 ContractViolation: build/testing/index.d.ts#ContractViolation
 deepEqual: build/testing/index.d.ts#deepEqual

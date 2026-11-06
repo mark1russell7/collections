@@ -416,6 +416,7 @@ show: build/testing/index.d.ts#show
 interface DAGExecutionOptions<TNode extends DAGNode = DAGNode> {
   concurrency?: number;
   failFast?: boolean;
+  skipDependents?: boolean;
   onNodeStart?: (node: TNode) => void;
   onNodeComplete?: (result: NodeResult<TNode>) => void;
 }
@@ -433,6 +434,7 @@ interface DAGResult<TNode extends DAGNode = DAGNode> {
   success: boolean;
   results: Map<string, NodeResult<TNode>>;
   failedNodes: string[];
+  skippedNodes: string[];
   totalDuration: number;
 }
 
@@ -455,6 +457,7 @@ interface NodeResult<TNode extends DAGNode = DAGNode> {
   duration: number;
   logs: string[];
   output?: unknown | undefined;
+  skipped?: boolean | undefined;
 }
 
 ### build/dag/index.d.ts#buildLeveledDAG

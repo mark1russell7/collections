@@ -153,6 +153,11 @@ export class LinkedHashMap<K, V> implements MapLike<K, V> {
     return this._hash;
   }
 
+  /** This value is the hash function of the keys, the same as `hash`. It agrees with `keyEq`. */
+  get keyHash(): Hash<K> {
+    return this._hash;
+  }
+
   // ========================================================================
   // Lookup operations
   // ========================================================================

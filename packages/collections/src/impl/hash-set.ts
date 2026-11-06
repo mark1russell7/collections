@@ -63,6 +63,7 @@ export interface HashSetOptions<T> {
 export class HashSet<T> implements Set<T> {
   private readonly _map: HashMap<T, symbol>;
   private readonly _eq: Eq<T>;
+  private readonly _hash: Hash<T>;
 
   constructor(options: HashSetOptions<T> = {}) {
     const {
@@ -73,6 +74,7 @@ export class HashSet<T> implements Set<T> {
     } = options;
 
     this._eq = eq;
+    this._hash = hash;
     this._map = new HashMap<T, symbol>({
       initialCapacity,
       loadFactor,
@@ -95,6 +97,11 @@ export class HashSet<T> implements Set<T> {
 
   get eq(): Eq<T> {
     return this._eq;
+  }
+
+  /** This value is the hash function of the elements. It agrees with `eq`. */
+  get hash(): Hash<T> {
+    return this._hash;
   }
 
   // ========================================================================

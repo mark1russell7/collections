@@ -121,6 +121,11 @@ export function boundedList<T>(
 
     // After drop-oldest removed the first element, an index of the caller is one place lower
     const shifted = (index: number): number => (policy === "drop-oldest" ? Math.max(0, index - 1) : index);
+    // A front insert drops the last element, as unshift does. Each other insert drops the first element, as push does.
+    const dropEnd = (index: number): "first" | "last" => (index === 0 ? "last" : "first");
+    // An index that the base refuses goes to the base before a drop, so the base throws and no element goes
+    const inRange = (index: unknown): boolean =>
+      Number.isInteger(index) && (index as number) >= 0 && (index as number) <= next.size;
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -182,12 +187,13 @@ export function boundedList<T>(
             case "insert":
               return function (index: number, element: T): void {
                 let at = index;
-                if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element);
+                if (inRange(index) && target.size >= capacity && policy !== "grow") {
+                  const end = dropEnd(index);
+                  handleOverflow(element, end);
                   if (policy === "reject" || policy === "drop-newest") {
                     return;
                   }
-                  at = shifted(at);
+                  if (end === "first") at = shifted(at);
                 }
                 (value as Function).call(target, at, element);
               };
@@ -199,18 +205,22 @@ export function boundedList<T>(
                 const elementsArray = Array.from(elements);
 
                 // Check if adding all elements would exceed capacity
-                if (target.size + elementsArray.length > capacity && policy !== "grow") {
+                const inserting = prop === "insertAll";
+                if ((!inserting || inRange(args[0])) && target.size + elementsArray.length > capacity && policy !== "grow") {
                   // Add elements one by one with overflow handling. An insert keeps the order of
-                  // the elements, at an index that follows each drop.
+                  // the elements, at an index that follows each drop. The index of the call gives
+                  // the drop end of each element: an insertAll at 0 is a front insert.
                   let added = false;
                   let at = args[0] as number;
+                  const end = inserting ? dropEnd(at) : "first";
                   for (const element of elementsArray) {
                     if (target.size >= capacity) {
-                      handleOverflow(element);
+                      handleOverflow(element, end);
                       if (policy === "reject" || policy === "drop-newest") {
                         break;
                       }
-                      at = shifted(at);
+                      // A drop from the last end can take an element of this call: then the index is the size
+                      at = end === "first" ? shifted(at) : Math.min(at, target.size);
                     }
                     if (prop === "addAll") {
                       target.add(element);

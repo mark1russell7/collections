@@ -14,7 +14,9 @@
  * Policy for handling overflow when adding to a full bounded collection.
  *
  * - 'throw': Throw an error when trying to add to a full collection
- * - 'drop-oldest': Remove the oldest element and add the new one
+ * - 'drop-oldest': Remove one element at the end opposite to the insert, and add the new one.
+ *   A front insert (`unshift`, `addFirst`, `offerFirst`, an insert at index 0) removes the last element.
+ *   Each other insert removes the first element.
  * - 'drop-newest': Ignore the new element (don't add it)
  * - 'reject': Return false/None but don't throw (graceful failure)
  * - 'grow': Automatically increase capacity (becomes unbounded)

@@ -50,6 +50,6 @@ jobs:
       roadmap: docs/ROADMAP.md
       # The check opens each page in a browser at 360, 400 and 1280 pixels, in light and dark.
       site-check: true
-      site-check-pages: /,/releases/,/status/
+      site-check-pages: /,/structures/,/releases/,/status/
       # The probe presses the keys of each demo. The check reads the TypeScript source and removes its types.
       site-check-probe: packages/site/src/check-probe.ts

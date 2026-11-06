@@ -35,8 +35,8 @@ describe("the count of the structures with a demo", () => {
     expect(structuresWithDemo(['import { type HashMap, compose } from "@mark1russell7/collections";'], KEYS)).toEqual([]);
   });
 
-  it("reads the real site: the three demos of the page, of the 12 structures of the package", () => {
-    expect(siteMeasures(siteDir, packageDir)).toEqual([{ id: "structures-with-demo", value: 3, unit: "structures" }]);
+  it("reads the real site: the demos and the explorer show each of the 12 structures of the package", () => {
+    expect(siteMeasures(siteDir, packageDir)).toEqual([{ id: "structures-with-demo", value: 12, unit: "structures" }]);
     const files = readdirSync(`${packageDir}/src/impl`).filter((file) => file.endsWith(".ts") && !file.endsWith(".test.ts"));
     expect(structureKeys(files)).toHaveLength(12);
   });

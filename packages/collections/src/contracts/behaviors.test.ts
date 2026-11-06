@@ -14,7 +14,7 @@ import { boundedList } from "../behaviors/bounded.js";
 import { safeDeque } from "../behaviors/safe.js";
 import { readonly } from "../behaviors/readonly.js";
 import { synchronized, readWriteLock } from "../behaviors/synchronized.js";
-import { isSome, isNone } from "../core/effects.js";
+import { isNone, isSome } from "@mark1russell7/optional";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

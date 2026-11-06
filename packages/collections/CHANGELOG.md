@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.7.0
+
+`Optional` and `Result` come from `@mark1russell7/optional` 1.2.0, and collections has no copy of them. MINOR: before 1.0.0 a breaking change raises MINOR. The exports `Option`, `Some`, `None`, `Ok`, `Err` and their functions are removed, and the shape of the values changes from `_tag` to `tag`.
+
+### Changed
+
+- The safe middleware (`safeList`, `safeQueue`, `safeDeque`, `safeMap`) gives the values of `@mark1russell7/optional`. A present value is `{ tag: "some", value }`, and an absent value is `{ tag: "none" }`. A `Result` is `{ tag: "ok", value }` or `{ tag: "err", error }`.
+- `@mark1russell7/optional` is a new dependency. It has no dependencies.
+
+### Removed
+
+The module `core/effects` is removed. Import its replacements from `@mark1russell7/optional`:
+
+| Removed | Replacement |
+| --- | --- |
+| `Option`, `Some(v)`, `None` | `Optional`, `some(v)`, `none` |
+| `Ok(v)`, `Err(e)` | `ok(v)`, `err(e)` |
+| `isSome`, `isNone`, `isOk`, `isErr` | the same names |
+| `getOrElse`, `getOrElseResult` | `getOr`, `getOkOr` |
+| `mapOption`, `flatMapOption`, `mapError` | `map`, `flatMap`, `mapErr` |
+| `mapResult`, `flatMapResult`, `tryCatch`, `tryCatchAsync` | the same names |
+| `optionToResult`, `resultToOption` | `fromOptional`, `toOptional` |
+| `toNullable`, `fromNullable` | `unwrap`, `fromNullable` |
+| `unwrap`, `unwrapResult` | no replacement: `unwrap` of optional gives `undefined` for `none` and does not throw |
+| the method `match` of `Ok` and `Err` | `isOk` and `isErr` |
+| `sequence`, `sequenceResults`, `AsyncOption`, `AsyncResult`, `mapAsyncOption`, `mapAsyncResult` | no replacement |
+
+### Fixed
+
+- `hashMap.get` threw "Key not found" for a key whose value is `undefined`, and `getOrDefault` gave the default for it. Now the node of the key tells if the key is present, as in `linkedHashMap` and `treeMap`. A new law of the map contract found the bug. It runs on all maps.
+- Thus `safeMap().safe.get` threw for such a key. Now it gives `some(undefined)`.
+
 ## 0.6.0
 
 `executeDAG` does not start a node whose dependency failed. MINOR: before 1.0.0 a breaking change raises MINOR. With `failFast: false`, such a node now gets a skipped result.

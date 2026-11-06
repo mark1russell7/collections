@@ -240,8 +240,10 @@ export function lruMap<K, V>(
                   if (stale) {
                     removeNode(stale);
                   }
-                  // Keep the node list bounded: when it reaches capacity, drop stale nodes first
-                  if (nodeMap.size >= capacity) {
+                  // Keep the node list bounded. At most `capacity` nodes are live, so at twice the capacity a scan
+                  // removes at least `capacity` stale nodes: the cost of a set is amortized O(1). A scan at the
+                  // capacity read each node at each set into a full map (C10). evictLRU skips the other stale nodes.
+                  if (nodeMap.size >= 2 * capacity) {
                     dropStaleNodes();
                   }
                   if (target.size >= capacity) {

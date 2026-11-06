@@ -118,3 +118,19 @@ for (const [name, base] of [
     });
   });
 }
+
+describe("the cost of lruMap", () => {
+  // Before 0.7.0 a set into a full map read each node with `has` of the base: capacity + 2 calls (C10)
+  it.each([10, 100, 1000])("uses a constant number of calls of the base for a set into a full map (capacity %i)", (capacity) => {
+    const base = hashMap<number, number>();
+    let calls = 0;
+    const has = base.has.bind(base);
+    (base as { has: (k: number) => boolean }).has = (k) => (calls++, has(k));
+    const lru = lruMap<number, number>({ capacity })(base);
+    for (let i = 0; i < capacity; i++) lru.set(i, i);
+    calls = 0;
+    for (let i = capacity; i < capacity + 1000; i++) lru.set(i, i);
+    expect(calls / 1000).toBeLessThanOrEqual(3);
+    expect(lru.size).toBe(capacity);
+  });
+});

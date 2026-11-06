@@ -24,6 +24,11 @@ cache.set("c", 3);
 cache.has("a"); // false: the map removed the oldest key
 ```
 
+`compose` applies its layers from right to left, so the last layer is next to the base. The order of the layers is important:
+
+- Put `ttlMap` below `lruMap`: `compose(lruMap(...), ttlMap(...))`. Then an expired entry is not an eviction.
+- Put an evented layer next to the base. Then its events include each drop, eviction and expiry of the layers above it. A layer above `boundedMap`, `lruMap` or `ttlMap` does not see their removals.
+
 ## The summary tree
 
 A summary tree is a persistent sequence. Each node keeps the sum of its leaves in a monoid. Each change gives a new tree in logarithmic time, and the old tree stays the same.

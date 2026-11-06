@@ -2,7 +2,7 @@
 
 ## 0.7.0
 
-Model tests of the bounded, LRU and TTL layers found five faults. This version corrects them. MINOR: before 1.0.0 a change of behavior raises MINOR. A front insert into a full `drop-oldest` deque now drops the last element.
+Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found six faults. This version corrects them. MINOR: before 1.0.0 a change of behavior raises MINOR. A front insert into a full `drop-oldest` deque now drops the last element.
 
 ### Changed
 
@@ -16,6 +16,7 @@ Model tests of the bounded, LRU and TTL layers found five faults. This version c
 - `boundedQueue` and `boundedDeque`: `addAll` applies the policy to each element, and stops at the first element that the queue refuses. The elements before it stay.
 - `ttlMap`: a lazy removal in `get` or `has` did not start `onExpire`. Now `onExpire` occurs one time for each expired entry, in the order of expiry.
 - `ttlMap`: a new `set` of a key starts its time again and puts the key at the end of the order of expiry.
+- `lruMap`: a `set` of a new key into a full map read each entry with `has` of the base, so it cost O(capacity). Now it costs amortized O(1): the layer looks for stale entries only at twice the capacity.
 
 ## 0.6.0
 

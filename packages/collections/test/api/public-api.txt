@@ -121,6 +121,7 @@ SafeListOperations: build/index.d.ts#SafeListOperations
 SafeMapOperations: build/index.d.ts#SafeMapOperations
 SafeQueueOperations: build/index.d.ts#SafeQueueOperations
 SelectCase: build/index.d.ts#SelectCase
+Semaphore: build/index.d.ts#Semaphore
 Set: build/index.d.ts#Set$1
 Settled: build/index.d.ts#Settled
 Sized: build/index.d.ts#Sized
@@ -299,6 +300,7 @@ safeMap: build/index.d.ts#safeMap
 safeQueue: build/index.d.ts#safeQueue
 scan: build/index.d.ts#scan
 select: build/index.d.ts#select
+semaphore: build/index.d.ts#semaphore
 shallowEq: build/index.d.ts#shallowEq
 singletonList: build/index.d.ts#singletonList
 singletonMap: build/index.d.ts#singletonMap
@@ -1553,6 +1555,15 @@ export interface SelectCase<R> {
   wait?: (onValue: (value: any) => void, onClosed: (error: Error) => void) => () => boolean;
 }
 
+### build/index.d.ts#Semaphore
+export interface Semaphore {
+  readonly permits: number;
+  readonly available: number;
+  readonly waiting: number;
+  acquire(): Promise<() => void>;
+  run<R>(task: () => R | PromiseLike<R>): Promise<R>;
+}
+
 ### build/index.d.ts#Set$1
 interface Set$1<T> extends ReadonlySet<T>, Collection<T> {
   add(element: T): boolean;
@@ -2328,6 +2339,9 @@ export declare function scan<T, U>(iterable: Iterable<T>, fn: (acc: U, value: T)
 
 ### build/index.d.ts#select
 export declare function select<R>(...cases: SelectCase<R>[]): Promise<R>;
+
+### build/index.d.ts#semaphore
+export declare function semaphore(permits: number): Semaphore;
 
 ### build/index.d.ts#shallowEq
 export declare const shallowEq: Eq<any>;

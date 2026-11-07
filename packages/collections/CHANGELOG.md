@@ -2,7 +2,11 @@
 
 ## 0.9.1
 
-The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.
+The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. A new export `semaphore` bounds the tasks in flight. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.
+
+### Added
+
+- `semaphore(permits)` and the type `Semaphore`: a bound on the tasks that run at the same time. The waiting callers get the permits in the order that they came. `run` gives the permit back when the task ends or throws.
 
 ### Deprecated
 

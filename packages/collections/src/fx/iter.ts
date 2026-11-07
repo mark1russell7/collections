@@ -7,9 +7,9 @@
  * @example
  * const result = pipe(
  *   [1, 2, 3, 4, 5],
- *   map(x => x * 2),
- *   filter(x => x > 5),
- *   take(2),
+ *   (it) => map(it, x => x * 2),
+ *   (it) => filter(it, x => x > 5),
+ *   (it) => take(it, 2),
  *   toArray
  * ) // [6, 8]
  */

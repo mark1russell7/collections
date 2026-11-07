@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0
+
+`boundedList` has one drop end for each front insert (C21). MINOR: before 1.0.0 a change of behavior raises MINOR. On a full `drop-oldest` list, `insert(0, x)` now drops the last element.
+
+### Changed
+
+- `boundedList` with `drop-oldest`: `insert(0, x)` and `insertAll(0, xs)` into a full list drop the last element, as `unshift(x)` does. Before, they dropped the first element. Each other index drops the first element, as before.
+
+### Fixed
+
+- `boundedList`: `insert` and `insertAll` at an index that the base refuses dropped an element before the base threw. Now the base throws first, and the list does not change.
+
 ## 0.9.0
 
 A layer above a removing layer now sees its removals (C23). The tests of the removal channel found six more faults. This version corrects them. MINOR: new exports, and before 1.0.0 a change of behavior raises MINOR. An evented layer above a layer that refuses an element no longer emits an event for it.

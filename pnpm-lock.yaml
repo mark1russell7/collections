@@ -224,6 +224,9 @@ importers:
       '@mark1russell7/rigor-statistics':
         specifier: ^0.1.8
         version: 0.1.15
+      '@mark1russell7/rigor-testkit':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.6
@@ -503,6 +506,10 @@ packages:
 
   '@mark1russell7/rigor-statistics@0.1.15':
     resolution: {integrity: sha512-dxr3UiAs64JXV3trXCaTRTesHqXEMUoVvDGIyrz0BWsAZERA/lrIQNUATFAuqnAWzdmbHUyi/5nzA4uPXTSTJw==}
+    engines: {node: '>=22'}
+
+  '@mark1russell7/rigor-testkit@0.1.0':
+    resolution: {integrity: sha512-BoHgdZAezurWNq7gVlqev6r56PmzFWL8338x0fZDJ6ekSPWrleSjmqRnmao0R7SlIehudesdb6+ZzMIhIg/z0A==}
     engines: {node: '>=22'}
 
   '@mark1russell7/site-pages@0.3.4':
@@ -1695,6 +1702,8 @@ snapshots:
   '@mark1russell7/rigor-statistics@0.1.15':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.6
+
+  '@mark1russell7/rigor-testkit@0.1.0': {}
 
   '@mark1russell7/site-pages@0.3.4':
     dependencies:

@@ -18,6 +18,7 @@ import { checkCapacity } from "../core/capacity.js";
 import type { Middleware } from "../core/middleware.js";
 import type { MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
+import { removals, removalSource, type MapRemoval } from "../core/removals.js";
 
 /**
  * Options for LRU behavior.
@@ -133,9 +134,15 @@ export function lruMap<K, V>(
       nodeMap.delete(node.key);
     };
 
-    // A layer below this one (for example ttlMap, in compose(lruMap, ttlMap)) can remove an
-    // entry without this layer seeing it. Its node is then stale: the list must not keep it
-    // (it holds the value, and it would grow without bound) and evicting it is not an eviction.
+    // A removal below (for example an expiry of ttlMap, in compose(lruMap, ttlMap)) removes the node of its key
+    const source = removalSource<MapRemoval<K, V>>(next, ({ key }) => {
+      const node = nodeMap.get(key);
+      if (node) removeNode(node);
+    });
+
+    // A layer below with no removal channel can remove an entry without this layer seeing it. Its node is
+    // then stale: the list must not keep it (it holds the value, and it would grow without bound) and evicting
+    // it is not an eviction. With the channel, no node is stale and these checks find nothing.
     const dropStaleNodes = (): void => {
       for (const node of [...nodeMap.values()]) {
         if (!next.has(node.key)) {
@@ -161,12 +168,16 @@ export function lruMap<K, V>(
             timestamp: candidate.lastAccessed,
           });
         }
+        source.emit({ key: candidate.key, value: candidate.value, reason: "evict" });
         return;
       }
     };
 
     return new Proxy(next, {
       get(target, prop, receiver) {
+        if (prop === removals) {
+          return source.channel;
+        }
         // Add isFull property
         if (prop === "isFull") {
           return target.size >= capacity;
@@ -185,17 +196,7 @@ export function lruMap<K, V>(
           switch (prop) {
             case "get":
               return function (key: K): V {
-                let result: V;
-                try {
-                  result = (value as Function).call(target, key);
-                } catch (error) {
-                  // The entry is gone below (for example expired): forget its node
-                  const stale = nodeMap.get(key);
-                  if (stale) {
-                    removeNode(stale);
-                  }
-                  throw error;
-                }
+                const result: V = (value as Function).call(target, key);
                 // Update access time
                 const node = nodeMap.get(key);
                 if (node) {
@@ -208,14 +209,9 @@ export function lruMap<K, V>(
               return function (key: K): boolean {
                 const result = (value as Function).call(target, key);
                 const node = nodeMap.get(key);
-                if (node) {
-                  if (result) {
-                    // Update access time
-                    moveToHead(node);
-                  } else {
-                    // The entry is gone below (for example expired): forget its node
-                    removeNode(node);
-                  }
+                if (node && result) {
+                  // Update access time
+                  moveToHead(node);
                 }
                 return result;
               };

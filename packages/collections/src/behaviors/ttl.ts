@@ -16,6 +16,7 @@
 import type { Middleware } from "../core/middleware.js";
 import type { Entry, MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
+import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
 import type { Collection } from "../interfaces/collection.js";
 
 /**
@@ -81,6 +82,8 @@ export function ttlMap<K, V>(
     // The times of the live keys, in the order of expiry: a set deletes its key before it adds it again
     const metadata = new Map<K, TTLEntry<V>>();
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    // A removal below (for example an eviction of lruMap) ends the time of its key, so it never expires
+    const source = removalSource<MapRemoval<K, V>>(next, ({ key }) => void metadata.delete(key));
 
     // This function removes the expired entries from the front of the order, and stops at the first live entry
     const sweep = (): void => {
@@ -90,6 +93,7 @@ export function ttlMap<K, V>(
         metadata.delete(key);
         next.delete(key);
         onExpire?.({ key, value: entry.value, createdAt: entry.createdAt, expiredAt: now });
+        source.emit({ key, value: entry.value, reason: "expire" });
       }
     };
 
@@ -106,6 +110,9 @@ export function ttlMap<K, V>(
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
+        }
+        if (prop === removals) {
+          return source.channel;
         }
 
         // Composite methods (setIfAbsent, compute, merge, putAll and others) go through this
@@ -205,6 +212,7 @@ export function ttlCollection<T>(
   ): Collection<T> & { readonly dispose: () => void } => {
     const metadata = new Map<T, { expiresAt: number; createdAt: number }>();
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    const source = removalSource<ElementRemoval<T>>(next, ({ value }) => void metadata.delete(value));
 
     const checkExpired = (): void => {
       const now = Date.now();
@@ -229,6 +237,7 @@ export function ttlCollection<T>(
               expiredAt: now,
             });
           }
+          source.emit({ value: element, reason: "expire" });
         }
       }
     };
@@ -246,6 +255,9 @@ export function ttlCollection<T>(
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
+        }
+        if (prop === removals) {
+          return source.channel;
         }
 
         const value = Reflect.get(target, prop, receiver);

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "@mark1russell7/collections",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Collections with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.",
   "keywords": [
     "collections",
@@ -35,6 +35,7 @@
     "./dag": "./src/dag/index.ts",
     "./graph": "./src/graph/index.ts",
     "./layers": "./src/core/layers.ts",
+    "./summary-tree": "./src/summary-tree/index.ts",
     "./testing": "./src/testing/index.ts",
     "./package.json": "./package.json"
   },
@@ -65,6 +66,10 @@
       "./layers": {
         "types": "./build/core/layers.d.ts",
         "default": "./build/core/layers.js"
+      },
+      "./summary-tree": {
+        "types": "./build/summary-tree/index.d.ts",
+        "default": "./build/summary-tree/index.js"
       },
       "./testing": {
         "types": "./build/testing/index.d.ts",

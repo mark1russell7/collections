@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.3
+
+The summary tree is also a set of plain functions, so a bundler keeps only the functions that a program calls (C35). PATCH: before 1.0.0 a feature raises PATCH, and the class keeps its API.
+
+### Added
+
+- The entry `@mark1russell7/collections/summary-tree` gives the summary tree as plain functions over a plain record `{ spec, root }`: `of`, `at`, `locate`, `search`, `set`, `splice`, `insert`, `remove`, `slice`, `concat`, `split`, `splitAt` and the others. The rope of typeset (the functions `of`, `at`, `locate`, `set`, `splice`, `slice`, `concat` and `insert`) weighs 1842 gzip bytes in a bundle. With the class, it weighs 2551.
+- `SummaryTree` wraps the same functions. Its new field `record` and its new function `fromRecord` move a tree between the two forms without a copy.
+- The types `SummaryTreeRecord` and `SummaryNode`.
+- `bundle-weight.test.ts` bundles a small program of each entry with esbuild. A case fails when its gzip bytes pass the measured weight plus 10 percent. An import of each entry that uses nothing adds no byte.
+
 ## 0.9.2
 
 The s20 audit found four faults of the set operations and of `readonly`. This version corrects them. PATCH: a fix with no change to the public API.

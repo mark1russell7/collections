@@ -128,12 +128,14 @@ SortedMap: build/index.d.ts#SortedMap
 SortedSet: build/index.d.ts#SortedSet
 Stack: build/index.d.ts#Stack
 StorageListeners: build/index.d.ts#StorageListeners
-type SummaryLocation: build/index.d.ts#SummaryLocation
-type SummaryMonoid: build/index.d.ts#SummaryMonoid
-type SummarySearch: build/index.d.ts#SummarySearch
-type SummarySpec: build/index.d.ts#SummarySpec
+type SummaryLocation: build/functions.d.ts#SummaryLocation
+type SummaryMonoid: build/functions.d.ts#SummaryMonoid
+type SummaryNode: build/functions.d.ts#SummaryNode
+type SummarySearch: build/functions.d.ts#SummarySearch
+type SummarySpec: build/functions.d.ts#SummarySpec
 SummaryStatistics: build/index.d.ts#SummaryStatistics
 SummaryTree: build/index.d.ts#SummaryTree
+type SummaryTreeRecord: build/functions.d.ts#SummaryTreeRecord
 TTLCache: build/index.d.ts#TTLCache
 TTLOptions: build/index.d.ts#TTLOptions
 type TransferQueue: build/index.d.ts#TransferQueue
@@ -378,6 +380,36 @@ Outers: build/layers.d.ts#Outers
 Stacked: build/layers.d.ts#Stacked
 compose: build/layers.d.ts#compose
 
+## ./summary-tree (build/summary-tree/index.d.ts): names
+
+SummaryLocation: build/functions.d.ts#SummaryLocation
+SummaryMonoid: build/functions.d.ts#SummaryMonoid
+SummaryNode: build/functions.d.ts#SummaryNode
+SummarySearch: build/functions.d.ts#SummarySearch
+SummarySpec: build/functions.d.ts#SummarySpec
+SummaryTreeRecord: build/functions.d.ts#SummaryTreeRecord
+append: build/functions.d.ts#append
+at: build/functions.d.ts#at
+concat: build/functions.d.ts#concat
+height: build/functions.d.ts#height
+insert: build/functions.d.ts#insert
+isEmpty: build/functions.d.ts#isEmpty
+leaves: build/functions.d.ts#leaves
+locate: build/functions.d.ts#locate
+of: build/functions.d.ts#of
+prepend: build/functions.d.ts#prepend
+remove: build/functions.d.ts#remove
+search: build/functions.d.ts#search
+set: build/functions.d.ts#set
+size: build/functions.d.ts#size
+slice: build/functions.d.ts#slice
+splice: build/functions.d.ts#splice
+split: build/functions.d.ts#split
+splitAt: build/functions.d.ts#splitAt
+summary: build/functions.d.ts#summary
+summaryOf: build/functions.d.ts#summaryOf
+toArray: build/functions.d.ts#toArray
+
 ## ./testing (build/testing/index.d.ts): names
 
 ContractViolation: build/testing/index.d.ts#ContractViolation
@@ -469,6 +501,115 @@ export declare function getTopologicalOrder<TNode extends DAGNode>(dag: Dependen
 
 ### build/dag/index.d.ts#visualizeDAG
 export declare function visualizeDAG<TNode extends DAGNode>(dag: DependencyDAG<TNode>): string;
+
+### build/functions.d.ts#SummaryLocation
+interface SummaryLocation<Leaf> {
+  readonly index: number;
+  readonly leaf: Leaf;
+  readonly offset: number;
+}
+
+### build/functions.d.ts#SummaryMonoid
+interface SummaryMonoid<Summary> {
+  readonly empty: Summary;
+  readonly combine: (left: Summary, right: Summary) => Summary;
+}
+
+### build/functions.d.ts#SummaryNode
+interface SummaryNode<Leaf, Summary> {
+  readonly left: SummaryNode<Leaf, Summary> | null;
+  readonly leaf: Leaf;
+  readonly own: Summary;
+  readonly inner: Summary;
+  readonly right: SummaryNode<Leaf, Summary> | null;
+  readonly height: number;
+  readonly size: number;
+  readonly summary: Summary;
+}
+
+### build/functions.d.ts#SummarySearch
+interface SummarySearch<Leaf, Summary> {
+  readonly index: number;
+  readonly leaf: Leaf;
+  readonly before: Summary;
+  readonly through: Summary;
+}
+
+### build/functions.d.ts#SummarySpec
+interface SummarySpec<Leaf, Summary> {
+  readonly monoid: SummaryMonoid<Summary>;
+  readonly measure: (leaf: Leaf) => Summary;
+  readonly merge?: (left: Leaf, right: Leaf) => Leaf | undefined;
+}
+
+### build/functions.d.ts#SummaryTreeRecord
+interface SummaryTreeRecord<Leaf, Summary> {
+  readonly spec: SummarySpec<Leaf, Summary>;
+  readonly root: SummaryNode<Leaf, Summary> | null;
+}
+
+### build/functions.d.ts#append
+declare function append<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, ...leaves: Leaf[]): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#at
+declare function at<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, index: number): Leaf | undefined;
+
+### build/functions.d.ts#concat
+declare function concat<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, other: SummaryTreeRecord<Leaf, Summary> | Iterable<Leaf>): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#height
+declare function height<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): number;
+
+### build/functions.d.ts#insert
+declare function insert<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, index: number, inserted: SummaryTreeRecord<Leaf, Summary> | Iterable<Leaf>): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#isEmpty
+declare function isEmpty<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): boolean;
+
+### build/functions.d.ts#leaves
+declare function leaves<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Generator<Leaf, void, undefined>;
+
+### build/functions.d.ts#locate
+declare function locate<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, key: (summary: Summary) => number, target: number): SummaryLocation<Leaf> | undefined;
+
+### build/functions.d.ts#of
+declare function of<Leaf, Summary>(spec: SummarySpec<Leaf, Summary>, leaves?: Iterable<Leaf>): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#prepend
+declare function prepend<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, ...leaves: Leaf[]): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#remove
+declare function remove<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, start: number, end?: number): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#search
+declare function search<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, predicate: (prefix: Summary) => boolean): SummarySearch<Leaf, Summary> | undefined;
+
+### build/functions.d.ts#set
+declare function set<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, index: number, leaf: Leaf): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#size
+declare function size<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): number;
+
+### build/functions.d.ts#slice
+declare function slice<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, start?: number, end?: number): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#splice
+declare function splice<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, start: number, deleteCount?: number, inserted?: SummaryTreeRecord<Leaf, Summary> | Iterable<Leaf>): SummaryTreeRecord<Leaf, Summary>;
+
+### build/functions.d.ts#split
+declare function split<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, predicate: (prefix: Summary) => boolean): [SummaryTreeRecord<Leaf, Summary>, SummaryTreeRecord<Leaf, Summary>];
+
+### build/functions.d.ts#splitAt
+declare function splitAt<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, index: number): [SummaryTreeRecord<Leaf, Summary>, SummaryTreeRecord<Leaf, Summary>];
+
+### build/functions.d.ts#summary
+declare function summary<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Summary;
+
+### build/functions.d.ts#summaryOf
+declare function summaryOf<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>, start?: number, end?: number): Summary;
+
+### build/functions.d.ts#toArray
+declare function toArray<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Leaf[];
 
 ### build/graph/index.d.ts#WeightedEdge
 interface WeightedEdge {
@@ -1612,34 +1753,6 @@ export declare class StorageListeners<E> {
   clear(): void;
 }
 
-### build/index.d.ts#SummaryLocation
-interface SummaryLocation<Leaf> {
-  readonly index: number;
-  readonly leaf: Leaf;
-  readonly offset: number;
-}
-
-### build/index.d.ts#SummaryMonoid
-interface SummaryMonoid<Summary> {
-  readonly empty: Summary;
-  readonly combine: (left: Summary, right: Summary) => Summary;
-}
-
-### build/index.d.ts#SummarySearch
-interface SummarySearch<Leaf, Summary> {
-  readonly index: number;
-  readonly leaf: Leaf;
-  readonly before: Summary;
-  readonly through: Summary;
-}
-
-### build/index.d.ts#SummarySpec
-interface SummarySpec<Leaf, Summary> {
-  readonly monoid: SummaryMonoid<Summary>;
-  readonly measure: (leaf: Leaf) => Summary;
-  readonly merge?: (left: Leaf, right: Leaf) => Leaf | undefined;
-}
-
 ### build/index.d.ts#SummaryStatistics
 export interface SummaryStatistics {
   count: number;
@@ -1651,8 +1764,10 @@ export interface SummaryStatistics {
 
 ### build/index.d.ts#SummaryTree
 export declare class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
+  readonly record: SummaryTreeRecord<Leaf, Summary>;
   private constructor();
   static of<Leaf, Summary>(spec: SummarySpec<Leaf, Summary>, leaves?: Iterable<Leaf>): SummaryTree<Leaf, Summary>;
+  static fromRecord<Leaf, Summary>(record: SummaryTreeRecord<Leaf, Summary>): SummaryTree<Leaf, Summary>;
   get spec(): SummarySpec<Leaf, Summary>;
   get size(): number;
   get isEmpty(): boolean;

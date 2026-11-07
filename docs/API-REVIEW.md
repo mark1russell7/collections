@@ -8,11 +8,11 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 
 | Verdict | What it means | Names |
 |---|---|---|
-| keep | The name stays as it is. | 201 |
+| keep | The name stays as it is. | 206 |
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 57 |
 | remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. | 75 |
-| move | The name goes to its home in the map. Collections keeps a re-export for one MINOR version. | 9 |
-| ask | The map has no home for the area. The strategist names a home (S1 and S2). | 18 |
+| move | The name goes to its home in the map. Collections keeps a re-export for one MINOR version. | 22 |
+| ask | The map had no home for the area. The strategist named the homes on 2026-11-07 (S1 and S2). | 0 |
 
 The counts are of the 360 names of `main`. The eight names of the removals have their own table at the end.
 
@@ -61,7 +61,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 |---|---|---|
 | `compose`, `bundle`, `Middleware`, `Evented`, `Async`, `BoundedCollection` | keep | The behaviors and the layers guide use them. The root `compose` gives a collection, and `compose` of `./layers` gives a function. |
 | `hasCapability`, `SafeCollection`, `ElementType`, `Asyncify`, `interceptMethods`, `blockMethods`, `delegate`, `WithCapability`, `CollectionBuilder`, `enhanceMethod` | remove | No other file uses these helpers. |
-| `Emitter`, `createEmitter`, `Listener`, `Unsubscribe`, `EventMap` | ask | `evented` uses the emitter. The map has no home for events (S1). They stay here until the strategist names one. |
+| `Emitter`, `createEmitter`, `Listener`, `Unsubscribe`, `EventMap` | keep | `evented` uses the emitter. The strategist made collections its home (S1): collections is the bottom layer, so each package can use it with no new dependency. |
 | `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` | remove | No file uses them. |
 | `StorageListeners`, `reportListenerError`, `ListenerErrorHandler` | keep | The memory storage of `@procedures/collections` uses them. |
 
@@ -91,7 +91,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `asyncQueue`, `AsyncQueue`, `AsyncQueueOptions`, `asSettled`, `Settled` | keep | The async contracts test them. |
-| `channel`, `Channel`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `workerPool`, `buffered`, `unbuffered`, `SelectCase` | ask | Channels, `select` and a worker pool are tools of concurrency, not collections. `ticker` and `timeout` are timers. The map has no home for them (S2). |
+| `channel`, `Channel`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `workerPool`, `buffered`, `unbuffered`, `SelectCase` | move | Channels, `select` and a worker pool are tools of concurrency. Their home is `@mark1russell7/service` (S2). There, `ticker` and `timeout` use its clock, so one fake clock tests each tool. |
 
 ### The iterables and the collectors
 
@@ -156,7 +156,7 @@ Each decision changes the API. Before 1.0, a change of the API raises the MINOR 
 - **D5. A clock for the TTL behaviors.** `TTLCache` takes a clock as an option. The default is the clock of the system, so the change is backward compatible.
 - **D6. The iterable functions.** The iterator helpers of the language work on an iterator, but not on each iterable. The recommendation is to keep the functions, and to tell in the doc when to use the language helpers.
 
-## The questions for the strategist
+## The answers of the strategist
 
-- **S1. A home for events.** `Emitter` and `createEmitter` are an event emitter with types. The map has no area for events. Is collections the home, or a new area?
-- **S2. A home for concurrency.** `channel`, `select`, `ticker`, `timeout` and `workerPool` are tools of concurrency. `@mark1russell7/service` has clocks and loops. Do they go there, or to a new area?
+- **S1. A home for events.** `Emitter` and `createEmitter` are a set of listeners for each key. The emitter stays in collections, with the verdict "keep".
+- **S2. A home for concurrency.** The channels, `select`, `ticker`, `timeout`, `workerPool` and the pipeline functions go to `@mark1russell7/service`, on its clock. A pull request to `systems` adds them on a new subpath. Then collections keeps a re-export with a deprecation for one MINOR version, and removes it in the next.

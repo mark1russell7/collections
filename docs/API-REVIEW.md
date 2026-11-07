@@ -145,6 +145,15 @@ The pull request #31 adds these names to the root entry.
 |---|---|---|
 | `ElementRemoval`, `MapRemoval`, `RemovalChannel`, `RemovalReason`, `removals`, `removalsOf`, `removalSource`, `RemovalSource` | keep | Each behavior tells the reason of each removal, and the laws of C23 test them. |
 
+## The summary tree as functions (C35)
+
+Version 0.9.3 adds the entry `./summary-tree` and two types of the root entry.
+
+| Names | Verdict | Reason |
+|---|---|---|
+| `of`, `size`, `isEmpty`, `summary`, `height`, `at`, `summaryOf`, `concat`, `splitAt`, `split`, `search`, `locate`, `slice`, `splice`, `insert`, `remove`, `set`, `append`, `prepend`, `leaves`, `toArray` | keep | A bundle keeps a class with all of its methods. The rope of typeset calls few functions, so it imports them from `./summary-tree`. `bundle-weight.test.ts` holds the weight. |
+| `SummaryNode`, `SummaryTreeRecord` | keep | A tree of `./summary-tree` is a plain record of a spec and a root. `SummaryTree.record` gives the record of a class tree. |
+
 ## The semaphore (0.9.4)
 
 `@procedures/client` adds this name.

@@ -8,6 +8,28 @@ A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a n
 
 - `semaphore(permits)` and the type `Semaphore`. At most `permits` tasks hold a permit. The waiting callers get the permits in the order that they came. A second call of one release does nothing. `run` gives the permit back when the task ends or throws.
 
+## 0.9.3
+
+The summary tree is also a set of plain functions, so a bundler keeps only the functions that a program calls (C35). PATCH: before 1.0.0 a feature raises PATCH, and the class keeps its API.
+
+### Added
+
+- The entry `@mark1russell7/collections/summary-tree` gives the summary tree as plain functions over a plain record `{ spec, root }`: `of`, `at`, `locate`, `search`, `set`, `splice`, `insert`, `remove`, `slice`, `concat`, `split`, `splitAt` and the others. The rope of typeset (the functions `of`, `at`, `locate`, `set`, `splice`, `slice`, `concat` and `insert`) weighs 1842 gzip bytes in a bundle. With the class, it weighs 2551.
+- `SummaryTree` wraps the same functions. Its new field `record` and its new function `fromRecord` move a tree between the two forms without a copy.
+- The types `SummaryTreeRecord` and `SummaryNode`.
+- `bundle-weight.test.ts` bundles a small program of each entry with esbuild. A case fails when its gzip bytes pass the measured weight plus 10 percent. An import of each entry that uses nothing adds no byte.
+
+## 0.9.2
+
+The s20 audit found four faults of the set operations and of `readonly`. This version corrects them. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `HashSet`: `clone`, `union`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` keep the custom hash of the set. Before, the inner sets used `defaultHash`, so they did not find an equal element.
+- `HashSet`: `intersection`, `symmetricDifference` and `retainAll` read the other iterable one time. Before, `intersection` of a generator gave an empty set.
+- `TreeSet`: `retainAll`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` compare with the comparator of the set. Before, they used a native `Set`, which compares with `===`.
+- `readonly`: a view of an `lruCache` blocks `deleteWhere`. Before, `deleteWhere` emptied the cache through the view.
+
 ## 0.9.1
 
 The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.

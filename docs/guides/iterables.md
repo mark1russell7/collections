@@ -25,10 +25,10 @@ assert.deepEqual(seen, []);
 
 const firstTwo = take(filter(doubled, (value) => value > 4), 2);
 assert.deepEqual(toArray(firstTwo), [6, 8]);
-assert.deepEqual(seen, [1, 2, 3, 4, 5]);
+assert.deepEqual(seen, [1, 2, 3, 4]);
 ```
 
-`map` does not read a value before `toArray` asks for one. `take` stops after two values, but it reads one more value first. The section "Known defects" tells more.
+`map` does not read a value before `toArray` asks for one. `take` stops after two values, so `map` does not read the element `5`.
 
 ## pipe: a chain from left to right
 
@@ -249,7 +249,3 @@ assert.equal(hashedMap.get("pear"), 4);
 ```
 
 The two kinds of result compare keys with `===`. Use a `HashSet` or a `HashMap` with the operations of this package. Use a `Set` or a `Map` with other code.
-
-## Known defects
-
-- `take(source, n)` reads one more value from `source` than it gives, and `take(source, 0)` reads one value. A source with side effects does one step too many.

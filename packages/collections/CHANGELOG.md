@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.2
+
+`take` reads no element after the last element that it gives. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `take(source, n)` read one more element of `source` than it gave, and `take(source, 0)` read one element. A source with side effects did one step too many. Now `take` stops after the n-th element.
+
 ## 0.7.1
 
 A readonly view blocks each change of the structures of this package. PATCH: a fix with no change to the public API.

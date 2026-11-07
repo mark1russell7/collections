@@ -57,6 +57,21 @@ const tree = summaryTree(text, ["a", "b", "c"]);
 assert.equal(tree.summary, "abc");
 ```
 
+The entry `./summary-tree` gives the same tree as plain functions over a plain record. A bundler then keeps only the functions that a program calls. The class `SummaryTree` wraps these functions, and its field `record` is the record.
+
+```ts
+import assert from "node:assert/strict";
+import * as Tree from "@mark1russell7/collections/summary-tree";
+
+const text: Tree.SummarySpec<string, string> = {
+  monoid: { empty: "", combine: (a, b) => a + b },
+  measure: (leaf) => leaf,
+};
+const tree = Tree.splice(Tree.of(text, ["a", "b", "c"]), 1, 1, ["x", "y"]);
+assert.equal(Tree.summary(tree), "axyc");
+assert.deepEqual(Tree.locate(tree, (s) => s.length, 2), { index: 2, leaf: "y", offset: 0 });
+```
+
 ## Dependency graphs
 
 The entry `./dag` gives the levels of a graph, and a run of each level with a limit of concurrency.
@@ -106,6 +121,7 @@ The entry `./testing` gives the small checks of a contract suite: `holds`, `same
 | `@mark1russell7/collections` | Lists, sets, maps, queues, the summary tree, behaviors, channels, lazy operations, `keyBetween` and the other functions of ranks |
 | `@mark1russell7/collections/dag` | Levels, topological order, a run with a limit of concurrency, filters |
 | `@mark1russell7/collections/graph` | `hubBreadthFirstOrder` |
+| `@mark1russell7/collections/summary-tree` | The summary tree as plain functions over a plain record |
 | `@mark1russell7/collections/testing` | The checks of a contract suite |
 | `@mark1russell7/collections/layers` | `compose` and the types of a stack of layers, in one file with no imports |
 

@@ -22,7 +22,7 @@
     "**/*.spec.tsx"
   ],
   "technicalNouns": [],
-  "technicalVerbs": ["peek", "pop", "dequeue"],
+  "technicalVerbs": ["peek", "pop", "dequeue", "compact"],
   "properNouns": [
     "ASD",
     "ASD-STE100",

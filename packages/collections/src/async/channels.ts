@@ -337,7 +337,7 @@ export function fanOut<T>(input: Channel<T>, count: number, bufferSize: number =
 }
 
 /**
- * Fan-in: merges multiple input channels into one output channel.
+ * Fan-in: this function merges multiple input channels into one output channel.
  *
  * @example
  * const ch1 = channel<number>()

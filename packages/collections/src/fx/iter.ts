@@ -76,13 +76,14 @@ export function* flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T> {
 // ============================================================================
 
 /**
- * This function takes the first n elements.
+ * This function takes the first n elements. It reads no element after the n-th one, and it reads nothing when n is 0.
  */
 export function* take<T>(iterable: Iterable<T>, n: number): Generator<T> {
+  if (n <= 0) return;
   let count = 0;
   for (const value of iterable) {
-    if (count++ >= n) break;
     yield value;
+    if (++count >= n) return;
   }
 }
 

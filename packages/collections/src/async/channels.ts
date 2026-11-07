@@ -42,7 +42,7 @@ export class Channel<T> {
 
   /**
    * This method sends a value through the channel.
-   * Blocks if channel buffer is full.
+   * The call blocks while the buffer of the channel is full.
    *
    * @throws Error if channel is closed
    */
@@ -55,7 +55,7 @@ export class Channel<T> {
 
   /**
    * This method receives a value from the channel.
-   * Blocks if no value is available.
+   * The call blocks while no value is available.
    *
    * @throws Error if channel is closed and empty
    */

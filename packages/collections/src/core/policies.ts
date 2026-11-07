@@ -211,9 +211,9 @@ export type MergeFunction<T> = (current: T, incoming: T) => T;
 export interface CompactionPolicy {
   /** Compact when the used part of the capacity drops below this ratio (0-1). */
   readonly minLoadFactor?: number;
-  /** Compact when wasted space exceeds this many elements. */
+  /** The collection compacts when its wasted space is more than this number of elements. */
   readonly maxWastedSpace?: number;
-  /** Automatically compact on every removal. */
+  /** When it is true, the collection compacts at each removal. */
   readonly autoCompact?: boolean;
 }
 

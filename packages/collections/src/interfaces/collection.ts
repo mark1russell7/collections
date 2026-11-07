@@ -129,12 +129,12 @@ export type IsReadonly<C> = C extends ReadonlyCollection<any>
   : false;
 
 /**
- * Extract element type from a collection.
+ * This type gives the element type of a collection.
  */
 export type ElementOf<C> = C extends ReadonlyCollection<infer T> ? T : never;
 
 /**
- * Make a collection readonly by removing mutation methods.
+ * This type makes a collection readonly: it removes the methods that change the collection.
  */
 export type Readonly<C extends Collection<any>> = C extends Collection<infer T>
   ? ReadonlyCollection<T>

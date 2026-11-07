@@ -11,7 +11,7 @@ import type { Eq } from "../core/traits.js";
 // ============================================================================
 
 /**
- * Checks if an index is within valid bounds [0, size).
+ * This function gives true when an index is in the bounds [0, size).
  * This function throws RangeError if out of bounds.
  *
  * @param index The index to check
@@ -26,7 +26,7 @@ export function checkBounds(index: number, size: number, collectionName: string 
 }
 
 /**
- * Checks if an index is valid for insertion [0, size].
+ * This function gives true when an index is valid for an insertion, in [0, size].
  * In this function, index === size is correct for append operations.
  *
  * @param index The index to check
@@ -41,7 +41,7 @@ export function checkInsertBounds(index: number, size: number, collectionName: s
 }
 
 /**
- * Checks if a range [start, end) is valid.
+ * This function gives true when a range [start, end) is valid.
  *
  * @param start Start index (inclusive)
  * @param end End index (exclusive)
@@ -101,7 +101,7 @@ export function findLastIndex<T>(array: T[], element: T, eq: Eq<T>): number {
 }
 
 /**
- * Checks if an array contains an element using custom equality.
+ * This function gives true when an array has an element, with a custom equality.
  *
  * @param array The array to search
  * @param element The element to find

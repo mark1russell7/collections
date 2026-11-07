@@ -57,7 +57,7 @@ export interface LinkedHashMapOptions<K, V> {
   initialCapacity?: number;
 
   /**
-   * Load factor before resizing.
+   * This option is the load factor before a resize.
    * @default 0.75
    */
   loadFactor?: number;

@@ -1,7 +1,7 @@
 /**
  * TTL (Time-To-Live) expiration behavior.
  *
- * Automatically expires elements after a specified time period.
+ * The behavior removes each element when its time to live ends.
  * Perfect for temporary caches and time-limited data.
  *
  * @example
@@ -20,7 +20,7 @@ import { removals, removalSource, type ElementRemoval, type MapRemoval } from ".
 import type { Collection } from "../interfaces/collection.js";
 
 /**
- * Start the background expiration checker without keeping a Node.js process alive.
+ * This function starts the background expiration checker, and it does not keep a Node.js process alive.
  * (In a browser, setInterval gives a number and there is nothing to unref.)
  */
 function startExpirationTimer(check: () => void, interval: number): ReturnType<typeof setInterval> {
@@ -368,7 +368,7 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * Manually trigger cleanup of expired entries.
+   * This method removes the expired entries at once.
    */
   cleanup(): void {
     const now = Date.now();
@@ -392,7 +392,7 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * Get remaining TTL for a key in milliseconds.
+   * This method gives the remaining TTL of a key, in milliseconds.
    * This method gives undefined if key doesn't exist or is expired.
    */
   getTTL(key: K): number | undefined {
@@ -404,7 +404,7 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * Update TTL for an existing key.
+   * This method updates the TTL of a key that is in the map.
    */
   touch(key: K, customTTL?: number): boolean {
     const entry = this.map.get(key);
@@ -425,7 +425,7 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * Stop the background expiration checker and clean up.
+   * This method stops the background expiration checker and cleans up.
    */
   dispose(): void {
     if (this.intervalId) {

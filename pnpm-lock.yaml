@@ -207,6 +207,10 @@ importers:
         version: 7.0.2
 
   packages/collections:
+    dependencies:
+      '@mark1russell7/optional':
+        specifier: ^1.2.0
+        version: 1.2.0
     devDependencies:
       '@mark1russell7/cue':
         specifier: ^2.0.0
@@ -479,6 +483,10 @@ packages:
     resolution: {integrity: sha512-0/L9nQwGqUTCLTnUPtYKJ/cvXTr/gJWFWASUzGUjKyj3LxNpYgAplLuTPNQe0g4kjcM+9JAb/D/IfYwBGvM/mA==}
     engines: {node: '>=22'}
     hasBin: true
+
+  '@mark1russell7/optional@1.2.0':
+    resolution: {integrity: sha512-vS5jF21WC/VApRv4p8afRZahcMl9cuNp03LxbVngY9nYkzq+S7Oit6ksySt2baML+tp46UF60sxnHxn1jlwtTg==}
+    engines: {node: '>=22.12'}
 
   '@mark1russell7/rigor-bench@0.2.23':
     resolution: {integrity: sha512-/zuSClxNKIwZ1RFy+9giLK0kIpvNNkrD184EP6onk/4vYRJXKV8pB4+EPpuZOvRuND2lTVY3PUFnm+Amvf9BBw==}
@@ -1672,6 +1680,8 @@ snapshots:
       yaml: 2.9.1
 
   '@mark1russell7/cue@2.1.1': {}
+
+  '@mark1russell7/optional@1.2.0': {}
 
   '@mark1russell7/rigor-bench@0.2.23(esbuild@0.28.2)':
     dependencies:

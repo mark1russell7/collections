@@ -19,6 +19,7 @@ import type { Middleware } from "../core/middleware.js";
 import type { MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type MapRemoval } from "../core/removals.js";
+import { keyIndex, mapEquality } from "../core/key-index.js";
 
 /**
  * Options for LRU behavior.
@@ -66,7 +67,8 @@ export function lruMap<K, V>(
     // Doubly-linked list for LRU tracking
     let head: LRUNode<K, V> | null = null;
     let tail: LRUNode<K, V> | null = null;
-    const nodeMap = new Map<K, LRUNode<K, V>>();
+    // The nodes, found with the equality of the base (C20)
+    const nodeMap = keyIndex<K, LRUNode<K, V>>(mapEquality(next));
 
     const moveToHead = (node: LRUNode<K, V>): void => {
       // Remove from current position

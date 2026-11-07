@@ -198,7 +198,8 @@ describe("a removing layer corrects its state on a removal below it", () => {
     }
     calls = 0;
     map.delete(2999);
-    expect(calls).toBeLessThanOrEqual(10);
+    // An order with the 3000 expired keys costs thousands of calls. Since 0.11.0 the key index of ttlMap also uses keyEq.
+    expect(calls).toBeLessThanOrEqual(20);
     ttl.dispose();
   });
 

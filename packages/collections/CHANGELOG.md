@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.11.0
+
+`lruMap`, `ttlMap` and `ttlCollection` find each key with the equality of their base (C20). MINOR: a new getter, and before 1.0.0 a change of behavior raises MINOR.
+
+### Added
+
+- The getter `keyHash` of `HashMap` and `LinkedHashMap`, and the optional field `keyHash` of `MapLike`. The getter `hash` of `HashSet`.
+
+### Fixed
+
+- `lruMap` and `ttlMap` kept their keys in a JavaScript `Map`, so they did not agree with a base that has a custom `keyEq` or comparator. Two equal keys were two entries of the layer. Then the layer evicted or expired a key that was gone, or the entry of the other key. Now the layer finds a key as the base does.
+- `ttlCollection` did the same with the `eq` of its base. A `remove` with an equal element kept the old time, which later removed the element of a new `add`.
+
+### Changed
+
+- Over a `treeMap`, `lruMap` and `ttlMap` find a key in O(log n), with the comparator of the base. Over a map with a custom `keyEq` and no hash, they find a key in O(n). With the default `keyEq`, they use a JavaScript `Map`, as before.
+
 ## 0.10.0
 
 `boundedList` has one drop end for each front insert (C21). MINOR: before 1.0.0 a change of behavior raises MINOR. On a full `drop-oldest` list, `insert(0, x)` now drops the last element.

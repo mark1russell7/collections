@@ -18,6 +18,24 @@ Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found s
 - `ttlMap`: a new `set` of a key starts its time again and puts the key at the end of the order of expiry.
 - `lruMap`: a `set` of a new key into a full map read each entry with `has` of the base, so it cost O(capacity). Now it costs amortized O(1): the layer looks for stale entries only at twice the capacity.
 
+## 0.7.2
+
+`take` reads no element after the last element that it gives. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `take(source, n)` read one more element of `source` than it gave, and `take(source, 0)` read one element. A source with side effects did one step too many. Now `take` stops after the n-th element.
+
+## 0.7.1
+
+A readonly view blocks each change of the structures of this package. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A readonly view of `arrayDeque`, `priorityQueue` or `linkedList` did not block `pollOrUndefined`. The method removed an element of the base. It now throws the readonly error.
+- A readonly view did not block the internal changes of the structures, for example `unlinkNode` of `linkedList` and `heapify` of `priorityQueue`. TypeScript marks them private, but a call at run time reached them. The view now blocks them.
+- A new test puts each method of each structure in the reads or in the blocked names. A new method fails the test until one of the two lists has its name.
+
 ## 0.7.0
 
 `Optional` and `Result` come from `@mark1russell7/optional` 1.2.0, and collections has no copy of them. MINOR: before 1.0.0 a breaking change raises MINOR. The exports `Option`, `Some`, `None`, `Ok`, `Err` and their functions are removed, and the shape of the values changes from `_tag` to `tag`.

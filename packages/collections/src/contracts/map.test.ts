@@ -98,7 +98,8 @@ function checkEntries(s: S, m: M, order: "insertion" | "sorted" | "any"): void {
   for (const k of [-3, 0, 5, 19, 150]) {
     expect(s.has(k)).toBe(m.has(k));
     expect(s.getOrUndefined(k)).toBe(m.get(k));
-    if (!m.has(k)) expect(() => s.get(k)).toThrow();
+    if (m.has(k)) expect(s.get(k)).toBe(m.get(k));
+    else expect(() => s.get(k)).toThrow();
   }
 }
 
@@ -120,6 +121,18 @@ for (const [name, create, order] of [
         check: (s, m) => checkEntries(s, m, order),
         maxSteps: 150,
       });
+    });
+
+    // C8: before the fix, HashMap.get threw "Key not found" for this key, and getOrDefault gave the default
+    it("keeps a key whose value is undefined: get and getOrDefault give the value, not an error or the default", () => {
+      const map = create() as unknown as MapLike<number, string | undefined>;
+      map.set(1, undefined);
+      expect(map.has(1)).toBe(true);
+      expect(map.size).toBe(1);
+      expect(map.get(1)).toBeUndefined();
+      expect(map.getOrDefault(1, "default")).toBeUndefined();
+      expect(map.getOrDefault(2, "default")).toBe("default");
+      expect(() => map.get(2)).toThrow();
     });
   });
 }

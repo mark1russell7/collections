@@ -71,9 +71,11 @@ function notify<T>(name: string, listener: ((arg: T) => void) | undefined, arg: 
  * With `skipDependents` (the default), a node whose dependency failed or was skipped does not start. Its result has
  * `skipped: true` and an error that names those dependencies. A dependency outside the DAG does not count.
  *
- * `failFast` operates at level granularity. When a node in a level fails, each
- * node already in flight in that level continues to completion. No later level
- * starts. (There is no mid-level cancellation.)
+ * `failFast` operates on levels. When a node of a level fails, each node of that level continues to its end.
+ * This includes the nodes that did not start before the failure, when `concurrency` is less than the
+ * size of the level. No later level starts. The run does not cancel a node.
+ *
+ * A node that did not start (`skipped: true`) calls neither `onNodeStart` nor `onNodeComplete`.
  */
 export async function executeDAG<TNode extends DAGNode>(
   dag: DependencyDAG<TNode>,

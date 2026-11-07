@@ -33,7 +33,13 @@ assert.equal(cache.get("c"), 3);
 `compose` applies its layers from right to left, so the last layer is next to the base. The order of the layers is important:
 
 - Put `ttlMap` below `lruMap`: `compose(lruMap(...), ttlMap(...))`. Then an expired entry is not an eviction.
-- Put an evented layer next to the base. Then its events include each drop, eviction and expiry of the layers above it. A layer above `boundedMap`, `lruMap` or `ttlMap` does not see their removals.
+- An evented layer can go at each place. Below a removing layer, it gets each removal as a call. Above it, it gets each removal from the removal channel, with a `reason`.
+
+The bounded layers, `lruMap` and `ttlMap` remove entries by themselves. Each of them sends its removals on a removal channel, and each layer above it gets them. `removalsOf(collection)` gives the channel:
+
+```typescript
+removalsOf<MapRemoval<string, User>>(cache)?.on(({ key, reason }) => console.log(key, reason)); // "evict" or "expire"
+```
 
 ## The summary tree
 
@@ -87,6 +93,7 @@ Each guide has examples, and a test runs each example:
 - [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
 - [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
 - [Iterables and collectors](https://github.com/mark1russell7/collections/blob/main/docs/guides/iterables.md): lazy functions, reducers, collectors and the names of the root
+- [Rank keys](https://github.com/mark1russell7/collections/blob/main/docs/guides/rank-keys.md): the keys of a list that a user can reorder, and the writes of a move
 
 ## Contract checks
 

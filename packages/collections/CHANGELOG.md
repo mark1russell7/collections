@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.1
+## 0.9.1
 
 The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.
 
@@ -8,6 +8,27 @@ The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH:
 
 - The 13 names of `async/channels.ts`: `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Import each one from `@mark1russell7/service/channel`. The next MINOR version removes them from collections.
 - Collections does not re-export the channels of service, and it does not depend on service. Service depends on collections for `asyncQueue`.
+## 0.9.0
+
+A layer above a removing layer now sees its removals (C23). The tests of the removal channel found six more faults. This version corrects them. MINOR: new exports, and before 1.0.0 a change of behavior raises MINOR. An evented layer above a layer that refuses an element no longer emits an event for it.
+
+### Added
+
+- The removal channel: `removals`, `removalsOf`, `removalSource` and the types `RemovalReason`, `MapRemoval`, `ElementRemoval`, `RemovalChannel` and `RemovalSource`. The bounded layers, `lruMap`, `ttlMap` and `ttlCollection` send each removal that they make by themselves. Each other layer forwards the channel.
+- The events `delete` of `eventedMap`, `remove` of `eventedList` and `evented`, `dequeue` of `eventedQueue`, and `removeFirst` and `removeLast` of `eventedDeque` occur for each removal below. They have the field `reason`: `"drop"`, `"evict"` or `"expire"`.
+
+### Changed
+
+- The evented layers emit no `add`, `enqueue`, `addFirst`, `addLast` or `set` event for an element that a layer below refused (the policies `reject` and `drop-newest`).
+
+### Fixed
+
+- `boundedMap` over a removing layer: its order kept the removed keys, so a drop removed nothing and the size passed the capacity. Now the channel takes the key out of the order, and a drop skips a key that is gone.
+- `ttlMap` over `lruMap`: `onExpire` occurred for an entry that `lruMap` evicted. `ttlCollection` over a bounded list did the same for a dropped element.
+- `lruMap` over `ttlMap`: the layer kept the node of each expired entry until a scan. Now it forgets the node at the expiry, so a set costs one call of `has` of the base when entries expire as fast as they come.
+- `eventedList`: `insert` into a full `drop-oldest` list emitted the index of the caller. The bounded layer put the element one place lower, and now the event has that index.
+- `eventedList`: `pop` emitted no index. Now its `remove` event has the index of the last element.
+- `eventedDeque`: `push` emitted `addFirst`, but `push` of a deque adds at the end. Now it emits `addLast`.
 
 ## 0.8.0
 

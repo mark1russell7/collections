@@ -121,7 +121,8 @@ for (const [name, create, order] of [
         check: (s, m) => checkEntries(s, m, order),
         maxSteps: 150,
       });
-    });
+      // The sequences have the size "medium" since 0.8.0: on a loaded machine the first base took 5.2 s of 5 s
+    }, 15_000);
 
     // C8: before the fix, HashMap.get threw "Key not found" for this key, and getOrDefault gave the default
     it("keeps a key whose value is undefined: get and getOrDefault give the value, not an error or the default", () => {

@@ -18,6 +18,7 @@ import { treeMap } from "../impl/tree-map.js";
 import { treeSet } from "../impl/tree-set.js";
 import type { MapLike } from "../interfaces/map.js";
 import type { Queue } from "../interfaces/queue.js";
+import { lruCache } from "./lru.js";
 import { readonly } from "./readonly.js";
 
 /** The methods that do not change a structure. A name here stays open on a readonly view. */
@@ -38,7 +39,7 @@ const READS = new Set([
   // The internal reads: TypeScript marks them private, and none of them changes the structure
   "checkIndex", "checkInsertIndex", "checkRange", "getNode", "nextPowerOfTwo", "compare", "bucketIndex",
   "checkUnchanged", "findNode", "keyEq", "valueEq", "getBucketIndex", "hash", "createNode", "findValue", "getFirstNode",
-  "getLastNode", "inOrderTraversal", "reverseInOrderTraversal",
+  "getLastNode", "inOrderTraversal", "reverseInOrderTraversal", "empty", "setOf",
   // SummaryTree is persistent: each of these operations gives a new tree and keeps the old tree
   "append", "at", "concat", "locate", "prepend", "search", "slice", "splice", "split", "splitAt", "summaryOf", "treeOf",
   "wrap",
@@ -68,6 +69,13 @@ const structures: [string, () => { base: object; content: () => unknown }][] = [
   ["hashMap", () => mapOf(hashMap<string, number>())],
   ["linkedHashMap", () => mapOf(linkedHashMap<string, number>())],
   ["treeMap", () => mapOf(treeMap<string, number>())],
+  ["lruCache", () => {
+    const base = lruCache<string, number>(3);
+    base.set("c", 3);
+    base.set("a", 1);
+    base.set("b", 2);
+    return { base, content: () => [...base.entries()] };
+  }],
   ["summaryTree", () => { const base = summaryTree(sum, [3, 1, 2]); return { base, content: () => base.toArray() }; }],
 ];
 

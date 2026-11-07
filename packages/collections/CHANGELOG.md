@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.10.0
+## 0.11.0
 
 `lruMap`, `ttlMap` and `ttlCollection` find each key with the equality of their base (C20). MINOR: a new getter, and before 1.0.0 a change of behavior raises MINOR.
 
@@ -17,7 +17,7 @@
 
 - Over a `treeMap`, `lruMap` and `ttlMap` find a key in O(log n), with the comparator of the base. Over a map with a custom `keyEq` and no hash, they find a key in O(n). With the default `keyEq`, they use a JavaScript `Map`, as before.
 
-## 0.9.0
+## 0.10.0
 
 `boundedList` has one drop end for each front insert (C21). MINOR: before 1.0.0 a change of behavior raises MINOR. On a full `drop-oldest` list, `insert(0, x)` now drops the last element.
 
@@ -29,7 +29,7 @@
 
 - `boundedList`: `insert` and `insertAll` at an index that the base refuses dropped an element before the base threw. Now the base throws first, and the list does not change.
 
-## 0.8.0
+## 0.9.0
 
 A layer above a removing layer now sees its removals (C23). The tests of the removal channel found six more faults. This version corrects them. MINOR: new exports, and before 1.0.0 a change of behavior raises MINOR. An evented layer above a layer that refuses an element no longer emits an event for it.
 
@@ -51,7 +51,7 @@ A layer above a removing layer now sees its removals (C23). The tests of the rem
 - `eventedList`: `pop` emitted no index. Now its `remove` event has the index of the last element.
 - `eventedDeque`: `push` emitted `addFirst`, but `push` of a deque adds at the end. Now it emits `addLast`.
 
-## 0.7.0
+## 0.8.0
 
 Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found six faults. This version corrects them. MINOR: before 1.0.0 a change of behavior raises MINOR. A front insert into a full `drop-oldest` deque now drops the last element.
 
@@ -68,6 +68,38 @@ Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found s
 - `ttlMap`: a lazy removal in `get` or `has` did not start `onExpire`. Now `onExpire` occurs one time for each expired entry, in the order of expiry.
 - `ttlMap`: a new `set` of a key starts its time again and puts the key at the end of the order of expiry.
 - `lruMap`: a `set` of a new key into a full map read each entry with `has` of the base, so it cost O(capacity). Now it costs amortized O(1): the layer looks for stale entries only at twice the capacity.
+
+## 0.7.0
+
+`Optional` and `Result` come from `@mark1russell7/optional` 1.2.0, and collections has no copy of them. MINOR: before 1.0.0 a breaking change raises MINOR. The exports `Option`, `Some`, `None`, `Ok`, `Err` and their functions are removed, and the shape of the values changes from `_tag` to `tag`.
+
+### Changed
+
+- The safe middleware (`safeList`, `safeQueue`, `safeDeque`, `safeMap`) gives the values of `@mark1russell7/optional`. A present value is `{ tag: "some", value }`, and an absent value is `{ tag: "none" }`. A `Result` is `{ tag: "ok", value }` or `{ tag: "err", error }`.
+- `@mark1russell7/optional` is a new dependency. It has no dependencies.
+
+### Removed
+
+The module `core/effects` is removed. Import its replacements from `@mark1russell7/optional`:
+
+| Removed | Replacement |
+| --- | --- |
+| `Option`, `Some(v)`, `None` | `Optional`, `some(v)`, `none` |
+| `Ok(v)`, `Err(e)` | `ok(v)`, `err(e)` |
+| `isSome`, `isNone`, `isOk`, `isErr` | the same names |
+| `getOrElse`, `getOrElseResult` | `getOr`, `getOkOr` |
+| `mapOption`, `flatMapOption`, `mapError` | `map`, `flatMap`, `mapErr` |
+| `mapResult`, `flatMapResult`, `tryCatch`, `tryCatchAsync` | the same names |
+| `optionToResult`, `resultToOption` | `fromOptional`, `toOptional` |
+| `toNullable`, `fromNullable` | `unwrap`, `fromNullable` |
+| `unwrap`, `unwrapResult` | no replacement: `unwrap` of optional gives `undefined` for `none` and does not throw |
+| the method `match` of `Ok` and `Err` | `isOk` and `isErr` |
+| `sequence`, `sequenceResults`, `AsyncOption`, `AsyncResult`, `mapAsyncOption`, `mapAsyncResult` | no replacement |
+
+### Fixed
+
+- `hashMap.get` threw "Key not found" for a key whose value is `undefined`, and `getOrDefault` gave the default for it. Now the node of the key tells if the key is present, as in `linkedHashMap` and `treeMap`. A new law of the map contract found the bug. It runs on all maps.
+- Thus `safeMap().safe.get` threw for such a key. Now it gives `some(undefined)`.
 
 ## 0.6.0
 

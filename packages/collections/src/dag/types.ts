@@ -39,7 +39,10 @@ export interface DependencyDAG<TNode extends DAGNode = DAGNode> {
 export interface DAGExecutionOptions<TNode extends DAGNode = DAGNode> {
   /** Max parallel operations per level (default: 4) */
   concurrency?: number;
-  /** When this value is true, the run stops on the first error. The default is true. */
+  /**
+   * When this value is true, no level starts after a level with a failure. The default is true.
+   * Each node of the level with the failure runs, also a node that did not start before the failure.
+   */
   failFast?: boolean;
   /**
    * When this value is true, a node whose dependency failed or was skipped does not start. Its result has `skipped: true`.

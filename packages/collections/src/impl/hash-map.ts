@@ -141,46 +141,36 @@ export class HashMap<K, V> implements MapLike<K, V> {
   // ========================================================================
 
   has(key: K): boolean {
-    const hash = this._keyHash(key);
-    const index = this.bucketIndex(hash);
-    let node = this._buckets[index] ?? null;
-
-    while (node !== null) {
-      if (node.hash === hash && this._keyEq(node.key, key)) {
-        return true;
-      }
-      node = node.next;
-    }
-
-    return false;
+    return this.findNode(key) !== null;
   }
 
   get(key: K): V {
-    const value = this.getOrUndefined(key);
-    if (value === undefined) {
+    // The node, not the value, tells if the key is present: a key can have the value undefined (C8)
+    const node = this.findNode(key);
+    if (node === null) {
       throw new Error(`Key not found: ${key}`);
     }
-    return value;
+    return node.value;
   }
 
   getOrUndefined(key: K): V | undefined {
-    const hash = this._keyHash(key);
-    const index = this.bucketIndex(hash);
-    let node = this._buckets[index] ?? null;
-
-    while (node !== null) {
-      if (node.hash === hash && this._keyEq(node.key, key)) {
-        return node.value;
-      }
-      node = node.next;
-    }
-
-    return undefined;
+    return this.findNode(key)?.value;
   }
 
   getOrDefault(key: K, defaultValue: V): V {
-    const value = this.getOrUndefined(key);
-    return value !== undefined ? value : defaultValue;
+    const node = this.findNode(key);
+    return node !== null ? node.value : defaultValue;
+  }
+
+  /** This method finds the node of a key, or gives `null`. */
+  private findNode(key: K): Node<K, V> | null {
+    const hash = this._keyHash(key);
+    let node = this._buckets[this.bucketIndex(hash)] ?? null;
+    while (node !== null) {
+      if (node.hash === hash && this._keyEq(node.key, key)) return node;
+      node = node.next;
+    }
+    return null;
   }
 
   containsValue(value: V): boolean {

@@ -4,7 +4,7 @@
 # and private members. The command `api-report check` compares this file with the built .d.ts files.
 # To accept a change of the API, start the build, then `api-report update`, and review the diff.
 
-## . (build/index.d.ts): 366 names
+## . (build/index.d.ts): names
 
 ArrayConvertible: build/index.d.ts#ArrayConvertible
 ArrayDeque: build/index.d.ts#ArrayDeque
@@ -13,10 +13,8 @@ ArrayList: build/index.d.ts#ArrayList
 ArrayListOptions: build/index.d.ts#ArrayListOptions
 Async: build/index.d.ts#Async
 AsyncEmitter: build/index.d.ts#AsyncEmitter
-AsyncOption: build/index.d.ts#AsyncOption
 AsyncQueue: build/index.d.ts#AsyncQueue
 AsyncQueueOptions: build/index.d.ts#AsyncQueueOptions
-AsyncResult: build/index.d.ts#AsyncResult
 Asyncify: build/index.d.ts#Asyncify
 BiMap: build/index.d.ts#BiMap
 type BlockingQueue: build/index.d.ts#BlockingQueue
@@ -54,7 +52,6 @@ Emptiable: build/index.d.ts#Emptiable
 Entry: build/index.d.ts#Entry
 Eq: build/index.d.ts#Eq
 EqualityProvider: build/index.d.ts#EqualityProvider
-Err: build/index.d.ts#Err
 EventBatcher: build/index.d.ts#EventBatcher
 EventMap: build/index.d.ts#EventMap
 Evented: build/index.d.ts#Evented
@@ -95,9 +92,6 @@ MultiMap: build/index.d.ts#MultiMap
 MutableCollectionBase: build/index.d.ts#MutableCollectionBase
 NavigableMap: build/index.d.ts#NavigableMap
 NavigableSet: build/index.d.ts#NavigableSet
-None: build/index.d.ts#None
-Ok: build/index.d.ts#Ok
-Option: build/index.d.ts#Option
 OverflowContext: build/index.d.ts#OverflowContext
 OverflowHandler: build/index.d.ts#OverflowHandler
 OverflowPolicy: build/index.d.ts#OverflowPolicy
@@ -118,7 +112,6 @@ ReadonlySet: build/index.d.ts#ReadonlySet
 RemovalChannel: build/index.d.ts#RemovalChannel
 RemovalReason: build/index.d.ts#RemovalReason
 RemovalSource: build/index.d.ts#RemovalSource
-Result: build/index.d.ts#Result
 RetryContext: build/index.d.ts#RetryContext
 RetryPolicy: build/index.d.ts#RetryPolicy
 RetryPredicate: build/index.d.ts#RetryPredicate
@@ -131,7 +124,6 @@ SelectCase: build/index.d.ts#SelectCase
 Set: build/index.d.ts#Set$1
 Settled: build/index.d.ts#Settled
 Sized: build/index.d.ts#Sized
-Some: build/index.d.ts#Some
 SortedMap: build/index.d.ts#SortedMap
 SortedSet: build/index.d.ts#SortedSet
 Stack: build/index.d.ts#Stack
@@ -230,14 +222,9 @@ findIndex: build/index.d.ts#findIndex
 findLastIndex: build/index.d.ts#findLastIndex
 first: build/index.d.ts#first
 flatMap: build/index.d.ts#flatMap
-flatMapOption: build/index.d.ts#flatMapOption
-flatMapResult: build/index.d.ts#flatMapResult
 flatMapping: build/index.d.ts#flatMapping
 flatten: build/index.d.ts#flatten
 forwardEvent: build/index.d.ts#forwardEvent
-fromNullable: build/index.d.ts#fromNullable
-getOrElse: build/index.d.ts#getOrElse
-getOrElseResult: build/index.d.ts#getOrElseResult
 groupBy: build/index.d.ts#groupBy
 groupingBy: build/index.d.ts#groupingBy
 groupingByWith: build/index.d.ts#groupingByWith
@@ -250,10 +237,6 @@ hashString: build/index.d.ts#hashString
 immutableListOf: build/index.d.ts#immutableListOf
 immutableMapOf: build/index.d.ts#immutableMapOf
 interceptMethods: build/index.d.ts#interceptMethods
-isErr: build/index.d.ts#isErr
-isNone: build/index.d.ts#isNone
-isOk: build/index.d.ts#isOk
-isSome: build/index.d.ts#isSome
 isValidKey: build/index.d.ts#isValidKey
 iterToMap: build/index.d.ts#toMap$1
 joining: build/index.d.ts#joining
@@ -267,12 +250,7 @@ listOf: build/index.d.ts#listOf
 lruCache: build/index.d.ts#lruCache
 lruMap: build/index.d.ts#lruMap
 map: build/index.d.ts#map
-mapAsyncOption: build/index.d.ts#mapAsyncOption
-mapAsyncResult: build/index.d.ts#mapAsyncResult
-mapError: build/index.d.ts#mapError
 mapOf: build/index.d.ts#mapOf
-mapOption: build/index.d.ts#mapOption
-mapResult: build/index.d.ts#mapResult
 mapping: build/index.d.ts#mapping
 max: build/index.d.ts#max
 maxBy: build/index.d.ts#maxBy
@@ -287,7 +265,6 @@ nullsFirst: build/index.d.ts#nullsFirst
 nullsLast: build/index.d.ts#nullsLast
 numberCompare: build/index.d.ts#numberCompare
 onWhen: build/index.d.ts#onWhen
-optionToResult: build/index.d.ts#optionToResult
 partition: build/index.d.ts#partition
 partitioningBy: build/index.d.ts#partitioningBy
 pipe: build/index.d.ts#pipe
@@ -312,7 +289,6 @@ removalsOf: build/index.d.ts#removalsOf
 reportListenerError: build/index.d.ts#reportListenerError
 requireNonEmpty: build/index.d.ts#requireNonEmpty
 requireNonNull: build/index.d.ts#requireNonNull
-resultToOption: build/index.d.ts#resultToOption
 reverse: build/index.d.ts#reverse
 reverseArrayIterator: build/index.d.ts#reverseArrayIterator
 reversed: build/index.d.ts#reversed
@@ -323,8 +299,6 @@ safeMap: build/index.d.ts#safeMap
 safeQueue: build/index.d.ts#safeQueue
 scan: build/index.d.ts#scan
 select: build/index.d.ts#select
-sequence: build/index.d.ts#sequence
-sequenceResults: build/index.d.ts#sequenceResults
 shallowEq: build/index.d.ts#shallowEq
 singletonList: build/index.d.ts#singletonList
 singletonMap: build/index.d.ts#singletonMap
@@ -354,12 +328,9 @@ timeout: build/index.d.ts#timeout
 toArray: build/index.d.ts#toArray$1
 toList: build/index.d.ts#toList$1
 toMap: build/index.d.ts#toMap$2
-toNullable: build/index.d.ts#toNullable
 toSet: build/index.d.ts#toSet$1
 treeMap: build/index.d.ts#treeMap
 treeSet: build/index.d.ts#treeSet
-tryCatch: build/index.d.ts#tryCatch
-tryCatchAsync: build/index.d.ts#tryCatchAsync
 ttlCache: build/index.d.ts#ttlCache
 ttlCollection: build/index.d.ts#ttlCollection
 ttlMap: build/index.d.ts#ttlMap
@@ -367,13 +338,11 @@ unbuffered: build/index.d.ts#unbuffered
 unmodifiableCollection: build/index.d.ts#unmodifiableCollection
 unmodifiableList: build/index.d.ts#unmodifiableList
 unmodifiableMap: build/index.d.ts#unmodifiableMap
-unwrap: build/index.d.ts#unwrap
-unwrapResult: build/index.d.ts#unwrapResult
 window: build/index.d.ts#window
 workerPool: build/index.d.ts#workerPool
 zip: build/index.d.ts#zip
 
-## ./dag (build/dag/index.d.ts): 17 names
+## ./dag (build/dag/index.d.ts): names
 
 type DAGExecutionOptions: build/dag/index.d.ts#DAGExecutionOptions
 type DAGNode: build/dag/index.d.ts#DAGNode
@@ -393,12 +362,12 @@ getDescendants: build/dag/index.d.ts#getDescendants
 getTopologicalOrder: build/dag/index.d.ts#getTopologicalOrder
 visualizeDAG: build/dag/index.d.ts#visualizeDAG
 
-## ./graph (build/graph/index.d.ts): 2 names
+## ./graph (build/graph/index.d.ts): names
 
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 
-## ./layers (build/core/layers.d.ts): 8 names
+## ./layers (build/core/layers.d.ts): names
 
 Chain: build/layers.d.ts#Chain
 Composed: build/layers.d.ts#Composed
@@ -409,7 +378,7 @@ Outers: build/layers.d.ts#Outers
 Stacked: build/layers.d.ts#Stacked
 compose: build/layers.d.ts#compose
 
-## ./testing (build/testing/index.d.ts): 6 names
+## ./testing (build/testing/index.d.ts): names
 
 ContractViolation: build/testing/index.d.ts#ContractViolation
 deepEqual: build/testing/index.d.ts#deepEqual
@@ -625,9 +594,6 @@ export declare class AsyncEmitter<E extends EventMap> {
   dispose(): void;
 }
 
-### build/index.d.ts#AsyncOption
-export type AsyncOption<T> = Promise<Option<T>>;
-
 ### build/index.d.ts#AsyncQueue
 export declare class AsyncQueue<T> implements AsyncQueue$1<T> {
   constructor(options?: AsyncQueueOptions);
@@ -677,9 +643,6 @@ export interface AsyncQueueOptions {
   capacity?: number;
   timeout?: number;
 }
-
-### build/index.d.ts#AsyncResult
-export type AsyncResult<T, E> = Promise<Result<T, E>>;
 
 ### build/index.d.ts#Asyncify
 export type Asyncify<C> = { [K in keyof C]: C[K] extends ((...args: infer Args) => infer R) ? (...args: Args) => Promise<R> : C[K]; };
@@ -925,17 +888,6 @@ export type Eq<T> = (a: T, b: T) => boolean;
 export interface EqualityProvider<T> {
   readonly eq: Eq<T>;
 }
-
-### build/index.d.ts#Err
-export interface Err<E> {
-  readonly _tag: "Err";
-  readonly error: E;
-  match<U>(cases: {
-    Ok: (value: never) => U;
-    Err: (error: E) => U;
-  }): U;
-}
-export declare const Err: <E>(error: E) => Err<E>;
 
 ### build/index.d.ts#EventBatcher
 export declare class EventBatcher<E extends EventMap, K extends keyof E> {
@@ -1371,26 +1323,6 @@ export interface NavigableSet<T> extends SortedSet<T> {
   descendingIterator(): Iterator<T>;
 }
 
-### build/index.d.ts#None
-export interface None {
-  readonly _tag: "None";
-}
-export declare const None: None;
-
-### build/index.d.ts#Ok
-export interface Ok<T> {
-  readonly _tag: "Ok";
-  readonly value: T;
-  match<U>(cases: {
-    Ok: (value: T) => U;
-    Err: (error: never) => U;
-  }): U;
-}
-export declare const Ok: <T>(value: T) => Ok<T>;
-
-### build/index.d.ts#Option
-export type Option<T> = None | Some<T>;
-
 ### build/index.d.ts#OverflowContext
 export interface OverflowContext<T> {
   readonly newElement: T;
@@ -1558,9 +1490,6 @@ export interface RemovalSource<R> {
   emit(removal: R): void;
 }
 
-### build/index.d.ts#Result
-export type Result<T, E> = Ok<T> | Err<E>;
-
 ### build/index.d.ts#RetryContext
 export interface RetryContext {
   readonly attempt: number;
@@ -1587,36 +1516,36 @@ export interface SafeCollection {
 
 ### build/index.d.ts#SafeDequeOperations
 export interface SafeDequeOperations<T> extends SafeQueueOperations<T> {
-  peekFirst(): Option<T>;
-  peekLast(): Option<T>;
-  pollFirst(): Option<T>;
-  pollLast(): Option<T>;
-  pop(): Option<T>;
+  peekFirst(): Optional<T>;
+  peekLast(): Optional<T>;
+  pollFirst(): Optional<T>;
+  pollLast(): Optional<T>;
+  pop(): Optional<T>;
 }
 
 ### build/index.d.ts#SafeListOperations
 export interface SafeListOperations<T> {
-  get(index: number): Option<T>;
+  get(index: number): Optional<T>;
   set(index: number, element: T): Result<T, string>;
   removeAt(index: number): Result<T, string>;
-  first(): Option<T>;
-  last(): Option<T>;
-  pop(): Option<T>;
-  shift(): Option<T>;
+  first(): Optional<T>;
+  last(): Optional<T>;
+  pop(): Optional<T>;
+  shift(): Optional<T>;
 }
 
 ### build/index.d.ts#SafeMapOperations
 export interface SafeMapOperations<K, V> {
-  get(key: K): Option<V>;
+  get(key: K): Optional<V>;
   set(key: K, value: V): Result<V | undefined, string>;
   delete(key: K): Result<V | undefined, string>;
 }
 
 ### build/index.d.ts#SafeQueueOperations
 export interface SafeQueueOperations<T> {
-  peek(): Option<T>;
-  poll(): Option<T>;
-  dequeue(): Option<T>;
+  peek(): Optional<T>;
+  poll(): Optional<T>;
+  dequeue(): Optional<T>;
 }
 
 ### build/index.d.ts#SelectCase
@@ -1646,13 +1575,6 @@ export type Settled<T> = {
 export interface Sized {
   readonly size: number;
 }
-
-### build/index.d.ts#Some
-export interface Some<T> {
-  readonly _tag: "Some";
-  readonly value: T;
-}
-export declare const Some: <T>(value: T) => Some<T>;
 
 ### build/index.d.ts#SortedMap
 export interface SortedMap<K, V> extends MapLike<K, V> {
@@ -2170,12 +2092,6 @@ export declare function first<T>(): Collector<T, T | undefined, T | undefined>;
 ### build/index.d.ts#flatMap
 export declare function flatMap<T, U>(iterable: Iterable<T>, fn: (value: T, index: number) => Iterable<U>): Generator<U>;
 
-### build/index.d.ts#flatMapOption
-export declare const flatMapOption: <T, U>(opt: Option<T>, f: (value: T) => Option<U>) => Option<U>;
-
-### build/index.d.ts#flatMapResult
-export declare const flatMapResult: <T, U, E>(result: Result<T, E>, f: (value: T) => Result<U, E>) => Result<U, E>;
-
 ### build/index.d.ts#flatMapping
 export declare function flatMapping<T, U, A, R>(mapper: (element: T) => Iterable<U>, downstream: Collector<U, A, R>): Collector<T, A, R>;
 
@@ -2184,15 +2100,6 @@ export declare function flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T
 
 ### build/index.d.ts#forwardEvent
 export declare const forwardEvent: <E1 extends EventMap, E2 extends EventMap, K1 extends keyof E1, K2 extends keyof E2>(source: Emitter<E1>, target: Emitter<E2>, sourceEvent: K1, targetEvent: K2, transform?: (payload: E1[K1]) => E2[K2]) => Unsubscribe;
-
-### build/index.d.ts#fromNullable
-export declare const fromNullable: <T>(value: T | null | undefined) => Option<T>;
-
-### build/index.d.ts#getOrElse
-export declare const getOrElse: <T>(opt: Option<T>, defaultValue: T) => T;
-
-### build/index.d.ts#getOrElseResult
-export declare const getOrElseResult: <T, E>(result: Result<T, E>, defaultValue: T) => T;
 
 ### build/index.d.ts#groupBy
 export declare function groupBy<T, K>(iterable: Iterable<T>, keyExtractor: (value: T) => K): HashMap<K, ArrayList<T>>;
@@ -2229,18 +2136,6 @@ export declare function immutableMapOf<K, V>(...entries: [K, V][]): MapLike<K, V
 
 ### build/index.d.ts#interceptMethods
 export declare const interceptMethods: <C extends object>(target: C, interceptor: (target: C, method: keyof C, args: unknown[]) => unknown) => C;
-
-### build/index.d.ts#isErr
-export declare const isErr: <T, E>(result: Result<T, E>) => result is Err<E>;
-
-### build/index.d.ts#isNone
-export declare const isNone: <T>(opt: Option<T>) => opt is None;
-
-### build/index.d.ts#isOk
-export declare const isOk: <T, E>(result: Result<T, E>) => result is Ok<T>;
-
-### build/index.d.ts#isSome
-export declare const isSome: <T>(opt: Option<T>) => opt is Some<T>;
 
 ### build/index.d.ts#isValidKey
 export declare function isValidKey(key: unknown, options?: KeyCheckOptions): key is string;
@@ -2283,23 +2178,8 @@ export declare function lruMap<K, V>(options: LRUOptions): Middleware<MapLike<K,
 ### build/index.d.ts#map
 export declare function map<T, U>(iterable: Iterable<T>, fn: (value: T, index: number) => U): Generator<U>;
 
-### build/index.d.ts#mapAsyncOption
-export declare const mapAsyncOption: <T, U>(opt: AsyncOption<T>, f: (value: T) => U | Promise<U>) => AsyncOption<U>;
-
-### build/index.d.ts#mapAsyncResult
-export declare const mapAsyncResult: <T, U, E>(result: AsyncResult<T, E>, f: (value: T) => U | Promise<U>) => AsyncResult<U, E>;
-
-### build/index.d.ts#mapError
-export declare const mapError: <T, E, F>(result: Result<T, E>, f: (error: E) => F) => Result<T, F>;
-
 ### build/index.d.ts#mapOf
 export declare function mapOf<K, V>(...entries: [K, V][]): HashMap<K, V>;
-
-### build/index.d.ts#mapOption
-export declare const mapOption: <T, U>(opt: Option<T>, f: (value: T) => U) => Option<U>;
-
-### build/index.d.ts#mapResult
-export declare const mapResult: <T, U, E>(result: Result<T, E>, f: (value: T) => U) => Result<U, E>;
 
 ### build/index.d.ts#mapping
 export declare function mapping<T, U, A, R>(mapper: (element: T) => U, downstream: Collector<U, A, R>): Collector<T, A, R>;
@@ -2342,9 +2222,6 @@ export declare const numberCompare: Compare<number>;
 
 ### build/index.d.ts#onWhen
 export declare const onWhen: <E extends EventMap, K extends keyof E>(emitter: Emitter<E>, event: K, predicate: (payload: E[K]) => boolean, listener: Listener<E[K]>) => Unsubscribe;
-
-### build/index.d.ts#optionToResult
-export declare const optionToResult: <T, E>(opt: Option<T>, error: E) => Result<T, E>;
 
 ### build/index.d.ts#partition
 export declare function partition<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): [T[], T[]];
@@ -2418,9 +2295,6 @@ export declare function requireNonEmpty(size: number, collectionName?: string): 
 ### build/index.d.ts#requireNonNull
 export declare function requireNonNull<T>(value: T | null | undefined, message?: string): T;
 
-### build/index.d.ts#resultToOption
-export declare const resultToOption: <T, E>(result: Result<T, E>) => Option<T>;
-
 ### build/index.d.ts#reverse
 export declare function reverse<T>(iterable: Iterable<T>): Generator<T>;
 
@@ -2458,12 +2332,6 @@ export declare function scan<T, U>(iterable: Iterable<T>, fn: (acc: U, value: T)
 
 ### build/index.d.ts#select
 export declare function select<R>(...cases: SelectCase<R>[]): Promise<R>;
-
-### build/index.d.ts#sequence
-export declare const sequence: <T>(opts: Option<T>[]) => Option<T[]>;
-
-### build/index.d.ts#sequenceResults
-export declare const sequenceResults: <T, E>(results: Result<T, E>[]) => Result<T[], E>;
 
 ### build/index.d.ts#shallowEq
 export declare const shallowEq: Eq<any>;
@@ -2567,9 +2435,6 @@ declare function toMap$1<T, K, V>(iterable: Iterable<T>, keyFn: (value: T) => K,
 declare function toMap$2<T, K>(iterable: Iterable<T>, keyExtractor: (value: T) => K): HashMap<K, T>;
 declare function toMap$2<T, K, V>(iterable: Iterable<T>, keyExtractor: (value: T) => K, valueExtractor: (value: T) => V): HashMap<K, V>;
 
-### build/index.d.ts#toNullable
-export declare const toNullable: <T>(opt: Option<T>) => T | undefined;
-
 ### build/index.d.ts#toSet
 declare function toSet<T>(): Collector<T, HashSet<T>, HashSet<T>>;
 
@@ -2581,12 +2446,6 @@ export declare function treeMap<K, V>(optionsOrEntries?: TreeMapOptions<K, V> | 
 
 ### build/index.d.ts#treeSet
 export declare function treeSet<T>(optionsOrElements?: TreeSetOptions<T> | Iterable<T>): TreeSet<T>;
-
-### build/index.d.ts#tryCatch
-export declare const tryCatch: <T, E = unknown>(fn: () => T, onError?: (error: unknown) => E) => Result<T, E>;
-
-### build/index.d.ts#tryCatchAsync
-export declare const tryCatchAsync: <T, E = unknown>(fn: () => Promise<T>, onError?: (error: unknown) => E) => Promise<Result<T, E>>;
 
 ### build/index.d.ts#ttlCache
 export declare function ttlCache<K, V>(ttl: number, options?: {
@@ -2621,12 +2480,6 @@ export declare const unmodifiableList: typeof readonlyList;
 
 ### build/index.d.ts#unmodifiableMap
 export declare const unmodifiableMap: typeof readonlyMap;
-
-### build/index.d.ts#unwrap
-export declare const unwrap: <T>(opt: Option<T>) => T;
-
-### build/index.d.ts#unwrapResult
-export declare const unwrapResult: <T, E>(result: Result<T, E>) => T;
 
 ### build/index.d.ts#window
 export declare function window<T>(iterable: Iterable<T>, size: number): Generator<T[]>;

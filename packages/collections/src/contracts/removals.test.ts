@@ -151,7 +151,7 @@ describe("a layer that does not remove forwards the channel below it", () => {
 });
 
 describe("a removing layer corrects its state on a removal below it", () => {
-  // Before 0.8.0 the oldest key of the order was gone, so the drop removed nothing and the size passed the capacity
+  // Before 0.9.0 the oldest key of the order was gone, so the drop removed nothing and the size passed the capacity
   it("boundedMap over ttlMap drops a live key and keeps its capacity", () => {
     const ttl = ttlMap<string, number>({ ttl: TTL, checkInterval: 1000 })(hashMap<string, number>());
     const map = boundedMap<string, number>({ capacity: 2, policy: "drop-oldest" })(ttl);
@@ -198,12 +198,12 @@ describe("a removing layer corrects its state on a removal below it", () => {
     }
     calls = 0;
     map.delete(2999);
-    // An order with the 3000 expired keys costs thousands of calls. Since 0.10.0 the key index of ttlMap also uses keyEq.
+    // An order with the 3000 expired keys costs thousands of calls. Since 0.11.0 the key index of ttlMap also uses keyEq.
     expect(calls).toBeLessThanOrEqual(20);
     ttl.dispose();
   });
 
-  // Before 0.8.0 ttlMap kept the time of an evicted key, and gave it to onExpire later
+  // Before 0.9.0 ttlMap kept the time of an evicted key, and gave it to onExpire later
   it("ttlMap over lruMap gives no expiry for an evicted entry", () => {
     const expired: string[] = [];
     const map = compose(

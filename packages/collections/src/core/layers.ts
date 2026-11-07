@@ -28,7 +28,9 @@ export type OuterOf<L> = L extends (next: any) => infer O ? O : never;
 
 /**
  * This type checks each neighbor pair of a list of layers. The result of the inner neighbor must
- * fit the input of the outer neighbor. At the first bad pair, the compiler marks that argument.
+ * fit the input of the outer neighbor. A bad pair makes the compiler refuse the call. The compiler
+ * marks the first argument, not the bad pair. Its message shows the type that the first bad pair
+ * needs. At the place of the inner neighbor, it needs a layer that gives the input of the outer one.
  *
  * The type is tail recursive, so the compiler accepts a chain of 100 layers.
  */

@@ -43,10 +43,9 @@ export interface ReadonlyList<T> extends ReadonlyCollection<T> {
   lastIndexOf(element: T, fromIndex?: number): number;
 
   /**
-   * This method gives a view of the portion of this list between fromIndex (inclusive)
-   * and toIndex (exclusive).
+   * This method gives a new list with the elements from fromIndex (inclusive) to toIndex (exclusive).
    *
-   * Changes to the sublist are reflected in the original list.
+   * The new list is a copy, not a view. A change to one list does not change the other list.
    *
    * @param fromIndex Start index (inclusive)
    * @param toIndex End index (exclusive)
@@ -135,7 +134,8 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   reverse(): void;
 
   /**
-   * This method gives a mutable sublist view.
+   * This method gives a new mutable list with the elements from fromIndex (inclusive) to toIndex (exclusive).
+   * The new list is a copy, not a view.
    *
    * @param fromIndex Start index (inclusive)
    * @param toIndex End index (exclusive)

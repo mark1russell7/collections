@@ -1,35 +1,29 @@
 /**
- * Safe behavior - Gives Option/Result-based error handling.
- *
- * This module wraps collection operations that throw errors to instead return
- * Option<T> or Result<T, E>, enabling functional error handling.
+ * The safe middleware. Each operation that throws on a missing element has a safe form in the property `safe`. The safe
+ * form gives an `Optional` or a `Result` of `@mark1russell7/optional`, and does not throw.
  *
  * @example
- * const list = compose(
- *   safeList<number>()
- * )(arrayList<number>())
+ * import { isSome } from "@mark1russell7/optional";
  *
- * const value = list.safe.get(10) // Option<number> instead of throwing
- * if (isSome(value)) {
- *   console.log(value.value)
- * }
+ * const list = compose(safeList<number>())(arrayList<number>());
+ * const value = list.safe.get(10); // an Optional<number>, not an exception
+ * if (isSome(value)) console.log(value.value);
  */
 
 import type { Middleware } from "../core/middleware.js";
 import type { List } from "../interfaces/list.js";
 import type { Queue, Deque } from "../interfaces/queue.js";
 import type { MapLike } from "../interfaces/map.js";
-import { type Option, type Result } from "../core/effects.js";
-import { None, Some, tryCatch } from "../core/effects.js";
+import { none, some, toOptional, tryCatch, type Optional, type Result } from "@mark1russell7/optional";
 
 /**
  * Safe operations for List.
  */
 export interface SafeListOperations<T> {
   /**
-   * Get element at index, giving Option.
+   * Get element at index, as an optional.
    */
-  get(index: number): Option<T>;
+  get(index: number): Optional<T>;
 
   /**
    * Set element at index, giving Result with old value or error.
@@ -42,24 +36,24 @@ export interface SafeListOperations<T> {
   removeAt(index: number): Result<T, string>;
 
   /**
-   * Get first element as Option.
+   * Get first element as an optional.
    */
-  first(): Option<T>;
+  first(): Optional<T>;
 
   /**
-   * Get last element as Option.
+   * Get last element as an optional.
    */
-  last(): Option<T>;
+  last(): Optional<T>;
 
   /**
-   * Pop element, giving Option.
+   * Pop element, as an optional.
    */
-  pop(): Option<T>;
+  pop(): Optional<T>;
 
   /**
-   * Shift element, giving Option.
+   * Shift element, as an optional.
    */
-  shift(): Option<T>;
+  shift(): Optional<T>;
 }
 
 /**
@@ -67,19 +61,19 @@ export interface SafeListOperations<T> {
  */
 export interface SafeQueueOperations<T> {
   /**
-   * Peek at head element as Option.
+   * Peek at head element as an optional.
    */
-  peek(): Option<T>;
+  peek(): Optional<T>;
 
   /**
-   * Poll element as Option.
+   * Poll element as an optional.
    */
-  poll(): Option<T>;
+  poll(): Optional<T>;
 
   /**
-   * Dequeue element as Option.
+   * Dequeue element as an optional.
    */
-  dequeue(): Option<T>;
+  dequeue(): Optional<T>;
 }
 
 /**
@@ -87,29 +81,29 @@ export interface SafeQueueOperations<T> {
  */
 export interface SafeDequeOperations<T> extends SafeQueueOperations<T> {
   /**
-   * Peek at first element as Option.
+   * Peek at first element as an optional.
    */
-  peekFirst(): Option<T>;
+  peekFirst(): Optional<T>;
 
   /**
-   * Peek at last element as Option.
+   * Peek at last element as an optional.
    */
-  peekLast(): Option<T>;
+  peekLast(): Optional<T>;
 
   /**
-   * Poll first element as Option.
+   * Poll first element as an optional.
    */
-  pollFirst(): Option<T>;
+  pollFirst(): Optional<T>;
 
   /**
-   * Poll last element as Option.
+   * Poll last element as an optional.
    */
-  pollLast(): Option<T>;
+  pollLast(): Optional<T>;
 
   /**
-   * Pop element as Option.
+   * Pop element as an optional.
    */
-  pop(): Option<T>;
+  pop(): Optional<T>;
 }
 
 /**
@@ -117,9 +111,9 @@ export interface SafeDequeOperations<T> extends SafeQueueOperations<T> {
  */
 export interface SafeMapOperations<K, V> {
   /**
-   * Get value for key as Option.
+   * Get value for key as an optional.
    */
-  get(key: K): Option<V>;
+  get(key: K): Optional<V>;
 
   /**
    * Set value for key, giving Result with old value or success.
@@ -135,7 +129,7 @@ export interface SafeMapOperations<K, V> {
 /**
  * This function makes a safe List middleware.
  *
- * This function exposes a `safe` property with Option/Result-based operations.
+ * This function exposes a `safe` property with Optional/Result-based operations.
  */
 export function safeList<T>(): Middleware<
   List<T>,
@@ -143,14 +137,8 @@ export function safeList<T>(): Middleware<
 > {
   return (next: List<T>): List<T> & { safe: SafeListOperations<T> } => {
     const safe: SafeListOperations<T> = {
-      get(index: number): Option<T> {
-        return tryCatch(
-          () => next.get(index),
-          () => "Index out of bounds"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      get(index: number): Optional<T> {
+        return toOptional(tryCatch(() => next.get(index)));
       },
 
       set(index: number, element: T): Result<T, string> {
@@ -167,34 +155,22 @@ export function safeList<T>(): Middleware<
         );
       },
 
-      first(): Option<T> {
-        return next.isEmpty ? None : Some(next.first());
+      first(): Optional<T> {
+        return next.isEmpty ? none : some(next.first());
       },
 
-      last(): Option<T> {
-        return next.isEmpty ? None : Some(next.last());
+      last(): Optional<T> {
+        return next.isEmpty ? none : some(next.last());
       },
 
-      pop(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.pop(),
-          () => "List is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      pop(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.pop()));
       },
 
-      shift(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.shift(),
-          () => "List is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      shift(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.shift()));
       },
     };
 
@@ -212,37 +188,19 @@ export function safeQueue<T>(): Middleware<
 > {
   return (next: Queue<T>): Queue<T> & { safe: SafeQueueOperations<T> } => {
     const safe: SafeQueueOperations<T> = {
-      peek(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.peek(),
-          () => "Queue is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      peek(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.peek()));
       },
 
-      poll(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.poll(),
-          () => "Queue is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      poll(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.poll()));
       },
 
-      dequeue(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.dequeue(),
-          () => "Queue is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      dequeue(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.dequeue()));
       },
     };
 
@@ -259,55 +217,43 @@ export function safeDeque<T>(): Middleware<
 > {
   return (next: Deque<T>): Deque<T> & { safe: SafeDequeOperations<T> } => {
     const safe: SafeDequeOperations<T> = {
-      peek(): Option<T> {
-        return next.isEmpty ? None : Some(next.peekFirst());
+      peek(): Optional<T> {
+        return next.isEmpty ? none : some(next.peekFirst());
       },
 
-      poll(): Option<T> {
+      poll(): Optional<T> {
         // One poll: before, the test and the result each called pollFirst(), so poll() removed
         // two elements and returned the second (BUGS-2026-07 L12)
-        if (next.isEmpty) return None;
-        return Some(next.pollFirst() as T);
+        if (next.isEmpty) return none;
+        return some(next.pollFirst() as T);
       },
 
-      dequeue(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.dequeue(),
-          () => "Deque is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      dequeue(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.dequeue()));
       },
 
-      peekFirst(): Option<T> {
-        return next.isEmpty ? None : Some(next.peekFirst());
+      peekFirst(): Optional<T> {
+        return next.isEmpty ? none : some(next.peekFirst());
       },
 
-      peekLast(): Option<T> {
-        return next.isEmpty ? None : Some(next.peekLast());
+      peekLast(): Optional<T> {
+        return next.isEmpty ? none : some(next.peekLast());
       },
 
-      pollFirst(): Option<T> {
+      pollFirst(): Optional<T> {
         const result = next.pollFirst();
-        return result !== undefined ? Some(result) : None;
+        return result !== undefined ? some(result) : none;
       },
 
-      pollLast(): Option<T> {
+      pollLast(): Optional<T> {
         const result = next.pollLast();
-        return result !== undefined ? Some(result) : None;
+        return result !== undefined ? some(result) : none;
       },
 
-      pop(): Option<T> {
-        if (next.isEmpty) return None;
-        return tryCatch(
-          () => next.pop(),
-          () => "Deque is empty"
-        ).match<Option<T>>({
-          Ok: (value) => Some(value),
-          Err: () => None,
-        }) as Option<T>;
+      pop(): Optional<T> {
+        if (next.isEmpty) return none;
+        return toOptional(tryCatch(() => next.pop()));
       },
     };
 
@@ -326,8 +272,8 @@ export function safeMap<K, V>(): Middleware<
     next: MapLike<K, V>
   ): MapLike<K, V> & { safe: SafeMapOperations<K, V> } => {
     const safe: SafeMapOperations<K, V> = {
-      get(key: K): Option<V> {
-        return next.has(key) ? Some(next.get(key)) : None;
+      get(key: K): Optional<V> {
+        return next.has(key) ? some(next.get(key)) : none;
       },
 
       set(key: K, value: V): Result<V | undefined, string> {

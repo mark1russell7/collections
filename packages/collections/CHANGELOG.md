@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.2
+
+The s20 audit found four faults of the set operations and of `readonly`. This version corrects them. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `HashSet`: `clone`, `union`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` keep the custom hash of the set. Before, the inner sets used `defaultHash`, so they did not find an equal element.
+- `HashSet`: `intersection`, `symmetricDifference` and `retainAll` read the other iterable one time. Before, `intersection` of a generator gave an empty set.
+- `TreeSet`: `retainAll`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` compare with the comparator of the set. Before, they used a native `Set`, which compares with `===`.
+- `readonly`: a view of an `lruCache` blocks `deleteWhere`. Before, `deleteWhere` emptied the cache through the view.
+
 ## 0.9.1
 
 The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.

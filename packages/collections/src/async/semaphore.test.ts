@@ -62,6 +62,20 @@ describe("semaphore", () => {
     expect(lock.available).toBe(0);
   });
 
+  it("gives one waiting caller a permit for one release, also when the release is called two times", async () => {
+    const lock = semaphore(1);
+    const release = await lock.acquire();
+    const got: number[] = [];
+    void lock.acquire().then(() => got.push(1));
+    void lock.acquire().then(() => got.push(2));
+    release();
+    release();
+    await tick();
+    expect(got).toEqual([1]);
+    expect(lock.waiting).toBe(1);
+    expect(lock.available).toBe(0);
+  });
+
   it("gives the permit back when a task throws", async () => {
     const lock = semaphore(1);
     await expect(lock.run(() => Promise.reject(new Error("no")))).rejects.toThrow("no");

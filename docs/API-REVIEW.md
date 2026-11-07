@@ -11,7 +11,7 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 | keep | The name stays as it is. | 206 |
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 57 |
 | remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. | 75 |
-| move | The name goes to its home in the map. Collections keeps a re-export for one MINOR version. | 22 |
+| move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |
 | ask | The map had no home for the area. The strategist named the homes on 2026-11-07 (S1 and S2). | 0 |
 
 The counts are of the 360 names of `main`. The eight names of the removals have their own table at the end.
@@ -159,4 +159,4 @@ Each decision changes the API. Before 1.0, a change of the API raises the MINOR 
 ## The answers of the strategist
 
 - **S1. A home for events.** `Emitter` and `createEmitter` are a set of listeners for each key. The emitter stays in collections, with the verdict "keep".
-- **S2. A home for concurrency.** The channels, `select`, `ticker`, `timeout`, `workerPool` and the pipeline functions go to `@mark1russell7/service`, on its clock. A pull request to `systems` adds them on a new subpath. Then collections keeps a re-export with a deprecation for one MINOR version, and removes it in the next.
+- **S2. A home for concurrency.** The channels, `select`, `ticker`, `timeout`, `workerPool` and the pipeline functions go to `@mark1russell7/service`, on its clock. The pull request systems#384 adds them as `@mark1russell7/service/channel`. Service then depends on collections for `asyncQueue`, so collections keeps no re-export. It marks the names `@deprecated` in place for one MINOR version, and removes them in the next.

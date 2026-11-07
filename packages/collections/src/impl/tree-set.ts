@@ -160,10 +160,7 @@ export class TreeSet<T> implements NavigableSet<T> {
   }
 
   retainAll(elements: Iterable<T>): boolean {
-    const toRetain = new Set<T>();
-    for (const element of elements) {
-      toRetain.add(element);
-    }
+    const toRetain = this.setOf(elements);
 
     let modified = false;
     for (const element of Array.from(this)) {
@@ -201,10 +198,7 @@ export class TreeSet<T> implements NavigableSet<T> {
       eq: this._eq,
     });
 
-    const otherSet = new Set<T>();
-    for (const element of other) {
-      otherSet.add(element);
-    }
+    const otherSet = this.setOf(other);
 
     for (const element of this) {
       if (otherSet.has(element)) {
@@ -221,10 +215,7 @@ export class TreeSet<T> implements NavigableSet<T> {
       eq: this._eq,
     });
 
-    const otherSet = new Set<T>();
-    for (const element of other) {
-      otherSet.add(element);
-    }
+    const otherSet = this.setOf(other);
 
     for (const element of this) {
       if (!otherSet.has(element)) {
@@ -246,8 +237,8 @@ export class TreeSet<T> implements NavigableSet<T> {
       result.add(element);
     }
 
-    // Toggle elements from other set
-    for (const element of other) {
+    // Toggle each element of the other set one time, so a repeated element does not toggle back
+    for (const element of this.setOf(other)) {
       if (result.has(element)) {
         result.remove(element);
       } else {
@@ -259,10 +250,7 @@ export class TreeSet<T> implements NavigableSet<T> {
   }
 
   isSubsetOf(other: Iterable<T>): boolean {
-    const otherSet = new Set<T>();
-    for (const element of other) {
-      otherSet.add(element);
-    }
+    const otherSet = this.setOf(other);
 
     for (const element of this) {
       if (!otherSet.has(element)) {
@@ -270,6 +258,18 @@ export class TreeSet<T> implements NavigableSet<T> {
       }
     }
     return true;
+  }
+
+  /**
+   * This method makes a set of the elements, with the comparator and the equality of this set.
+   * Before, the set operations used a native `Set`, which compares with `===` and ignores the comparator.
+   */
+  private setOf(elements: Iterable<T>): TreeSet<T> {
+    const set = new TreeSet<T>({ compare: this._compare, eq: this._eq });
+    for (const element of elements) {
+      set.add(element);
+    }
+    return set;
   }
 
   isSupersetOf(other: Iterable<T>): boolean {

@@ -79,6 +79,7 @@ Each guide has examples, and a test runs each example:
 - [Graph orders](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md): `hubBreadthFirstOrder`
 - [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
 - [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
+- [Iterables and collectors](https://github.com/mark1russell7/collections/blob/main/docs/guides/iterables.md): lazy functions, reducers, collectors and the names of the root
 
 ## Contract checks
 

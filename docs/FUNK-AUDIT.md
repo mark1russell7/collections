@@ -14,7 +14,7 @@ Funk is a 2025 experiment in functional helpers: 415 lines of library source and
 | `optional/optional.ts`, `Optional` | Home | `@mark1russell7/optional` is the home. Funk makes `Optional` from `Either`, with the symbol `NotFound` on the left. |
 | `optional/either.ts`, `Either` | Home | No package of the family has this type. `Result` of collections is the same type. Item C8 decides its home. |
 | `collections/collection.ts`, `map`, `filter`, `reduce` | Have | The lazy operations in `fx/iter.ts` do this, and they keep the order and the duplicates. Funk always gives a `Set`, so it removes duplicates. |
-| `collections/collection.ts`, `getOnlyElement` | Keep | Collections has `first` and `last`, but no operation that requires exactly one element. Item C17 adds it. |
+| `collections/collection.ts`, `getOnlyElement` | Keep | Collections has `first` and `last`, but no operation that accepts exactly one element and refuses other counts. Item C17 adds it. |
 | `collections/collection.ts`, `pour`, `without`, `flatten` | Have | `flatten`, `filter` and the collectors do this work. |
 | `cache.ts`, `aside` | Have | `computeIfAbsent` is the same idea, and it calls its function only on a miss. Funk computes the value first. |
 | `optional/collections/optional.map.ts`, `OptionalMap` | Have | `safeMap` gives the same lookup, and it does not change the base map. |
@@ -28,10 +28,10 @@ Funk is a 2025 experiment in functional helpers: 415 lines of library source and
 
 ## What this changes in the plan
 
-1. **The middleware design does not wait for Funk.** Funk has no middleware. The call to put item C4 before item C5 had a wrong reason, so item C5 can start now.
+1. **The middleware design does not wait for Funk.** Funk has no middleware. The call to put item C4 before item C5 had a wrong reason, so item C5 can start.
 2. **`Result` has no home.** The map of homes gives `@mark1russell7/optional` to optional values only. Item C8 must decide this, not only remove a copy.
 3. **Three shapes of an optional value exist.** Collections uses `_tag: "None"`, `@mark1russell7/optional` uses `tag: "none"`, and Funk uses `Either`.
-4. **Funk found a defect that collections has in another form.** Funk item F6 is about NaN in an array. The lists, hash sets and hash maps of collections default to `===`, so they do not find NaN. A native `Set` finds it. Item C2 now includes the default equality of each structure.
+4. **Funk found a defect that collections has in another form.** Funk item F6 is about NaN in an array. The lists, hash sets and hash maps of collections default to `===`, so they do not find NaN. A native `Set` finds it. Item C2 also includes the default equality of each structure.
 
 ## The status of Funk
 

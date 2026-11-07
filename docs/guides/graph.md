@@ -1,6 +1,6 @@
 # Graph orders
 
-The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has one function now: `hubBreadthFirstOrder`.
+The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has one function: `hubBreadthFirstOrder`.
 
 ## The order from the hubs
 
@@ -10,7 +10,7 @@ The entry `@mark1russell7/collections/graph` has pure functions on graphs. It im
 - The order starts at the node with the largest sum, and goes breadth-first through its component.
 - Then the order starts at the hub of the next component. The components come in the order of the sums of their hubs.
 
-Use the order to put the nodes of a diagram on a grid, so that each node is near its neighbours and the hubs come first.
+Use the order to put the nodes of a diagram on a grid. Then each node is near its neighbours, and the hubs come first.
 
 ```ts
 import assert from "node:assert/strict";
@@ -69,7 +69,7 @@ assert.deepEqual(hubBreadthFirstOrder(4, [{ a: 0, b: 1 }, { a: 0, b: 2 }, { a: 0
 
 ## Bad input
 
-The function throws a `RangeError` for a bad count of nodes, an edge to an index outside the nodes, or a weight that is not a finite number above 0. It does not change its arguments.
+The function throws a `RangeError` for a bad count of nodes or for an edge to an index outside the nodes. It also throws for a weight that is not a finite number above 0. It does not change its arguments.
 
 ```ts
 import assert from "node:assert/strict";

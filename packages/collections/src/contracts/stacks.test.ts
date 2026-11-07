@@ -225,7 +225,7 @@ describe("eventedMap at the bottom of a stack", () => {
 });
 
 describe("eventedMap above a removing layer", () => {
-  // Before 0.8.0 an evented layer above these layers did not see their removals (C23)
+  // Before 0.9.0 an evented layer above these layers did not see their removals (C23)
   const disposable = <M extends MapLike<number, string>>(m: M, dispose: () => void = () => {}): { map: M; dispose: () => void } => ({ map: m, dispose });
   const stacks: [string, () => { map: MapLike<number, string>; dispose: () => void }][] = [
     ...(["drop-oldest", "drop-newest", "reject", "throw"] as const).map(

@@ -120,7 +120,7 @@ for (const [name, base] of [
 }
 
 describe("the cost of lruMap", () => {
-  // Before 0.7.0 a set into a full map read each node with `has` of the base: capacity + 2 calls (C10)
+  // Before 0.8.0 a set into a full map read each node with `has` of the base: capacity + 2 calls (C10)
   it.each([10, 100, 1000])("uses a constant number of calls of the base for a set into a full map (capacity %i)", (capacity) => {
     const base = hashMap<number, number>();
     let calls = 0;

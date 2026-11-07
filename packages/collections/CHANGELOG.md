@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.1
+
+The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.
+
+### Deprecated
+
+- The 13 names of `async/channels.ts`: `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Import each one from `@mark1russell7/service/channel`. The next MINOR version removes them from collections.
+- Collections does not re-export the channels of service, and it does not depend on service. Service depends on collections for `asyncQueue`.
+
 ## 0.8.0
 
 Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found six faults. This version corrects them. MINOR: before 1.0.0 a change of behavior raises MINOR. A front insert into a full `drop-oldest` deque now drops the last element.

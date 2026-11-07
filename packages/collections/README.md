@@ -8,6 +8,8 @@ Collections for TypeScript with no dependencies: lists, maps, queues, a summary 
 npm i @mark1russell7/collections
 ```
 
+> The channels moved to `@mark1russell7/service/channel` (service 0.6.6 or later). Their names in collections are deprecated. The next MINOR version of collections removes them.
+
 ## Lists, maps and behaviors
 
 ```ts

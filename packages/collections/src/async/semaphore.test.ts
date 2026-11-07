@@ -109,7 +109,8 @@ describe("semaphore", () => {
         expect(lock.available).toBe(permits);
         expect(lock.waiting).toBe(0);
       }),
-      { numRuns: 100 }
+      // A fixed seed, so a failure repeats
+      { seed: 53, numRuns: 100 }
     );
   });
 

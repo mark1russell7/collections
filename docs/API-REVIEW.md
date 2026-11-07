@@ -145,6 +145,14 @@ The pull request #31 adds these names to the root entry.
 |---|---|---|
 | `ElementRemoval`, `MapRemoval`, `RemovalChannel`, `RemovalReason`, `removals`, `removalsOf`, `removalSource`, `RemovalSource` | keep | Each behavior tells the reason of each removal, and the laws of C23 test them. |
 
+## The semaphore (0.9.4)
+
+`@procedures/client` adds this name.
+
+| Names | Verdict | Reason |
+|---|---|---|
+| `semaphore`, `Semaphore` | keep | `@procedures/client` bounds the calls that run at the same time with it. The strategist placed it here on 2026-11-07. |
+
 ## The decisions for Mark
 
 Each decision changes the API. Before 1.0, a change of the API raises the MINOR version.

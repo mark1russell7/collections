@@ -14,7 +14,7 @@ A later guide shows `bounded`, `evented`, `lruMap` and `ttlMap`. Open pull reque
 
 ## Readonly: a change throws an error
 
-`readonly()` gives a view of the base. The view reads the base, and each method that changes the base throws an error.
+`readonly()` gives a view of the base. The view reads the base, and each method that changes the base throws an error. A test examines each method of each structure of the package.
 
 ```ts
 import assert from "node:assert/strict";
@@ -251,8 +251,7 @@ assert.equal(list.size, 1);
 
 ## Known defects
 
-The examples of this guide found three defects. This guide does not show the functions until each defect has a fix:
+The examples of this guide found two defects. This guide does not show the functions until each defect has a fix:
 
 - `reentrantSynchronized` is not reentrant. A call from inside a locked method waits for the lock of the outer call, so the two calls do not end.
 - The generic `safe()` gives the collection with no change, and adds no property `safe`. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.
-- A readonly view does not block `pollOrUndefined`. On a readonly deque, priority queue or linked list, this method removes an element of the base.

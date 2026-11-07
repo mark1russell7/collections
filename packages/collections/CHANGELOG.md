@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.1
+
+A readonly view blocks each change of the structures of this package. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A readonly view of `arrayDeque`, `priorityQueue` or `linkedList` did not block `pollOrUndefined`. The method removed an element of the base. It now throws the readonly error.
+- A readonly view did not block the internal changes of the structures, for example `unlinkNode` of `linkedList` and `heapify` of `priorityQueue`. TypeScript marks them private, but a call at run time reached them. The view now blocks them.
+- A new test puts each method of each structure in the reads or in the blocked names. A new method fails the test until one of the two lists has its name.
+
 ## 0.7.0
 
 `Optional` and `Result` come from `@mark1russell7/optional` 1.2.0, and collections has no copy of them. MINOR: before 1.0.0 a breaking change raises MINOR. The exports `Option`, `Some`, `None`, `Ok`, `Err` and their functions are removed, and the shape of the values changes from `_tag` to `tag`.

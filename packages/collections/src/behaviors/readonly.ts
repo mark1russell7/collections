@@ -84,6 +84,36 @@ const MUTATING_METHODS = new Set([
   "compute",
   "merge",
   "putAll",
+
+  // Queue changes that give undefined on an empty queue (C27: a readonly view removed an element)
+  "pollOrUndefined",
+
+  // The removal by a test of LRUCache (C31: a readonly view of an LRU cache emptied it)
+  "deleteWhere",
+
+  // The internal changes of the structures of this package. TypeScript marks them private, but a call at run
+  // time reaches them. `readonly.test.ts` puts each method of each structure in the reads or in this list.
+  "ensureCapacity",
+  "trimToSize",
+  "grow",
+  "resize",
+  "removeAtOffset",
+  "unlinkNode",
+  "heapify",
+  "bubbleUp",
+  "bubbleDown",
+  "addToEnd",
+  "moveToEnd",
+  "removeFromBucket",
+  "removeFromList",
+  "deleteNode",
+  "fixAfterInsertion",
+  "fixAfterDeletion",
+  "rotateLeft",
+  "rotateRight",
+  "moveToHead",
+  "removeNode",
+  "evictLRU",
 ]);
 
 /** Methods that return a view of the collection: the view is readonly too. */

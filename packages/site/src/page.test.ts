@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import { CacheModel, nextValue, planOf, startNeeds, TreeModel } from "./model.ts";
 
 const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const structuresPage = readFileSync(new URL("../structures/index.html", import.meta.url), "utf8");
+const structuresCode = readFileSync(new URL("./structures.ts", import.meta.url), "utf8");
 
 describe("the home page", () => {
   it("names the package and gives the install command", () => {
@@ -13,9 +15,26 @@ describe("the home page", () => {
   });
 
   it("links to the pages of site-pages and to the repository", () => {
+    expect(page).toContain('href="./structures/"');
     expect(page).toContain('href="./releases/"');
     expect(page).toContain('href="./status/"');
     expect(page).toContain('href="https://github.com/mark1russell7/collections"');
+  });
+});
+
+describe("the structures page", () => {
+  it("has its own title, and links back to the home page and the pages of site-pages", () => {
+    expect(structuresPage).toContain("<title>Structures · collections</title>");
+    expect(structuresPage).toContain('href="../"');
+    expect(structuresPage).toContain('href="../releases/"');
+    expect(structuresPage).toContain('href="../status/"');
+    expect(structuresPage).toContain('<script type="module" src="../src/structures.ts"></script>');
+  });
+
+  it("has an element for each id that the page code finds", () => {
+    const ids = [...structuresCode.matchAll(/byId(?:<[^>]+>)?\("([^"]+)"\)/g)].map((match) => match[1]);
+    expect(ids.length).toBeGreaterThan(10);
+    for (const id of ids) expect(structuresPage, id).toContain(`id="${String(id)}"`);
   });
 });
 

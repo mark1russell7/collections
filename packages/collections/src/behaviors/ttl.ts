@@ -14,8 +14,9 @@
  */
 
 import type { Middleware } from "../core/middleware.js";
-import type { MapLike } from "../interfaces/map.js";
+import type { Entry, MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
+import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
 import type { Collection } from "../interfaces/collection.js";
 
 /**
@@ -62,8 +63,13 @@ interface TTLEntry<V> {
 /**
  * This function makes a TTL Map middleware.
  *
- * Automatically removes entries after TTL expires.
- * This function uses a background interval to check for expired entries.
+ * An entry is live while the time is less than the time of its last `set` plus `ttl`.
+ * Each access to the map first removes the expired entries, so each read shows only live entries.
+ * The layer gives each expired entry to `onExpire` one time, in the order of expiry.
+ * A background interval also removes expired entries, so `onExpire` occurs with no access.
+ *
+ * The layer keeps the times in the order of expiry, so the removal before an access is amortized O(1).
+ * This order needs a clock that does not go back. If `Date.now()` goes back, an entry can stay until the entries before it expire.
  */
 export function ttlMap<K, V>(
   options: TTLOptions
@@ -73,39 +79,25 @@ export function ttlMap<K, V>(
   return (
     next: MapLike<K, V>
   ): MapLike<K, V> & { readonly dispose: () => void } => {
+    // The times of the live keys, in the order of expiry: a set deletes its key before it adds it again
     const metadata = new Map<K, TTLEntry<V>>();
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    // A removal below (for example an eviction of lruMap) ends the time of its key, so it never expires
+    const source = removalSource<MapRemoval<K, V>>(next, ({ key }) => void metadata.delete(key));
 
-    const checkExpired = (): void => {
+    // This function removes the expired entries from the front of the order, and stops at the first live entry
+    const sweep = (): void => {
       const now = Date.now();
-      const expired: K[] = [];
-
       for (const [key, entry] of metadata) {
-        if (now >= entry.expiresAt) {
-          expired.push(key);
-        }
-      }
-
-      for (const key of expired) {
-        const entry = metadata.get(key);
-        if (entry) {
-          next.delete(key);
-          metadata.delete(key);
-
-          if (onExpire) {
-            onExpire({
-              key,
-              value: entry.value,
-              createdAt: entry.createdAt,
-              expiredAt: now,
-            });
-          }
-        }
+        if (now < entry.expiresAt) return;
+        metadata.delete(key);
+        next.delete(key);
+        onExpire?.({ key, value: entry.value, createdAt: entry.createdAt, expiredAt: now });
+        source.emit({ key, value: entry.value, reason: "expire" });
       }
     };
 
-    // Start background expiration checker
-    intervalId = startExpirationTimer(checkExpired, checkInterval);
+    intervalId = startExpirationTimer(sweep, checkInterval);
 
     const dispose = (): void => {
       if (intervalId) {
@@ -116,9 +108,11 @@ export function ttlMap<K, V>(
 
     return new Proxy(next, {
       get(target, prop, receiver) {
-        // Add dispose method
         if (prop === "dispose") {
           return dispose;
+        }
+        if (prop === removals) {
+          return source.channel;
         }
 
         // Composite methods (setIfAbsent, compute, merge, putAll and others) go through this
@@ -128,64 +122,73 @@ export function ttlMap<K, V>(
           return composite;
         }
 
+        // A getter (size, isEmpty) reads only live entries
+        sweep();
         const value = Reflect.get(target, prop, receiver);
-
-        if (typeof value === "function") {
-          switch (prop) {
-            case "get":
-              return function (key: K): V {
-                // Check if expired before returning
-                const entry = metadata.get(key);
-                if (entry && Date.now() >= entry.expiresAt) {
-                  target.delete(key);
-                  metadata.delete(key);
-                  throw new Error(`Key expired: ${key}`);
-                }
-                return (value as Function).call(target, key);
-              };
-
-            case "has":
-              return function (key: K): boolean {
-                // Check if expired
-                const entry = metadata.get(key);
-                if (entry && Date.now() >= entry.expiresAt) {
-                  target.delete(key);
-                  metadata.delete(key);
-                  return false;
-                }
-                return (value as Function).call(target, key);
-              };
-
-            case "set":
-              return function (key: K, val: V): V | undefined {
-                const now = Date.now();
-                const result = (value as Function).call(target, key, val);
-
-                metadata.set(key, {
-                  value: val,
-                  expiresAt: now + ttl,
-                  createdAt: now,
-                });
-
-                return result;
-              };
-
-            case "delete":
-              return function (key: K): V | undefined {
-                const result = (value as Function).call(target, key);
-                metadata.delete(key);
-                return result;
-              };
-
-            case "clear":
-              return function (): void {
-                (value as Function).call(target);
-                metadata.clear();
-              };
-          }
+        if (typeof value !== "function") {
+          return value;
         }
 
-        return value;
+        switch (prop) {
+          case "set":
+            return function (key: K, val: V): V | undefined {
+              sweep();
+              const result = (value as Function).call(target, key, val);
+              const now = Date.now();
+              metadata.delete(key);
+              metadata.set(key, { value: val, expiresAt: now + ttl, createdAt: now });
+              return result;
+            };
+
+          case "delete":
+            return function (key: K): V | undefined {
+              sweep();
+              metadata.delete(key);
+              return (value as Function).call(target, key);
+            };
+
+          case "clear":
+            return function (): void {
+              metadata.clear();
+              (value as Function).call(target);
+            };
+
+          // The iteration gives the entries that are live when it starts. A removal while it runs (by a read in
+          // the loop, or by the interval between the steps of an async loop) does not change it, so the base
+          // iterator never sees a change and never throws.
+          case Symbol.iterator:
+          case "entries":
+            return function (): IterableIterator<Entry<K, V>> {
+              sweep();
+              return Array.from(target as Iterable<Entry<K, V>>).values();
+            };
+
+          case "keys":
+            return function (): IterableIterator<K> {
+              sweep();
+              return Array.from(target as Iterable<Entry<K, V>>, (e) => e.key).values();
+            };
+
+          case "values":
+            return function (): IterableIterator<V> {
+              sweep();
+              return Array.from(target as Iterable<Entry<K, V>>, (e) => e.value).values();
+            };
+
+          case "forEach":
+            return function (callback: (value: V, key: K, map: MapLike<K, V>) => void): void {
+              sweep();
+              for (const e of Array.from(target as Iterable<Entry<K, V>>)) callback(e.value, e.key, receiver as MapLike<K, V>);
+            };
+
+          default:
+            // Each other method (get, has, getOrUndefined, the iteration) reads only live entries,
+            // also when a caller keeps the method and calls it later
+            return function (this: unknown, ...args: unknown[]): unknown {
+              sweep();
+              return (value as Function).apply(target, args);
+            };
+        }
       },
     }) as MapLike<K, V> & { readonly dispose: () => void };
   };
@@ -209,6 +212,7 @@ export function ttlCollection<T>(
   ): Collection<T> & { readonly dispose: () => void } => {
     const metadata = new Map<T, { expiresAt: number; createdAt: number }>();
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    const source = removalSource<ElementRemoval<T>>(next, ({ value }) => void metadata.delete(value));
 
     const checkExpired = (): void => {
       const now = Date.now();
@@ -233,6 +237,7 @@ export function ttlCollection<T>(
               expiredAt: now,
             });
           }
+          source.emit({ value: element, reason: "expire" });
         }
       }
     };
@@ -250,6 +255,9 @@ export function ttlCollection<T>(
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
+        }
+        if (prop === removals) {
+          return source.channel;
         }
 
         const value = Reflect.get(target, prop, receiver);

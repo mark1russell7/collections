@@ -20,6 +20,7 @@ import type { Middleware } from "../core/middleware.js";
 import type { List } from "../interfaces/list.js";
 import type { Queue, Deque } from "../interfaces/queue.js";
 import type { MapLike } from "../interfaces/map.js";
+import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
 import type { Collection } from "../interfaces/collection.js";
 import type {
   OverflowPolicy,
@@ -71,6 +72,7 @@ export function boundedList<T>(
   const capacity = checkCapacity(options.capacity, "boundedList");
 
   return (next: List<T>): List<T> & BoundedCollection => {
+    const source = removalSource<ElementRemoval<T>>(next);
     // An unshift puts the element at the front, so drop-oldest drops the last element for it
     const handleOverflow = (element: T, dropFrom: "first" | "last" = "first"): void => {
       // Call overflow handler if provided
@@ -92,8 +94,8 @@ export function boundedList<T>(
         case "drop-oldest":
           // Remove one element: the first, or the last for an unshift
           if (!next.isEmpty) {
-            if (dropFrom === "last") next.pop();
-            else next.shift();
+            const value = dropFrom === "last" ? next.pop() : next.shift();
+            source.emit({ value, end: dropFrom, reason: "drop" });
           }
           break;
 
@@ -123,6 +125,7 @@ export function boundedList<T>(
     return new Proxy(next, {
       get(target, prop, receiver) {
         // Capacity property
+        if (prop === removals) return source.channel;
         if (prop === "capacity") {
           return capacity;
         }
@@ -232,6 +235,19 @@ export function boundedList<T>(
 }
 
 /**
+ * This function adds each element with `add`, one after the other, until `add` refuses one.
+ * It gives true when one element goes in. A throw of `add` stops it, and the earlier elements stay.
+ */
+function addEach<T>(elements: Iterable<T>, add: (element: T) => boolean): boolean {
+  let added = false;
+  for (const element of Array.from(elements)) {
+    if (!add(element)) break;
+    added = true;
+  }
+  return added;
+}
+
+/**
  * This function makes a bounded Queue middleware.
  */
 export function boundedQueue<T>(
@@ -241,6 +257,7 @@ export function boundedQueue<T>(
   const capacity = checkCapacity(options.capacity, "boundedQueue");
 
   return (next: Queue<T>): Queue<T> & BoundedCollection => {
+    const source = removalSource<ElementRemoval<T>>(next);
     const handleOverflow = (element: T): void => {
       if (onOverflow) {
         const context: OverflowContext<T> = {
@@ -257,7 +274,7 @@ export function boundedQueue<T>(
           throw new Error(`Queue is full (capacity: ${capacity})`);
         case "drop-oldest":
           if (!next.isEmpty) {
-            next.poll();
+            source.emit({ value: next.poll() as T, end: "first", reason: "drop" });
           }
           break;
         case "drop-newest":
@@ -274,6 +291,7 @@ export function boundedQueue<T>(
 
     return new Proxy(next, {
       get(target, prop, receiver) {
+        if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;
         if (prop === "isFull") return target.size >= capacity;
         if (prop === "remainingCapacity") return Math.max(0, capacity - target.size);
@@ -294,6 +312,12 @@ export function boundedQueue<T>(
                 }
                 return (value as Function).call(target, element);
               };
+
+            // The base addAll goes past the bound, so each element goes through add of this proxy (C10)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => (receiver as Queue<T>).add(element));
+              };
           }
         }
 
@@ -313,7 +337,9 @@ export function boundedDeque<T>(
   const capacity = checkCapacity(options.capacity, "boundedDeque");
 
   return (next: Deque<T>): Deque<T> & BoundedCollection => {
-    const handleOverflow = (element: T): void => {
+    const source = removalSource<ElementRemoval<T>>(next);
+    // An insert at the front drops the last element, as unshift of boundedList does (C10)
+    const handleOverflow = (element: T, dropFrom: "first" | "last"): void => {
       if (onOverflow) {
         const context: OverflowContext<T> = {
           newElement: element,
@@ -329,7 +355,8 @@ export function boundedDeque<T>(
           throw new Error(`Deque is full (capacity: ${capacity})`);
         case "drop-oldest":
           if (!next.isEmpty) {
-            next.removeFirst();
+            const value = dropFrom === "last" ? next.removeLast() : next.removeFirst();
+            source.emit({ value, end: dropFrom, reason: "drop" });
           }
           break;
         case "drop-newest":
@@ -346,6 +373,7 @@ export function boundedDeque<T>(
 
     return new Proxy(next, {
       get(target, prop, receiver) {
+        if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;
         if (prop === "isFull") return target.size >= capacity;
         if (prop === "remainingCapacity") return Math.max(0, capacity - target.size);
@@ -363,12 +391,18 @@ export function boundedDeque<T>(
             case "add":
               return function (element: T): any {
                 if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element);
+                  handleOverflow(element, prop === "addFirst" || prop === "offerFirst" ? "last" : "first");
                   if (policy === "reject" || policy === "drop-newest") {
                     return prop.startsWith("offer") || prop === "add" ? false : undefined;
                   }
                 }
                 return (value as Function).call(target, element);
+              };
+
+            // The base addAll goes past the bound, so each element goes through add of this proxy (C10)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => (receiver as Deque<T>).add(element));
               };
           }
         }
@@ -392,6 +426,10 @@ export function boundedMap<K, V>(
 
   return (next: MapLike<K, V>): MapLike<K, V> & BoundedCollection => {
     let insertionOrder: K[] = []; // Track insertion order for drop-oldest
+    // A removal below (for example an eviction of lruMap) takes its key out of the order
+    const source = removalSource<MapRemoval<K, V>>(next, ({ key }) => {
+      insertionOrder = insertionOrder.filter((k) => !next.keyEq(k, key));
+    });
 
     const handleOverflow = (key: K, value: V): void => {
       if (onOverflow) {
@@ -409,9 +447,15 @@ export function boundedMap<K, V>(
           throw new Error(`Map is full (capacity: ${capacity})`);
         case "drop-oldest":
           // Remove oldest key
-          if (insertionOrder.length > 0) {
+          // The removal channel below keeps the order exact. A layer below with no channel can remove a key
+          // without this layer seeing it, so a drop skips each key that is gone.
+          while (insertionOrder.length > 0) {
             const oldestKey = insertionOrder.shift()!;
+            if (!next.has(oldestKey)) continue;
+            const value = next.get(oldestKey);
             next.delete(oldestKey);
+            source.emit({ key: oldestKey, value, reason: "drop" });
+            break;
           }
           break;
         case "drop-newest":
@@ -428,6 +472,7 @@ export function boundedMap<K, V>(
 
     return new Proxy(next, {
       get(target, prop, receiver) {
+        if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;
         if (prop === "isFull") return target.size >= capacity;
         if (prop === "remainingCapacity") return Math.max(0, capacity - target.size);

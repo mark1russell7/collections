@@ -10,10 +10,10 @@
 // ============================================================================
 
 export * from "./core/traits.js";
-export * from "./core/effects.js";
 export * from "./core/policies.js";
 export * from "./core/middleware.js";
 export * from "./core/events.js";
+export * from "./core/removals.js";
 // ============================================================================
 // Interfaces
 // ============================================================================
@@ -220,18 +220,3 @@ export {
   groupBy,
 } from "./utils/factories.js";
 
-// Effects
-export {
-  None,
-  Some,
-  type Option,
-  Ok,
-  Err,
-  type Result,
-  isSome,
-  isNone,
-  isOk,
-  isErr,
-  getOrElse,
-  unwrap,
-} from "./core/effects.js";

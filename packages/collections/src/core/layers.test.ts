@@ -133,7 +133,7 @@ describe("the capability law of collection layers", () => {
     list.add(1);
     expect(seen).toEqual([1]);
     expect(list.capacity).toBe(2);
-    expect(list.safe.get(0)).toMatchObject({ _tag: "Some", value: 1 });
+    expect(list.safe.get(0)).toEqual({ tag: "some", value: 1 });
   });
 
   it("keeps each capability in every order of a list stack", () => {

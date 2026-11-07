@@ -7,9 +7,9 @@
  * @example
  * const result = pipe(
  *   [1, 2, 3, 4, 5],
- *   map(x => x * 2),
- *   filter(x => x > 5),
- *   take(2),
+ *   (it) => map(it, x => x * 2),
+ *   (it) => filter(it, x => x > 5),
+ *   (it) => take(it, 2),
  *   toArray
  * ) // [6, 8]
  */
@@ -76,13 +76,14 @@ export function* flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T> {
 // ============================================================================
 
 /**
- * This function takes the first n elements.
+ * This function takes the first n elements. It reads no element after the n-th one, and it reads nothing when n is 0.
  */
 export function* take<T>(iterable: Iterable<T>, n: number): Generator<T> {
+  if (n <= 0) return;
   let count = 0;
   for (const value of iterable) {
-    if (count++ >= n) break;
     yield value;
+    if (++count >= n) return;
   }
 }
 

@@ -68,9 +68,14 @@ function notify<T>(name: string, listener: ((arg: T) => void) | undefined, arg: 
  * A processor that throws does NOT reject the whole run. The run records the throw
  * as a failed NodeResult, so partial results are always given.
  *
- * `failFast` operates at level granularity. When a node in a level fails, each
- * node already in flight in that level continues to completion. No later level
- * starts. (There is no mid-level cancellation.)
+ * With `skipDependents` (the default), a node whose dependency failed or was skipped does not start. Its result has
+ * `skipped: true` and an error that names those dependencies. A dependency outside the DAG does not count.
+ *
+ * `failFast` operates on levels. When a node of a level fails, each node of that level continues to its end.
+ * This includes the nodes that did not start before the failure, when `concurrency` is less than the
+ * size of the level. No later level starts. The run does not cancel a node.
+ *
+ * A node that did not start (`skipped: true`) calls neither `onNodeStart` nor `onNodeComplete`.
  */
 export async function executeDAG<TNode extends DAGNode>(
   dag: DependencyDAG<TNode>,
@@ -80,20 +85,37 @@ export async function executeDAG<TNode extends DAGNode>(
   const {
     concurrency = 4,
     failFast = true,
+    skipDependents = true,
     onNodeStart,
     onNodeComplete,
   } = options;
 
   const results = new Map<string, NodeResult<TNode>>();
   const failedNodes: string[] = [];
+  const skippedNodes: string[] = [];
+  // The ids of the nodes that failed or were skipped
+  const blocked = new Set<string>();
   const startTime = Date.now();
   let shouldStop = false;
 
   for (const level of dag.levels) {
     if (shouldStop) break;
 
+    const runnable: TNode[] = [];
+    for (const node of level) {
+      const blockers = skipDependents ? node.dependencies.filter((dep) => blocked.has(dep)) : [];
+      if (blockers.length === 0) {
+        runnable.push(node);
+        continue;
+      }
+      const message = "Skipped " + node.id + ": the dependencies " + blockers.join(", ") + " failed or were skipped";
+      results.set(node.id, { node, success: false, skipped: true, error: new Error(message), duration: 0, logs: [message] });
+      skippedNodes.push(node.id);
+      blocked.add(node.id);
+    }
+
     const levelResults = await executeWithConcurrency(
-      level,
+      runnable,
       async (node) => {
         const startError = notify("onNodeStart", onNodeStart, node);
         const nodeStart = Date.now();
@@ -127,6 +149,7 @@ export async function executeDAG<TNode extends DAGNode>(
       results.set(result.node.id, result);
       if (!result.success) {
         failedNodes.push(result.node.id);
+        blocked.add(result.node.id);
         if (failFast) {
           shouldStop = true;
         }
@@ -135,9 +158,10 @@ export async function executeDAG<TNode extends DAGNode>(
   }
 
   return {
-    success: failedNodes.length === 0,
+    success: failedNodes.length === 0 && skippedNodes.length === 0,
     results,
     failedNodes,
+    skippedNodes,
     totalDuration: Date.now() - startTime,
   };
 }

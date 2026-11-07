@@ -1,5 +1,128 @@
 # Changelog
 
+## 0.9.2
+
+The s20 audit found four faults of the set operations and of `readonly`. This version corrects them. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `HashSet`: `clone`, `union`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` keep the custom hash of the set. Before, the inner sets used `defaultHash`, so they did not find an equal element.
+- `HashSet`: `intersection`, `symmetricDifference` and `retainAll` read the other iterable one time. Before, `intersection` of a generator gave an empty set.
+- `TreeSet`: `retainAll`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` compare with the comparator of the set. Before, they used a native `Set`, which compares with `===`.
+- `readonly`: a view of an `lruCache` blocks `deleteWhere`. Before, `deleteWhere` emptied the cache through the view.
+
+## 0.9.1
+
+The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.
+
+### Deprecated
+
+- The 13 names of `async/channels.ts`: `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Import each one from `@mark1russell7/service/channel`. The next MINOR version removes them from collections.
+- Collections does not re-export the channels of service, and it does not depend on service. Service depends on collections for `asyncQueue`.
+## 0.9.0
+
+A layer above a removing layer now sees its removals (C23). The tests of the removal channel found six more faults. This version corrects them. MINOR: new exports, and before 1.0.0 a change of behavior raises MINOR. An evented layer above a layer that refuses an element no longer emits an event for it.
+
+### Added
+
+- The removal channel: `removals`, `removalsOf`, `removalSource` and the types `RemovalReason`, `MapRemoval`, `ElementRemoval`, `RemovalChannel` and `RemovalSource`. The bounded layers, `lruMap`, `ttlMap` and `ttlCollection` send each removal that they make by themselves. Each other layer forwards the channel.
+- The events `delete` of `eventedMap`, `remove` of `eventedList` and `evented`, `dequeue` of `eventedQueue`, and `removeFirst` and `removeLast` of `eventedDeque` occur for each removal below. They have the field `reason`: `"drop"`, `"evict"` or `"expire"`.
+
+### Changed
+
+- The evented layers emit no `add`, `enqueue`, `addFirst`, `addLast` or `set` event for an element that a layer below refused (the policies `reject` and `drop-newest`).
+
+### Fixed
+
+- `boundedMap` over a removing layer: its order kept the removed keys, so a drop removed nothing and the size passed the capacity. Now the channel takes the key out of the order, and a drop skips a key that is gone.
+- `ttlMap` over `lruMap`: `onExpire` occurred for an entry that `lruMap` evicted. `ttlCollection` over a bounded list did the same for a dropped element.
+- `lruMap` over `ttlMap`: the layer kept the node of each expired entry until a scan. Now it forgets the node at the expiry, so a set costs one call of `has` of the base when entries expire as fast as they come.
+- `eventedList`: `insert` into a full `drop-oldest` list emitted the index of the caller. The bounded layer put the element one place lower, and now the event has that index.
+- `eventedList`: `pop` emitted no index. Now its `remove` event has the index of the last element.
+- `eventedDeque`: `push` emitted `addFirst`, but `push` of a deque adds at the end. Now it emits `addLast`.
+
+## 0.8.0
+
+Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found six faults. This version corrects them. MINOR: before 1.0.0 a change of behavior raises MINOR. A front insert into a full `drop-oldest` deque now drops the last element.
+
+### Changed
+
+- `boundedDeque` with `drop-oldest`: `addFirst` and `offerFirst` into a full deque drop the last element, at the end opposite to the insert. Before, they dropped the first element, which is the new element's neighbor.
+- `ttlMap`: each access first removes the expired entries. `getOrUndefined`, `size`, `isEmpty` and the iteration show only live entries. Before, they showed expired entries until the background check.
+- `ttlMap`: `get` of an expired key throws the error of the base map for a missing key, not "Key expired".
+- `ttlMap`: the iteration (`entries`, `keys`, `values`, `forEach` and `for of`) gives the entries that are live when it starts. A removal while it operates does not make the base iterator throw.
+
+### Fixed
+
+- `boundedQueue` and `boundedDeque`: `addAll` applies the policy to each element, and stops at the first element that the queue refuses. The elements before it stay.
+- `ttlMap`: a lazy removal in `get` or `has` did not start `onExpire`. Now `onExpire` occurs one time for each expired entry, in the order of expiry.
+- `ttlMap`: a new `set` of a key starts its time again and puts the key at the end of the order of expiry.
+- `lruMap`: a `set` of a new key into a full map read each entry with `has` of the base, so it cost O(capacity). Now it costs amortized O(1): the layer looks for stale entries only at twice the capacity.
+
+## 0.7.2
+
+`take` reads no element after the last element that it gives. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `take(source, n)` read one more element of `source` than it gave, and `take(source, 0)` read one element. A source with side effects did one step too many. Now `take` stops after the n-th element.
+
+## 0.7.1
+
+A readonly view blocks each change of the structures of this package. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A readonly view of `arrayDeque`, `priorityQueue` or `linkedList` did not block `pollOrUndefined`. The method removed an element of the base. It now throws the readonly error.
+- A readonly view did not block the internal changes of the structures, for example `unlinkNode` of `linkedList` and `heapify` of `priorityQueue`. TypeScript marks them private, but a call at run time reached them. The view now blocks them.
+- A new test puts each method of each structure in the reads or in the blocked names. A new method fails the test until one of the two lists has its name.
+
+## 0.7.0
+
+`Optional` and `Result` come from `@mark1russell7/optional` 1.2.0, and collections has no copy of them. MINOR: before 1.0.0 a breaking change raises MINOR. The exports `Option`, `Some`, `None`, `Ok`, `Err` and their functions are removed, and the shape of the values changes from `_tag` to `tag`.
+
+### Changed
+
+- The safe middleware (`safeList`, `safeQueue`, `safeDeque`, `safeMap`) gives the values of `@mark1russell7/optional`. A present value is `{ tag: "some", value }`, and an absent value is `{ tag: "none" }`. A `Result` is `{ tag: "ok", value }` or `{ tag: "err", error }`.
+- `@mark1russell7/optional` is a new dependency. It has no dependencies.
+
+### Removed
+
+The module `core/effects` is removed. Import its replacements from `@mark1russell7/optional`:
+
+| Removed | Replacement |
+| --- | --- |
+| `Option`, `Some(v)`, `None` | `Optional`, `some(v)`, `none` |
+| `Ok(v)`, `Err(e)` | `ok(v)`, `err(e)` |
+| `isSome`, `isNone`, `isOk`, `isErr` | the same names |
+| `getOrElse`, `getOrElseResult` | `getOr`, `getOkOr` |
+| `mapOption`, `flatMapOption`, `mapError` | `map`, `flatMap`, `mapErr` |
+| `mapResult`, `flatMapResult`, `tryCatch`, `tryCatchAsync` | the same names |
+| `optionToResult`, `resultToOption` | `fromOptional`, `toOptional` |
+| `toNullable`, `fromNullable` | `unwrap`, `fromNullable` |
+| `unwrap`, `unwrapResult` | no replacement: `unwrap` of optional gives `undefined` for `none` and does not throw |
+| the method `match` of `Ok` and `Err` | `isOk` and `isErr` |
+| `sequence`, `sequenceResults`, `AsyncOption`, `AsyncResult`, `mapAsyncOption`, `mapAsyncResult` | no replacement |
+
+### Fixed
+
+- `hashMap.get` threw "Key not found" for a key whose value is `undefined`, and `getOrDefault` gave the default for it. Now the node of the key tells if the key is present, as in `linkedHashMap` and `treeMap`. A new law of the map contract found the bug. It runs on all maps.
+- Thus `safeMap().safe.get` threw for such a key. Now it gives `some(undefined)`.
+
+## 0.6.0
+
+`executeDAG` does not start a node whose dependency failed. MINOR: before 1.0.0 a breaking change raises MINOR. With `failFast: false`, such a node now gets a skipped result.
+
+### Added
+
+- The option `skipDependents` of `executeDAG`. The default is true. Give false to start each node, as before.
+- `NodeResult.skipped` is true for a node that did not start. Its error names the dependencies that failed or were skipped.
+- `DAGResult.skippedNodes` has the ids of the skipped nodes. `failedNodes` has only the nodes whose processor failed.
+
+### Changed
+
+- With `failFast: false`, `executeDAG` started each node of each level, also when a dependency of the node failed. So a node used the work of a failed node. Now the node does not start.
+
 ## 0.5.0
 
 The LRU and bounded layers check their capacity, and `LRUCache` gets `deleteWhere`. MINOR: before 1.0.0 a breaking change raises MINOR. A capacity that is not a positive whole number now throws.

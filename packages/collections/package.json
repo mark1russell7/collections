@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "@mark1russell7/collections",
-  "version": "0.5.0",
+  "version": "0.9.2",
   "description": "Collections with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.",
   "keywords": [
     "collections",
@@ -87,6 +87,7 @@
     "@mark1russell7/rigor-bench": "^0.2.5",
     "@mark1russell7/rigor-generators": "^0.1.5",
     "@mark1russell7/rigor-statistics": "^0.1.8",
+    "@mark1russell7/rigor-testkit": "^0.1.0",
     "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.1.0",
     "esbuild": "^0.28.2",
@@ -94,5 +95,8 @@
     "tsdown": "^0.23.1",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@mark1russell7/optional": "^1.2.0"
   }
 }

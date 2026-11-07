@@ -8,20 +8,37 @@ Collections for TypeScript with no dependencies: lists, maps, queues, a summary 
 npm i @mark1russell7/collections
 ```
 
+> The channels moved to `@mark1russell7/service/channel` (service 0.6.6 or later). Their names in collections are deprecated. The next MINOR version of collections removes them.
+
 ## Lists, maps and behaviors
 
 ```ts
+import assert from "node:assert/strict";
 import { arrayList, compose, hashMap, lruMap } from "@mark1russell7/collections";
 
 const list = arrayList<number>();
 list.add(1);
 list.add(2);
+assert.deepEqual(list.toArray(), [1, 2]);
 
 const cache = compose(lruMap<string, number>({ capacity: 2 }))(hashMap<string, number>());
 cache.set("a", 1);
 cache.set("b", 2);
 cache.set("c", 3);
-cache.has("a"); // false: the map removed the oldest key
+// The map removed the oldest key
+assert.equal(cache.has("a"), false);
+assert.equal(cache.get("c"), 3);
+```
+
+`compose` applies its layers from right to left, so the last layer is next to the base. The order of the layers is important:
+
+- Put `ttlMap` below `lruMap`: `compose(lruMap(...), ttlMap(...))`. Then an expired entry is not an eviction.
+- An evented layer can go at each place. Below a removing layer, it gets each removal as a call. Above it, it gets each removal from the removal channel, with a `reason`.
+
+The bounded layers, `lruMap` and `ttlMap` remove entries by themselves. Each of them sends its removals on a removal channel, and each layer above it gets them. `removalsOf(collection)` gives the channel:
+
+```typescript
+removalsOf<MapRemoval<string, User>>(cache)?.on(({ key, reason }) => console.log(key, reason)); // "evict" or "expire"
 ```
 
 ## The summary tree
@@ -29,6 +46,7 @@ cache.has("a"); // false: the map removed the oldest key
 A summary tree is a persistent sequence. Each node keeps the sum of its leaves in a monoid. Each change gives a new tree in logarithmic time, and the old tree stays the same.
 
 ```ts
+import assert from "node:assert/strict";
 import { summaryTree, type SummarySpec } from "@mark1russell7/collections";
 
 const text: SummarySpec<string, string> = {
@@ -36,7 +54,7 @@ const text: SummarySpec<string, string> = {
   measure: (leaf) => leaf,
 };
 const tree = summaryTree(text, ["a", "b", "c"]);
-tree.summary; // "abc"
+assert.equal(tree.summary, "abc");
 ```
 
 ## Dependency graphs
@@ -44,22 +62,38 @@ tree.summary; // "abc"
 The entry `./dag` gives the levels of a graph, and a run of each level with a limit of concurrency.
 
 ```ts
+import assert from "node:assert/strict";
 import { buildLeveledDAG, getTopologicalOrder } from "@mark1russell7/collections/dag";
 
 const nodes = new Map([
   ["app", { id: "app", dependencies: ["lib"] }],
   ["lib", { id: "lib", dependencies: [] }],
 ]);
-getTopologicalOrder(buildLeveledDAG(nodes)).map((node) => node.id); // ["lib", "app"]
+assert.deepEqual(getTopologicalOrder(buildLeveledDAG(nodes)).map((node) => node.id), ["lib", "app"]);
 ```
 
 The entry `./graph` gives `hubBreadthFirstOrder`: the order of a weighted graph, from its largest hub, with no other imports.
 
 ```ts
+import assert from "node:assert/strict";
 import { hubBreadthFirstOrder } from "@mark1russell7/collections/graph";
 
-hubBreadthFirstOrder(3, [{ a: 0, b: 1 }, { a: 1, b: 2 }]); // [1, 0, 2]
+assert.deepEqual(hubBreadthFirstOrder(3, [{ a: 0, b: 1 }, { a: 1, b: 2 }]), [1, 0, 2]);
 ```
+
+## Guides
+
+Each guide has examples, and a test runs each example:
+
+- [Lists](https://github.com/mark1russell7/collections/blob/main/docs/guides/lists.md): `arrayList` and `linkedList`
+- [Maps and sets](https://github.com/mark1russell7/collections/blob/main/docs/guides/maps-and-sets.md): hash maps, tree maps, linked maps, and their sets
+- [Queues](https://github.com/mark1russell7/collections/blob/main/docs/guides/queues.md): `arrayDeque` and `priorityQueue`
+- [Dependency graphs](https://github.com/mark1russell7/collections/blob/main/docs/guides/dag.md): levels, the topological order, and a run with `executeDAG`
+- [Graph orders](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md): `hubBreadthFirstOrder`
+- [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
+- [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
+- [Iterables and collectors](https://github.com/mark1russell7/collections/blob/main/docs/guides/iterables.md): lazy functions, reducers, collectors and the names of the root
+- [Rank keys](https://github.com/mark1russell7/collections/blob/main/docs/guides/rank-keys.md): the keys of a list that a user can reorder, and the writes of a move
 
 ## Contract checks
 

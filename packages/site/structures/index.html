@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Structures · collections</title>
+<meta name="description" content="Each structure of collections, live in the page: start its operations, read each call as code, and see the cost of each operation.">
+<script>
+  // The theme before the first paint: the choice of the visitor, else the theme of the system.
+  try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
+</script>
+<link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="../">collections</a>
+  <nav aria-label="Site">
+    <a href="./" aria-current="page">Structures</a>
+    <a href="../releases/">Releases</a>
+    <a href="../status/">Status</a>
+    <a href="https://github.com/mark1russell7/collections">GitHub</a>
+    <button id="theme" class="theme" type="button" aria-label="Change the theme"><span aria-hidden="true">◐</span></button>
+  </nav>
+</header>
+<main>
+  <h1>Structures</h1>
+  <p class="lead">Each structure of the package, live in this page. Press an operation. The log shows the call as code and its result.</p>
+
+  <div id="pick" class="pick" role="group" aria-label="The structure to explore"></div>
+
+  <section class="demo" aria-labelledby="explore-title">
+    <h2 id="explore-title"><code id="explore-maker">arrayList</code> <span id="explore-kind" class="kind">List</span></h2>
+    <p id="explore-summary"></p>
+    <p class="start"><code id="explore-start"></code></p>
+
+    <ol id="explore-items" class="cells" aria-label="The elements, in the order of iteration"></ol>
+    <p id="explore-facts" class="note"></p>
+
+    <div class="fields">
+      <label id="field-value">Value <input id="input-value" type="number" min="0" max="99" value="7" inputmode="numeric"></label>
+      <label id="field-index">Index <input id="input-index" type="number" min="0" max="99" value="1" inputmode="numeric"></label>
+      <label id="field-key">Key
+        <select id="input-key">
+          <option>A</option><option selected>B</option><option>C</option><option>D</option><option>E</option><option>F</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="explore-ops" class="ops" role="group" aria-label="The operations"></div>
+
+    <div class="row">
+      <button id="explore-reset" type="button">Start again</button>
+      <span id="explore-version" role="status"></span>
+    </div>
+
+    <ol id="explore-log" class="calls" aria-label="The calls, newest first" aria-live="polite"></ol>
+    <p id="explore-empty" class="note">No calls yet.</p>
+    <div id="explore-versions" hidden>
+      <h3>Earlier versions</h3>
+      <ol id="explore-version-list" class="versions"></ol>
+    </div>
+  </section>
+
+  <h2>The cost of each operation</h2>
+  <p class="note">The cost has <code>n</code> for the number of elements. A hash structure gives the average cost. The worst case is <code>O(n)</code>.</p>
+  <div class="table-scroll">
+    <table class="costs">
+      <thead><tr><th scope="col">Structure</th><th scope="col">Operations and their cost</th></tr></thead>
+      <tbody id="cost-rows"></tbody>
+    </table>
+  </div>
+</main>
+
+<script type="module" src="../src/structures.ts"></script>
+</body>
+</html>

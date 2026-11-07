@@ -105,6 +105,63 @@ describe("executeDAG", () => {
     expect(result.results.size).toBe(3);
   });
 
+  it("skips each node whose dependency failed or was skipped, with failFast=false", async () => {
+    // a fails. b depends on a, c depends on b, d is independent, e depends on d
+    const nodes = buildNodeMap([
+      createNode("a"),
+      createNode("b", ["a"]),
+      createNode("c", ["b"]),
+      createNode("d"),
+      createNode("e", ["d"]),
+    ]);
+    const started: string[] = [];
+    const onNodeStart = vi.fn();
+    const result = await executeDAG(
+      buildLeveledDAG(nodes),
+      async (node: DAGNode) => {
+        started.push(node.id);
+        return node.id === "a" ? createFailureResult(node, "a failed") : createSuccessResult(node);
+      },
+      { failFast: false, onNodeStart }
+    );
+
+    expect(started.sort()).toEqual(["a", "d", "e"]);
+    expect(onNodeStart).toHaveBeenCalledTimes(3);
+    expect(result.success).toBe(false);
+    expect(result.failedNodes).toEqual(["a"]);
+    expect(result.skippedNodes).toEqual(["b", "c"]);
+    expect(result.results.size).toBe(5);
+    expect(result.results.get("b")).toMatchObject({ success: false, skipped: true, duration: 0 });
+    expect(result.results.get("b")?.error?.message).toBe("Skipped b: the dependencies a failed or were skipped");
+    expect(result.results.get("c")?.error?.message).toBe("Skipped c: the dependencies b failed or were skipped");
+    expect(result.results.get("e")?.success).toBe(true);
+  });
+
+  it("starts the dependents of a failed node with skipDependents=false (flip of the skip)", async () => {
+    const nodes = buildNodeMap([createNode("a"), createNode("b", ["a"])]);
+    const started: string[] = [];
+    const result = await executeDAG(
+      buildLeveledDAG(nodes),
+      async (node: DAGNode) => {
+        started.push(node.id);
+        return node.id === "a" ? createFailureResult(node, "a failed") : createSuccessResult(node);
+      },
+      { failFast: false, skipDependents: false }
+    );
+
+    expect(started).toEqual(["a", "b"]);
+    expect(result.skippedNodes).toEqual([]);
+    expect(result.results.get("b")?.success).toBe(true);
+    expect(result.results.get("b")?.skipped).toBeUndefined();
+  });
+
+  it("does not count a dependency outside the DAG", async () => {
+    const nodes = buildNodeMap([createNode("app", ["external"])]);
+    const result = await executeDAG(buildLeveledDAG(nodes), async (node: DAGNode) => createSuccessResult(node), { failFast: false });
+    expect(result.success).toBe(true);
+    expect(result.skippedNodes).toEqual([]);
+  });
+
   it("captures a thrown processor error as a failed result without losing partial results", async () => {
     // a and b are independent leaves; only b's processor throws.
     const nodes = buildNodeMap([createNode("a"), createNode("b")]);

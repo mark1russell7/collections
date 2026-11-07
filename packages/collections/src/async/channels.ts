@@ -27,6 +27,8 @@ import { asyncQueue, type AsyncQueue } from "./async-queue.js";
  *
  * The channels of Go are the model. This class gives send/receive operations
  * that can block until the other side is ready.
+ *
+ * @deprecated Import `Channel` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export class Channel<T> {
   private queue: AsyncQueue<T>;
@@ -140,6 +142,8 @@ export class Channel<T> {
 
 /**
  * SelectCase represents a case in a select statement.
+ *
+ * @deprecated Import `SelectCase` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export interface SelectCase<R> {
   channel: Channel<any>;
@@ -212,6 +216,8 @@ function firstOf(waits: readonly Wait[]): Promise<{ index: number; value: unknow
  *   ch2.case((v) => `ch2: ${v}`),
  *   timeout(1000).case(() => 'timeout')
  * )
+ *
+ * @deprecated Import `select` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export async function select<R>(...cases: SelectCase<R>[]): Promise<R> {
   const { index, value } = await firstOf(
@@ -229,6 +235,8 @@ export async function select<R>(...cases: SelectCase<R>[]): Promise<R> {
  *   dataChannel.case((v) => v),
  *   timeout(5000).case(() => 'timeout!')
  * )
+ *
+ * @deprecated Import `timeout` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function timeout(ms: number): Channel<void> {
   const ch = new Channel<void>();
@@ -247,6 +255,8 @@ export function timeout(ms: number): Channel<void> {
  * for await (const t of tick) {
  *   console.log('Tick:', t)
  * }
+ *
+ * @deprecated Import `ticker` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function ticker(ms: number): Channel<number> & { stop: () => void } {
   const ch = new Channel<number>(1);
@@ -273,6 +283,8 @@ export function ticker(ms: number): Channel<number> & { stop: () => void } {
  *
  * await input.send(5)
  * const result = await output.receive() // 10
+ *
+ * @deprecated Import `pipeline` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function pipeline<T, U>(
   input: Channel<T>,
@@ -305,6 +317,8 @@ export function pipeline<T, U>(
  * const [out1, out2, out3] = fanOut(input, 3)
  *
  * // Each output gets a copy of every input value
+ *
+ * @deprecated Import `fanOut` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function fanOut<T>(input: Channel<T>, count: number, bufferSize: number = 0): Channel<T>[] {
   const outputs = Array.from({ length: count }, () => new Channel<T>(bufferSize));
@@ -331,6 +345,8 @@ export function fanOut<T>(input: Channel<T>, count: number, bufferSize: number =
  * const merged = fanIn(ch1, ch2)
  *
  * // merged receives values from both ch1 and ch2
+ *
+ * @deprecated Import `fanIn` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function fanIn<T>(...inputs: Channel<T>[]): Channel<T> {
   const output = new Channel<T>();
@@ -356,6 +372,8 @@ export function fanIn<T>(...inputs: Channel<T>[]): Channel<T> {
  * It takes one value at a time, from the inputs in turn. It keeps no receive on an input while
  * it waits for the reader of the output. Thus each value of each input reaches the output one
  * time, in the order of its input, or stays in its input.
+ *
+ * @deprecated Import `merge` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function merge<T>(...inputs: Channel<T>[]): Channel<T> {
   const output = new Channel<T>();
@@ -389,6 +407,8 @@ export function merge<T>(...inputs: Channel<T>[]): Channel<T> {
 
 /**
  * Buffered channel with specified capacity.
+ *
+ * @deprecated Import `buffered` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function buffered<T>(capacity: number): Channel<T> {
   return new Channel<T>(capacity);
@@ -397,6 +417,8 @@ export function buffered<T>(capacity: number): Channel<T> {
 /**
  * Unbuffered channel (rendezvous point).
  * Sends block until receiver is ready.
+ *
+ * @deprecated Import `unbuffered` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function unbuffered<T>(): Channel<T> {
   return new Channel<T>(0);
@@ -408,6 +430,8 @@ export function unbuffered<T>(): Channel<T> {
  * @example
  * const ch = channel<number>()
  * const bufferedCh = channel<string>(10)
+ *
+ * @deprecated Import `channel` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function channel<T>(bufferSize: number = 0): Channel<T> {
   return new Channel<T>(bufferSize);
@@ -424,6 +448,8 @@ export function channel<T>(bufferSize: number = 0): Channel<T> {
  * )
  *
  * // 4 workers concurrently process jobs from jobChannel
+ *
+ * @deprecated Import `workerPool` from `@mark1russell7/service/channel`. The next MINOR version of collections removes it.
  */
 export function workerPool<T, R>(
   jobs: Channel<T>,

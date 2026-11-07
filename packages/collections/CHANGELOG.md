@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.8.0
+
+Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found six faults. This version corrects them. MINOR: before 1.0.0 a change of behavior raises MINOR. A front insert into a full `drop-oldest` deque now drops the last element.
+
+### Changed
+
+- `boundedDeque` with `drop-oldest`: `addFirst` and `offerFirst` into a full deque drop the last element, at the end opposite to the insert. Before, they dropped the first element, which is the new element's neighbor.
+- `ttlMap`: each access first removes the expired entries. `getOrUndefined`, `size`, `isEmpty` and the iteration show only live entries. Before, they showed expired entries until the background check.
+- `ttlMap`: `get` of an expired key throws the error of the base map for a missing key, not "Key expired".
+- `ttlMap`: the iteration (`entries`, `keys`, `values`, `forEach` and `for of`) gives the entries that are live when it starts. A removal while it operates does not make the base iterator throw.
+
+### Fixed
+
+- `boundedQueue` and `boundedDeque`: `addAll` applies the policy to each element, and stops at the first element that the queue refuses. The elements before it stay.
+- `ttlMap`: a lazy removal in `get` or `has` did not start `onExpire`. Now `onExpire` occurs one time for each expired entry, in the order of expiry.
+- `ttlMap`: a new `set` of a key starts its time again and puts the key at the end of the order of expiry.
+- `lruMap`: a `set` of a new key into a full map read each entry with `has` of the base, so it cost O(capacity). Now it costs amortized O(1): the layer looks for stale entries only at twice the capacity.
+
 ## 0.7.2
 
 `take` reads no element after the last element that it gives. PATCH: a fix with no change to the public API.

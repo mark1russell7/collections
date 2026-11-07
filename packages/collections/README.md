@@ -77,6 +77,7 @@ Each guide has examples, and a test runs each example:
 - [Queues](https://github.com/mark1russell7/collections/blob/main/docs/guides/queues.md): `arrayDeque` and `priorityQueue`
 - [Dependency graphs](https://github.com/mark1russell7/collections/blob/main/docs/guides/dag.md): levels, the topological order, and a run with `executeDAG`
 - [Graph orders](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md): `hubBreadthFirstOrder`
+- [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
 
 ## Contract checks
 

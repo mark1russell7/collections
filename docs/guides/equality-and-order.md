@@ -4,8 +4,8 @@ A collection finds, removes and sorts its elements with three kinds of function.
 
 | Type | Shape | Options that take it |
 | --- | --- | --- |
-| `Eq<T>` | `(a, b) => boolean` | `eq` of the lists, the deques, `hashSet` and `linkedHashMap`. `keyEq` and `valueEq` of `hashMap` |
-| `Hash<T>` | `(value) => number` | `keyHash` of `hashMap`. `hash` of `hashSet` and `linkedHashMap` |
+| `Eq<T>` | `(a, b) => boolean` | `eq` of the lists, the deques, `hashMap`, `hashSet` and `linkedHashMap`. `valueEq` of `hashMap` and `linkedHashMap` |
+| `Hash<T>` | `(value) => number` | `hash` of `hashMap`, `hashSet` and `linkedHashMap` |
 | `Compare<T>` | `(a, b) => number` | `compare` of `treeMap`, `treeSet` and `priorityQueue`. The argument of `sort` |
 
 ## The rules of the three functions
@@ -62,7 +62,7 @@ import { deepEq, defaultHash, hashMap } from "@mark1russell7/collections";
 assert.equal(defaultHash({ a: 1, b: [2] }), defaultHash({ b: [2], a: 1 }));
 
 type Cell = { row: number; column: number };
-const cells = hashMap<Cell, string>({ keyEq: deepEq });
+const cells = hashMap<Cell, string>({ eq: deepEq });
 cells.set({ row: 1, column: 2 }, "x");
 assert.equal(cells.get({ row: 1, column: 2 }), "x");
 assert.equal(cells.size, 1);
@@ -105,12 +105,13 @@ A hash can change in a new version of the package. Do not store a hash.
 
 | Values | The order of `defaultCompare` |
 | --- | --- |
-| `null` and `undefined` | `null`, then `undefined`, before each other value |
-| numbers | by value, with `NaN` first |
-| strings | by `localeCompare` |
+| two values of different types | by type: `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values |
 | booleans | `false` before `true` |
+| numbers | by value, with `NaN` first |
+| bigints | by value |
+| strings | by `localeCompare` |
 | dates | by time, with invalid dates first |
-| two values of different types | by their text, with `String` |
+| symbols, objects and functions | by their text, with `String`. Two different values with the same text keep the order of their first comparison. |
 
 A comparator for one type gives the same order for its type: `numberCompare`, `stringCompare`, `stringCompareIgnoreCase`, `booleanCompare` and `dateCompare`.
 
@@ -179,11 +180,15 @@ assert.deepEqual([3, null, 1].sort(nullsLast(numberCompare)), [1, 3, null]);
 
 Each comparator gives a number for each pair of its type, also for edge values. Two equal infinities give 0, and two invalid dates give 0. A sorted collection then holds each of these keys one time.
 
-Do not put values of different types in one sorted collection with `defaultCompare`. For two values of different types, it compares their text. This order is not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. It also gives 0 for `1` and `"1"`, and for two different objects. Roadmap row C39 has this defect.
+`defaultCompare` orders values of different types by type first. So the order is transitive for each set of values, and `1` and `"1"` are two keys. Before version 0.10.0, it compared the text of two values of different types: `9 < 10`, `10 < "10z"` and `"10z" < 9`.
+
+Two different objects with the same text are two keys. Their order is the order of their first comparison, so it is not the same in each process. To sort objects by a value, give a comparator, for example `comparing`.
 
 ```ts
 import assert from "node:assert/strict";
-import { numberCompare, treeSet } from "@mark1russell7/collections";
+import { defaultCompare, numberCompare, treeSet } from "@mark1russell7/collections";
+
+assert.deepEqual([9, "10z", 10, "1", 1].sort(defaultCompare), [1, 9, 10, "1", "10z"]);
 
 const limits = treeSet<number>({ compare: numberCompare });
 limits.add(Infinity);

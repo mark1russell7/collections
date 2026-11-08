@@ -60,15 +60,22 @@ assert.deepEqual(nCopies(3, 0).toArray(), [0, 0, 0]);
 
 ## Ranges of numbers
 
-`range(start, end, step)` gives the numbers from `start` up to `end`, and `end` is not in the list. The default `step` is 1. A negative `step` counts down. A `step` of 0 throws an error. `rangeTo(n)` is `range(0, n)`.
+`range(start, end, step)` gives the numbers from `start` up to `end`, and `end` is not in the list. The default `step` is 1. A negative `step` counts down. `rangeTo(n)` is `range(0, n)`.
+
+The number at index `i` is `start + i * step`. Each number comes from `start` and its index, so the error of a fraction does not grow along the list. `range(0, 1, 0.1)` gives 10 numbers.
+
+`range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a `step` of 0. It also throws for a list that is longer than an array. `nCopies(n, value)` throws a `RangeError` when `n` is not a safe integer of 0 or more.
 
 ```ts
 import assert from "node:assert/strict";
-import { range, rangeTo } from "@mark1russell7/collections";
+import { nCopies, range, rangeTo } from "@mark1russell7/collections";
 
 assert.deepEqual(rangeTo(5).toArray(), [0, 1, 2, 3, 4]);
 assert.deepEqual(range(10, 0, -3).toArray(), [10, 7, 4, 1]);
-assert.throws(() => range(0, 5, 0), /step/);
+assert.equal(range(0, 1, 0.1).size, 10);
+assert.throws(() => range(0, 5, 0), RangeError);
+assert.throws(() => range(0, Infinity), RangeError);
+assert.throws(() => nCopies(2.5, "x"), RangeError);
 ```
 
 ## Builders, maps by key and groups
@@ -124,10 +131,10 @@ assert.equal(byLetter.get("a"), "avocado");
 
 The root name `toList` is the factory of this guide. The collector with the same name has the root name `collectToList`. The guide of the iterables tells the names of the root.
 
-## Known defects
+## Defects that version 0.10.0 corrects
 
-The reading for this guide found three defects of `range` and `nCopies`. Roadmap row C40 has them.
+The reading for this guide found three defects of `range` and `nCopies` (roadmap row C40). Version 0.10.0 corrects them.
 
-- `range` adds `step` to the last number at each step, so the error of a fraction grows. `range(0, 1, 0.1)` gives 11 numbers, and the last number is `0.9999999999999999`.
-- `range(0, Infinity)` and `nCopies(Infinity, value)` do not stop. They add values until the memory is full.
-- `nCopies` does not examine that `n` is an integer. `nCopies(2.5, value)` gives 3 copies, and `nCopies(NaN, value)` gives an empty list with no error.
+- `range` added `step` to the last number at each step, so the error of a fraction grew. `range(0, 1, 0.1)` gave 11 numbers, and the last number was `0.9999999999999999`.
+- `range(0, Infinity)` and `nCopies(Infinity, value)` did not stop. They added values until the memory was full.
+- `nCopies` did not examine that `n` is an integer. `nCopies(2.5, value)` gave 3 copies, and `nCopies(NaN, value)` gave an empty list with no error.

@@ -108,7 +108,7 @@ const colliding = { hash: (k: number) => Math.abs(k) % 4, eq: (a: number, b: num
 
 for (const [name, create, order] of [
   ["HashMap", () => hashMap<number, string>(), "any"],
-  ["HashMap (colliding hash)", () => hashMap<number, string>({ keyHash: colliding.hash, keyEq: colliding.eq, initialCapacity: 2 }), "any"],
+  ["HashMap (colliding hash)", () => hashMap<number, string>({ hash: colliding.hash, eq: colliding.eq, initialCapacity: 2 }), "any"],
   ["LinkedHashMap", () => linkedHashMap<number, string>(), "insertion"],
   ["LinkedHashMap (colliding hash)", () => linkedHashMap<number, string>({ hash: colliding.hash, eq: colliding.eq, initialCapacity: 2 }), "insertion"],
   ["TreeMap", () => treeMap<number, string>(), "sorted"],
@@ -240,5 +240,46 @@ describe("HashMap iteration fails fast when the map changes (L15)", () => {
     const map = hashMap<number, string>({ initialCapacity: 4 });
     for (let k = 0; k < 100; k++) map.set(k, "v");
     expect([...map.keys()].sort((a, b) => a - b)).toEqual([...Array(100).keys()]);
+  });
+});
+
+describe("the option names of hashMap (D2)", () => {
+  /** The keys of these tests are cells: two cells with the same fields are one key. */
+  interface Cell {
+    readonly row: number;
+    readonly column: number;
+  }
+  const sameCell = (a: Cell, b: Cell): boolean => a.row === b.row && a.column === b.column;
+  const cellHash = (cell: Cell): number => cell.row * 31 + cell.column;
+
+  it("finds a key by its fields with eq and hash, the names of linkedHashMap and hashSet", () => {
+    const map = hashMap<Cell, string>({ eq: sameCell, hash: cellHash });
+    map.set({ row: 1, column: 2 }, "a");
+    expect(map.get({ row: 1, column: 2 })).toBe("a");
+    expect(map.keyEq).toBe(sameCell);
+    const linked = linkedHashMap<Cell, string>({ eq: sameCell, hash: cellHash });
+    linked.set({ row: 1, column: 2 }, "a");
+    expect(linked.get({ row: 1, column: 2 })).toBe("a");
+  });
+
+  it("keeps the old names keyEq and keyHash for one MINOR version", () => {
+    const map = hashMap<Cell, string>({ keyEq: sameCell, keyHash: cellHash });
+    map.set({ row: 1, column: 2 }, "a");
+    expect(map.get({ row: 1, column: 2 })).toBe("a");
+    expect(map.keyEq).toBe(sameCell);
+  });
+
+  it("uses eq and hash when the old names are also given", () => {
+    const never = (): boolean => false;
+    const map = hashMap<Cell, string>({ eq: sameCell, hash: cellHash, keyEq: never, keyHash: () => 0 });
+    map.set({ row: 1, column: 2 }, "a");
+    expect(map.get({ row: 1, column: 2 })).toBe("a");
+    expect(map.keyEq).toBe(sameCell);
+  });
+
+  it("uses the default equality of keys when no name is given", () => {
+    const map = hashMap<Cell, string>();
+    map.set({ row: 1, column: 2 }, "a");
+    expect(map.has({ row: 1, column: 2 })).toBe(false);
   });
 });

@@ -19,6 +19,7 @@ import type { Middleware } from "../core/middleware.js";
 import type { MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type MapRemoval } from "../core/removals.js";
+import { hasMembers } from "./members.js";
 
 /**
  * Options for LRU behavior.
@@ -174,6 +175,7 @@ export function lruMap<K, V>(
     };
 
     return new Proxy(next, {
+      has: hasMembers(removals, "isFull"),
       get(target, prop, receiver) {
         if (prop === removals) {
           return source.channel;

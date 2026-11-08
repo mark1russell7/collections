@@ -228,7 +228,7 @@ assert.equal(mean, 66.25);
 
 ## The statistics of a number
 
-`summarizingNumber` gives the count, the sum, the minimum, the maximum and the mean in one read.
+`summarizingNumber` gives the count, the sum, the minimum, the maximum and the mean in one read. It folds with the running summary of `@mark1russell7/rigor-statistics`. Thus a NaN throws a `RangeError`, and no NaN goes into a result. For the spread or the merge of two parts, use `runningOf`, `runningSd` and `mergeRunning` of that package.
 
 ```ts
 import assert from "node:assert/strict";

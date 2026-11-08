@@ -101,8 +101,8 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `map`, `filter`, `flatMap`, `flatten`, `take`, `skip`, `takeWhile`, `skipWhile`, `concat`, `zip`, `enumerate`, `chunk`, `window`, `partition`, `reduce`, `scan`, `sort`, `reverse`, `distinct`, `distinctConsecutive`, `tap`, `some`, `every`, `none`, `find`, `count`, `min`, `max`, `sum`, `toArray`, `toSet`, `iterToMap`, `pipe` | keep | The language has helpers on each iterator for `map`, `filter`, `take`, `flatMap`, `reduce`, `some`, `every`, `find` and `toArray`. These functions take each iterable, so D6 keeps them. |
-| `average`, `averagingNumber`, `summarizingNumber` | change | A mean is statistics. These functions call `@mark1russell7/rigor-statistics` after the move of `SummaryStatistics`. |
-| `SummaryStatistics` | move | Its home is `@mark1russell7/rigor-statistics`, the home of counts, means and spreads. |
+| `average`, `averagingNumber`, `summarizingNumber` | change | A mean is statistics. Version 0.10.0 folds them with the running summary of `@mark1russell7/rigor-statistics` 0.1.25. The results keep their bits, and a NaN throws a `RangeError`. |
+| `SummaryStatistics` | move | Its home is `@mark1russell7/rigor-statistics`, the home of counts, means and spreads. Its `RunningSummary` and `runningMean` replace it. Version 0.10.0 marks it `@deprecated`. |
 | `collect`, `Collector`, `groupingBy`, `groupingByWith`, `partitioningBy`, `counting`, `summingNumber`, `minBy`, `maxBy`, `joining`, `mapping`, `filtering`, `flatMapping`, `reducing`, `reducingWith`, `teeing`, `first`, `last` | keep | The tests of the collectors examine them. |
 | `collectToList`, `collectToArray`, `collectToSet`, `collectToMap` | keep | These names are the collectors of the four kinds. A collector is not a function of an iterable, so D4 keeps them. |
 

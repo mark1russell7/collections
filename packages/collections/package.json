@@ -90,7 +90,6 @@
     "@mark1russell7/cue": "^2.0.0",
     "@mark1russell7/rigor-bench": "^0.2.5",
     "@mark1russell7/rigor-generators": "^0.1.5",
-    "@mark1russell7/rigor-statistics": "^0.1.8",
     "@mark1russell7/rigor-testkit": "^0.1.0",
     "@stryker-mutator/core": "^10.1.1",
     "@stryker-mutator/vitest-runner": "^10.1.1",
@@ -104,6 +103,7 @@
   },
   "dependencies": {
     "@mark1russell7/algebra": "^0.8.3",
-    "@mark1russell7/optional": "^1.2.0"
+    "@mark1russell7/optional": "^1.2.0",
+    "@mark1russell7/rigor-statistics": "^0.1.25"
   }
 }

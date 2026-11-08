@@ -19,10 +19,11 @@
 import type { Middleware } from "../core/middleware.js";
 import type { List } from "../interfaces/list.js";
 import type { Queue, Deque } from "../interfaces/queue.js";
-import type { MapLike } from "../interfaces/map.js";
+import type { Entry, MapLike } from "../interfaces/map.js";
 import type { Collection } from "../interfaces/collection.js";
 import { Emitter, type Unsubscribe } from "../core/events.js";
 import { removalsOf, type ElementRemoval, type MapRemoval, type RemovalReason } from "../core/removals.js";
+import { compositeMapMethod } from "./composite.js";
 import { hasMembers } from "./members.js";
 
 /** The number of removals that a layer heard from the layers below it, and the number from the first end. */
@@ -48,6 +49,62 @@ function hear<R extends ElementRemoval<unknown> | MapRemoval<unknown, unknown>>(
 /** This function tells if a call added an element: the size grew, after the removals of the layers below. */
 const added = (size: number, sizeBefore: number, heard: Heard, heardBefore: number): boolean =>
   size - sizeBefore + heard.all - heardBefore > 0;
+
+/**
+ * This function gives the removals that change `before` to `after`, in the order of a replay.
+ * Each index is the place of the value at the time of its removal. It gives undefined when `after` is not in the order of `before`.
+ */
+function removalsInOrder<T>(before: readonly T[], after: readonly T[]): { value: T; index: number }[] | undefined {
+  const removed: { value: T; index: number }[] = [];
+  let kept = 0;
+  for (const value of before) {
+    if (kept < after.length && Object.is(value, after[kept])) kept++;
+    else removed.push({ value, index: kept });
+  }
+  return kept === after.length ? removed : undefined;
+}
+
+/** This function gives the values of `before` that are not in `after`, with each copy counted. The order does not matter. */
+function removedValues<T>(before: readonly T[], after: readonly T[]): T[] {
+  const left = new Map<T, number>();
+  for (const value of after) left.set(value, (left.get(value) ?? 0) + 1);
+  const removed: T[] = [];
+  for (const value of before) {
+    const count = left.get(value) ?? 0;
+    if (count > 0) left.set(value, count - 1);
+    else removed.push(value);
+  }
+  return removed;
+}
+
+/**
+ * This function wraps a bulk removal (removeAll, retainAll, removeRange) of the collection below.
+ * The base does the removal with its own equality, and `report` gets the contents before and after it.
+ */
+function bulkRemoval<T>(
+  target: { readonly size: number; toArray(): T[] },
+  method: Function,
+  report: (before: T[], after: T[]) => void,
+): (...args: unknown[]) => unknown {
+  return function (...args: unknown[]): unknown {
+    const before = target.toArray();
+    const result = method.apply(target, args);
+    if (target.size !== before.length) report(before, target.toArray());
+    return result;
+  };
+}
+
+/**
+ * This function adds each element with `add` of the layer, one after the other.
+ * Thus each element gives its own event, with the rules of a single add. It gives true when one element goes in.
+ */
+function addEach<T>(elements: Iterable<T>, add: (element: T) => boolean): boolean {
+  let changed = false;
+  for (const element of Array.from(elements)) {
+    if (add(element)) changed = true;
+  }
+  return changed;
+}
 
 // ============================================================================
 // Event type definitions
@@ -79,6 +136,8 @@ export interface QueueEvents<T> {
   enqueue: { value: T };
   /** Element was removed from queue. A removal by a layer below (a drop) has a `reason`. */
   dequeue: { value: T; reason?: RemovalReason };
+  /** An element left from a place that is not the head: `remove`, `removeAll` or `retainAll`. */
+  remove: { value: T };
   /** Collection was cleared */
   clear: {};
 }
@@ -95,6 +154,8 @@ export interface DequeEvents<T> {
   removeFirst: { value: T; reason?: RemovalReason };
   /** Element was removed from back. A removal by a layer below (a drop) has a `reason`. */
   removeLast: { value: T; reason?: RemovalReason };
+  /** An element left from `index`, not with a method of an end: `remove`, `removeAll` or `retainAll`. */
+  remove: { value: T; index: number };
   /** Collection was cleared */
   clear: {};
 }
@@ -234,6 +295,46 @@ export function eventedList<T>(): Middleware<
                 emitter.emit("clear", {});
               };
 
+            // The base writes a bulk change into its storage, and does not call its own add or remove (C24)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => {
+                  const size = target.size;
+                  const all = heard.all;
+                  (receiver as List<T>).add(element);
+                  return added(target.size, size, heard, all);
+                });
+              };
+
+            case "insertAll":
+              return function (index: number, elements: Iterable<T>): boolean {
+                let at = index;
+                return addEach(elements, (element) => {
+                  const size = target.size;
+                  const all = heard.all;
+                  const first = heard.first;
+                  (receiver as List<T>).insert(at, element);
+                  const wentIn = added(target.size, size, heard, all);
+                  // A drop of the first element below moved the place one lower. The next element goes after a new one.
+                  at = Math.min(target.size, Math.max(0, at - (heard.first - first)) + (wentIn ? 1 : 0));
+                  return wentIn;
+                });
+              };
+
+            case "removeAll":
+            case "retainAll":
+            case "removeRange":
+              return bulkRemoval<T>(target, value as Function, (before, after) => {
+                const removed = removalsInOrder(before, after);
+                if (removed) {
+                  for (const removal of removed) emitter.emit("remove", removal);
+                  return;
+                }
+                // A base that changed the order of the rest: a clear and the adds give the same contents
+                emitter.emit("clear", {});
+                after.forEach((element, at) => emitter.emit("add", { value: element, index: at }));
+              });
+
             case "sort":
               return function (...args: any[]): void {
                 (value as Function).apply(target, args);
@@ -300,11 +401,32 @@ export function eventedQueue<T>(): Middleware<
                 return removed;
               };
 
+            case "pollOrUndefined":
+              return function (): T | undefined {
+                const size = target.size;
+                const removed = (value as Function).call(target);
+                if (target.size < size) emitter.emit("dequeue", { value: removed });
+                return removed;
+              };
+
             case "clear":
               return function (): void {
                 (value as Function).call(target);
                 emitter.emit("clear", {});
               };
+
+            // The base writes a bulk change into its storage, and does not call its own add or remove (C24)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => (receiver as Queue<T>).add(element) !== false);
+              };
+
+            case "remove":
+            case "removeAll":
+            case "retainAll":
+              return bulkRemoval<T>(target, value as Function, (before, after) => {
+                for (const removed of removedValues(before, after)) emitter.emit("remove", { value: removed });
+              });
           }
         }
 
@@ -385,11 +507,44 @@ export function eventedDeque<T>(): Middleware<
                 return removed;
               };
 
+            case "pollOrUndefined":
+              return function (): T | undefined {
+                const size = target.size;
+                const removed = (value as Function).call(target);
+                if (target.size < size) emitter.emit("removeFirst", { value: removed });
+                return removed;
+              };
+
             case "clear":
               return function (): void {
                 (value as Function).call(target);
                 emitter.emit("clear", {});
               };
+
+            // The base writes a bulk change into its storage, and does not call its own add or remove (C24)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                return addEach(elements, (element) => {
+                  const size = target.size;
+                  const all = heard.all;
+                  (receiver as Deque<T>).addLast(element);
+                  return added(target.size, size, heard, all);
+                });
+              };
+
+            case "remove":
+            case "removeAll":
+            case "retainAll":
+              return bulkRemoval<T>(target, value as Function, (before, after) => {
+                const removed = removalsInOrder(before, after);
+                if (removed) {
+                  for (const removal of removed) emitter.emit("remove", removal);
+                  return;
+                }
+                // A base that changed the order of the rest: a clear and the adds give the same contents
+                emitter.emit("clear", {});
+                for (const element of after) emitter.emit("addLast", { value: element });
+              });
           }
         }
 
@@ -425,6 +580,13 @@ export function eventedMap<K, V>(): Middleware<
           return emitter.on.bind(emitter);
         }
 
+        // Composite methods (computeIfAbsent, compute, merge, putAll and others) go through this
+        // proxy's own set and delete, so each change gives its event (C24). The base calls its own set.
+        const composite = compositeMapMethod(receiver as MapLike<K, V>, prop);
+        if (composite) {
+          return composite;
+        }
+
         const value = Reflect.get(target, prop, receiver);
 
         if (typeof value === "function") {
@@ -458,6 +620,15 @@ export function eventedMap<K, V>(): Middleware<
                   emitter.emit("delete", { key, value: deletedValue });
                 }
                 return deletedValue;
+              };
+
+            // The first or last entry of a navigable map (treeMap)
+            case "pollFirstEntry":
+            case "pollLastEntry":
+              return function (): Entry<K, V> | undefined {
+                const entry: Entry<K, V> | undefined = (value as Function).call(target);
+                if (entry !== undefined) emitter.emit("delete", { key: entry.key, value: entry.value });
+                return entry;
               };
 
             case "clear":
@@ -523,6 +694,32 @@ export function evented<T>(): Middleware<
               return function (): void {
                 (value as Function).call(target);
                 emitter.emit("clear", {});
+              };
+
+            // The base writes a bulk change into its storage, and does not call its own add or remove (C24)
+            case "addAll":
+              return function (elements: Iterable<T>): boolean {
+                let changed = false;
+                for (const element of Array.from(elements)) {
+                  if ((receiver as Collection<T>).add(element)) changed = true;
+                }
+                return changed;
+              };
+
+            case "removeAll":
+            case "retainAll":
+              return bulkRemoval<T>(target, value as Function, (before, after) => {
+                for (const removed of removedValues(before, after)) emitter.emit("remove", { value: removed });
+              });
+
+            // The first or last element of a sorted set (treeSet)
+            case "pollFirst":
+            case "pollLast":
+              return function (): T | undefined {
+                const size = target.size;
+                const removed = (value as Function).call(target);
+                if (target.size < size) emitter.emit("remove", { value: removed });
+                return removed;
               };
           }
         }

@@ -71,7 +71,38 @@ assert.deepEqual(log, [
 assert.deepEqual(steps.toArray(), ["test", "release"]);
 ```
 
-`eventedQueue` gives `enqueue`, `dequeue` and `clear`. `eventedDeque` gives an event for each end: `addFirst`, `addLast`, `removeFirst` and `removeLast`.
+`eventedQueue` gives `enqueue`, `dequeue` and `clear`. `eventedDeque` gives an event for each end: `addFirst`, `addLast`, `removeFirst` and `removeLast`. A removal from the middle of a queue or a deque gives `remove`.
+
+## Events of a bulk change
+
+A bulk change gives one event for each element that it adds or removes. Thus a replay of the events gives the contents. The bulk changes are `addAll`, `insertAll`, `removeAll`, `retainAll` and `removeRange`. On a map, they are `putAll`, `merge` and the compute methods.
+
+```ts
+import assert from "node:assert/strict";
+import { arrayList, compose, eventedList, eventedMap, hashMap } from "@mark1russell7/collections";
+
+const tags = compose(eventedList<string>())(arrayList<string>());
+const log: string[] = [];
+tags.on("add", ({ value }) => log.push(`add ${value}`));
+tags.on("remove", ({ value, index }) => log.push(`remove ${value} at ${index}`));
+
+tags.addAll(["a", "b", "c", "d"]);
+tags.removeAll(["b", "d"]);
+assert.deepEqual(log, ["add a", "add b", "add c", "add d", "remove b at 1", "remove d at 2"]);
+
+const counts = compose(eventedMap<string, number>())(hashMap<string, number>());
+const changes: string[] = [];
+counts.on("set", ({ key, value }) => changes.push(`${key} = ${value}`));
+
+counts.merge("tea", 1, (total, one) => total + one);
+counts.merge("tea", 1, (total, one) => total + one);
+counts.computeIfAbsent("cake", () => 0);
+assert.deepEqual(changes, ["tea = 1", "tea = 2", "cake = 0"]);
+```
+
+The index of each `remove` is the place of the element at the time of the event. Thus a replay removes the elements in the order of the events.
+
+The layer adds the elements of `addAll` and `insertAll` one at a time, with the rules of a single add. A layer below, for example `bounded`, can drop or refuse each element. A bulk removal reads the contents before and after the change, so its time grows with the size of the collection.
 
 ## LRU: evict the entry with no use for the longest time
 

@@ -195,3 +195,28 @@ assert.deepEqual(events, ["start a", "end a"]);
 assert.ok(result.results.get("a")!.logs.includes("onNodeComplete threw: the listener broke"));
 assert.equal(result.results.get("b")!.skipped, true);
 ```
+
+## A text of the levels: visualizeDAG
+
+`visualizeDAG` gives a text of the levels, for a log or a test. Each line has a node and its dependencies. A node with no dependencies is a leaf.
+
+```ts
+import assert from "node:assert/strict";
+import { buildLeveledDAG, buildNodeMap, createNode, visualizeDAG } from "@mark1russell7/collections/dag";
+
+const dag = buildLeveledDAG(buildNodeMap([
+  createNode("app", ["lib", "util"]),
+  createNode("lib", ["util"]),
+  createNode("util"),
+]));
+
+assert.equal(visualizeDAG(dag), [
+  "DAG Structure:",
+  "  Level 0:",
+  "    - util (leaf)",
+  "  Level 1:",
+  "    - lib -> [util]",
+  "  Level 2:",
+  "    - app -> [lib, util]",
+].join("\n"));
+```

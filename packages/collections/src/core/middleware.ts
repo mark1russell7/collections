@@ -191,8 +191,8 @@ export const delegate = <C extends object, T extends C>(
       if (prop in wrapper) {
         return Reflect.get(wrapper, prop, receiver);
       }
-      // Otherwise delegate to target
-      const value = Reflect.get(t, prop, receiver);
+      // Otherwise delegate to target. A getter runs on the target, as a method does.
+      const value = Reflect.get(t, prop, t);
       // Bind methods to maintain correct 'this' context
       if (typeof value === "function") {
         return value.bind(t);

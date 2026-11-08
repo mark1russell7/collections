@@ -175,6 +175,31 @@ events.emit("full", { size: 4 });
 assert.deepEqual(sizes, [3]);
 ```
 
+`StorageListeners` keeps the listeners of one kind of event. `emit` gives the event to each listener, in the order of `add`. The error of a listener goes to a handler, and the other listeners get the event.
+
+```ts
+import assert from "node:assert/strict";
+import { StorageListeners } from "@mark1russell7/collections";
+
+const errors: unknown[] = [];
+const listeners = new StorageListeners<string>((error) => errors.push(error));
+const seen: string[] = [];
+listeners.add(() => {
+  throw new Error("broken");
+});
+const stop = listeners.add((event) => seen.push(event));
+
+listeners.emit("tea");
+stop();
+listeners.emit("bun");
+
+assert.deepEqual(seen, ["tea"]);
+assert.equal(errors.length, 2);
+assert.equal(listeners.size, 1);
+```
+
+The default handler is `reportListenerError`. It throws the error again in a microtask, as an `EventTarget` does. Thus the error is not lost, and the write that gave the event does not fail.
+
 ## The rules of a layer
 
 - A layer gives each member of the collection below that it does not change. A proxy does this with `Reflect.get`.

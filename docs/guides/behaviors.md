@@ -204,6 +204,21 @@ assert.equal(list.add(1), true);
 assert.equal(list.size, 1);
 ```
 
+`synchronizedList`, `synchronizedMap`, `synchronizedCollection` and `synchronizedSet` are other names of `synchronized`. They help code that comes from the Java collections.
+
+```ts
+import assert from "node:assert/strict";
+import { compose, hashMap, synchronized, synchronizedCollection, synchronizedList, synchronizedMap, synchronizedSet } from "@mark1russell7/collections";
+
+for (const name of [synchronizedList, synchronizedMap, synchronizedCollection, synchronizedSet]) {
+  assert.equal(name, synchronized);
+}
+
+const prices = compose(synchronizedMap())(hashMap<string, number>());
+prices.set("tea", 3);
+assert.equal(prices.get("tea"), 3);
+```
+
 ## Locks: readWriteLock
 
 `readWriteLock()` lets many reads run at the same time, and gives a write the object for itself. A write waits until the current reads end. A read waits until each write that waits or operates ends.
@@ -247,6 +262,22 @@ const read: unknown = list.get(0);
 assert.ok(read instanceof Promise);
 assert.equal(await read, 5);
 assert.equal(list.size, 1);
+```
+
+A loop with `for of` reads the object at once, with no lock. The methods `keys`, `values`, `entries` and `descendingIterator` give a promise of a copy. The lock reads the copy, so a write after the read does not change it.
+
+```ts
+import assert from "node:assert/strict";
+import { arrayList, compose, hashMap, readWriteLock } from "@mark1russell7/collections";
+
+const list = compose(readWriteLock())(arrayList([1, 2, 3]));
+assert.deepEqual([...list], [1, 2, 3]);
+
+const map = compose(readWriteLock())(hashMap<string, number>());
+await map.set("a", 1);
+const keys = await map.keys();
+await map.set("b", 2);
+assert.deepEqual([...keys], ["a"]);
 ```
 
 ## Known defects

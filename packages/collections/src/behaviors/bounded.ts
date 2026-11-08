@@ -28,6 +28,8 @@ import type {
   OverflowContext,
 } from "../core/policies.js";
 import { hasMembers } from "./members.js";
+import type { Clock } from "@mark1russell7/algebra/clock";
+import { systemClock } from "../core/system-clock.js";
 
 /**
  * Options for bounded behavior.
@@ -49,6 +51,12 @@ export interface BoundedOptions<T> {
    * The behavior calls this function before it applies the policy.
    */
   onOverflow?: OverflowHandler<T>;
+
+  /**
+   * The clock of the `timestamp` of `onOverflow`. A test gives `fakeClock()` of `@mark1russell7/algebra/clock`.
+   * The default clock reads `Date.now()`.
+   */
+  clock?: Clock;
 }
 
 /**
@@ -158,6 +166,7 @@ function boundedElements<C extends Collection<T>, T>(
   options: BoundedOptions<T>
 ): Middleware<C, C & BoundedCollection> {
   const { policy = "throw", onOverflow } = options;
+  const clock = options.clock ?? systemClock;
 
   return (next: C): C & BoundedCollection => {
     const source = removalSource<ElementRemoval<T>>(next);
@@ -167,7 +176,7 @@ function boundedElements<C extends Collection<T>, T>(
           newElement: element,
           currentSize: next.size,
           capacity,
-          timestamp: Date.now(),
+          timestamp: clock.now(),
         };
         onOverflow(context);
       }
@@ -285,6 +294,7 @@ export function boundedMap<K, V>(
   }
 ): Middleware<MapLike<K, V>, MapLike<K, V> & BoundedCollection> {
   const { policy = "throw", onOverflow } = options;
+  const clock = options.clock ?? systemClock;
   const capacity = checkCapacity(options.capacity, "boundedMap");
 
   return (next: MapLike<K, V>): MapLike<K, V> & BoundedCollection => {
@@ -301,7 +311,7 @@ export function boundedMap<K, V>(
           value,
           currentSize: next.size,
           capacity,
-          timestamp: Date.now(),
+          timestamp: clock.now(),
         });
       }
 

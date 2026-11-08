@@ -103,6 +103,7 @@ Each guide has examples, and a test runs each example:
 - [Lists](https://github.com/mark1russell7/collections/blob/main/docs/guides/lists.md): `arrayList` and `linkedList`
 - [Maps and sets](https://github.com/mark1russell7/collections/blob/main/docs/guides/maps-and-sets.md): hash maps, tree maps, linked maps, and their sets
 - [Queues](https://github.com/mark1russell7/collections/blob/main/docs/guides/queues.md): `arrayDeque` and `priorityQueue`
+- [Equality, hashes and order](https://github.com/mark1russell7/collections/blob/main/docs/guides/equality-and-order.md): `deepEq`, `defaultHash`, the comparators and their rules
 - [Async queues and tasks](https://github.com/mark1russell7/collections/blob/main/docs/guides/async.md): `asyncQueue`, `semaphore` and `asSettled`
 - [Dependency graphs](https://github.com/mark1russell7/collections/blob/main/docs/guides/dag.md): levels, the topological order, and a run with `executeDAG`
 - [Graph orders](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md): `hubBreadthFirstOrder`

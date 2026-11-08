@@ -49,88 +49,6 @@ export type Hash<T> = (value: T) => number;
 export type Compare<T> = (a: T, b: T) => number;
 
 /**
- * Capability: Has a size property.
- */
-export interface Sized {
-  /** The number of elements in the collection. */
-  readonly size: number;
-}
-
-/**
- * Capability: Can be cleared (all elements removed).
- */
-export interface Clearable {
-  /** This method removes all elements from the collection. */
-  clear(): void;
-}
-
-/**
- * Capability: Can check if empty.
- */
-export interface Emptiable {
-  /** This value gives true if the collection contains no elements. */
-  readonly isEmpty: boolean;
-}
-
-/**
- * Capability: Can be cloned.
- */
-export interface Cloneable<T> {
-  /** This method makes a shallow copy of the collection. */
-  clone(): T;
-}
-
-/**
- * Capability: Can be converted to an array.
- */
-export interface ArrayConvertible<T> {
-  /** This method gives an array containing all elements in the collection. */
-  toArray(): T[];
-}
-
-/**
- * Base read-only collection capabilities.
- * This type combines common traits that most collections share.
- */
-export interface ReadonlyCollectionBase<T>
-  extends Sized,
-    Emptiable,
-    Iterable<T>,
-    ArrayConvertible<T> {}
-
-/**
- * Base mutable collection capabilities.
- * This type adds mutation operations to readonly base.
- */
-export interface MutableCollectionBase<T>
-  extends ReadonlyCollectionBase<T>,
-    Clearable {}
-
-/**
- * Equality provider - with it, collections can specify custom equality.
- */
-export interface EqualityProvider<T> {
-  /** The equality function used by this collection. */
-  readonly eq: Eq<T>;
-}
-
-/**
- * Hash provider - with it, collections can specify custom hashing.
- */
-export interface HashProvider<T> {
-  /** The hash function used by this collection. */
-  readonly hash: Hash<T>;
-}
-
-/**
- * Comparison provider - with it, collections can specify custom ordering.
- */
-export interface ComparisonProvider<T> {
-  /** The comparison function used by this collection. */
-  readonly compare: Compare<T>;
-}
-
-/**
  * Bounded collection - has a maximum capacity.
  */
 export interface Bounded {
@@ -142,23 +60,4 @@ export interface Bounded {
 
   /** This value gives the number of elements that the collection can still take. */
   readonly remainingCapacity: number;
-}
-
-/**
- * Disposable resource - can be explicitly cleaned up.
- */
-export interface Disposable {
-  /** This method releases any resources held by this collection. */
-  dispose(): void;
-}
-
-/**
- * Freezable collection - can be made immutable.
- */
-export interface Freezable<T> {
-  /** This method makes this collection immutable. This method gives self for chaining. */
-  freeze(): T;
-
-  /** This value gives true if this collection is frozen. */
-  readonly isFrozen: boolean;
 }

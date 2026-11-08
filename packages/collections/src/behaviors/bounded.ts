@@ -27,6 +27,7 @@ import type {
   OverflowHandler,
   OverflowContext,
 } from "../core/policies.js";
+import { hasMembers } from "./members.js";
 
 /**
  * Options for bounded behavior.
@@ -203,6 +204,7 @@ function boundedElements<C extends Collection<T>, T>(
       Number.isInteger(index) && (index as number) >= 0 && (index as number) <= next.size;
 
     return new Proxy(next, {
+      has: hasMembers(removals, "capacity", "isFull", "remainingCapacity"),
       get(target, prop, receiver) {
         if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;
@@ -332,6 +334,7 @@ export function boundedMap<K, V>(
     };
 
     return new Proxy(next, {
+      has: hasMembers(removals, "capacity", "isFull", "remainingCapacity"),
       get(target, prop, receiver) {
         if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;

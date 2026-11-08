@@ -4,9 +4,9 @@ A factory makes a collection from a list of values. The factories are in the roo
 
 | Factory | Result | Writes |
 | --- | --- | --- |
-| `listOf`, `mutableListOf`, `toList` | an `arrayList` | yes |
+| `listOf` | an `arrayList` | yes |
 | `queueOf` | an `arrayDeque` | yes |
-| `mapOf`, `mutableMapOf` | a `hashMap` | yes |
+| `mapOf` | a `hashMap` | yes |
 | `immutableListOf`, `immutableMapOf` | a readonly list or map | no |
 | `emptyList`, `emptyQueue`, `emptyMap` | one readonly empty collection | no |
 | `singletonList`, `singletonMap`, `nCopies` | a readonly list or map | no |
@@ -37,7 +37,7 @@ assert.equal(fixed.get(0), 1);
 assert.throws(() => fixed.add(4), /readonly/);
 ```
 
-`mutableListOf` and `mutableMapOf` are the same functions as `listOf` and `mapOf`. Their names tell the reader that the code changes the result.
+To make a list from an iterable, give the iterable to `arrayList`. Version 0.10.0 removes `mutableListOf`, `mutableMapOf` and `toList`, the second names of `listOf`, `mapOf` and `arrayList`.
 
 ## Empty collections, one value and copies
 
@@ -60,15 +60,22 @@ assert.deepEqual(nCopies(3, 0).toArray(), [0, 0, 0]);
 
 ## Ranges of numbers
 
-`range(start, end, step)` gives the numbers from `start` up to `end`, and `end` is not in the list. The default `step` is 1. A negative `step` counts down. A `step` of 0 throws an error. `rangeTo(n)` is `range(0, n)`.
+`range(start, end, step)` gives the numbers from `start` up to `end`, and `end` is not in the list. The default `step` is 1. A negative `step` counts down. `rangeTo(n)` is `range(0, n)`.
+
+The number at index `i` is `start + i * step`. Each number comes from `start` and its index, so the error of a fraction does not grow along the list. `range(0, 1, 0.1)` gives 10 numbers.
+
+`range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a `step` of 0. It also throws for a list that is longer than an array. `nCopies(n, value)` throws a `RangeError` when `n` is not a safe integer of 0 or more.
 
 ```ts
 import assert from "node:assert/strict";
-import { range, rangeTo } from "@mark1russell7/collections";
+import { nCopies, range, rangeTo } from "@mark1russell7/collections";
 
 assert.deepEqual(rangeTo(5).toArray(), [0, 1, 2, 3, 4]);
 assert.deepEqual(range(10, 0, -3).toArray(), [10, 7, 4, 1]);
-assert.throws(() => range(0, 5, 0), /step/);
+assert.equal(range(0, 1, 0.1).size, 10);
+assert.throws(() => range(0, 5, 0), RangeError);
+assert.throws(() => range(0, Infinity), RangeError);
+assert.throws(() => nCopies(2.5, "x"), RangeError);
 ```
 
 ## Builders, maps by key and groups
@@ -77,7 +84,7 @@ assert.throws(() => range(0, 5, 0), /step/);
 
 ```ts
 import assert from "node:assert/strict";
-import { buildList, groupBy, rangeTo, toList, toMap } from "@mark1russell7/collections";
+import { arrayList, buildList, groupBy, rangeTo, toMap } from "@mark1russell7/collections";
 
 const users = [
   { id: 1, team: "core", name: "Ada" },
@@ -108,7 +115,7 @@ const evens = buildList<number>((list) => {
 });
 assert.deepEqual(evens.toArray(), [0, 2, 4]);
 
-assert.deepEqual(toList(new Set([3, 1])).toArray(), [3, 1]);
+assert.deepEqual(arrayList(new Set([3, 1])).toArray(), [3, 1]);
 ```
 
 For two values with the same key, `toMap` keeps the last value, and gives no error.
@@ -124,10 +131,10 @@ assert.equal(byLetter.get("a"), "avocado");
 
 The root name `toList` is the factory of this guide. The collector with the same name has the root name `collectToList`. The guide of the iterables tells the names of the root.
 
-## Known defects
+## Defects that version 0.10.0 corrects
 
-The reading for this guide found three defects of `range` and `nCopies`. Roadmap row C40 has them.
+The reading for this guide found three defects of `range` and `nCopies` (roadmap row C40). Version 0.10.0 corrects them.
 
-- `range` adds `step` to the last number at each step, so the error of a fraction grows. `range(0, 1, 0.1)` gives 11 numbers, and the last number is `0.9999999999999999`.
-- `range(0, Infinity)` and `nCopies(Infinity, value)` do not stop. They add values until the memory is full.
-- `nCopies` does not examine that `n` is an integer. `nCopies(2.5, value)` gives 3 copies, and `nCopies(NaN, value)` gives an empty list with no error.
+- `range` added `step` to the last number at each step, so the error of a fraction grew. `range(0, 1, 0.1)` gave 11 numbers, and the last number was `0.9999999999999999`.
+- `range(0, Infinity)` and `nCopies(Infinity, value)` did not stop. They added values until the memory was full.
+- `nCopies` did not examine that `n` is an integer. `nCopies(2.5, value)` gave 3 copies, and `nCopies(NaN, value)` gave an empty list with no error.

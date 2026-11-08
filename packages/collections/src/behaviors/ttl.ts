@@ -18,6 +18,7 @@ import type { Entry, MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
 import type { Collection } from "../interfaces/collection.js";
+import { hasMembers } from "./members.js";
 
 /**
  * This function starts the background expiration checker, and it does not keep a Node.js process alive.
@@ -107,6 +108,7 @@ export function ttlMap<K, V>(
     };
 
     return new Proxy(next, {
+      has: hasMembers("dispose", removals),
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
@@ -252,6 +254,7 @@ export function ttlCollection<T>(
     };
 
     return new Proxy(next, {
+      has: hasMembers("dispose", removals),
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;

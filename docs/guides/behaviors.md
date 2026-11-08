@@ -52,7 +52,7 @@ To give a value that does not change, copy it first: `compose(readonly())(arrayL
 
 ## Readonly: a sublist and a submap are readonly too
 
-A method that gives a view gives a readonly result. Examples are `subList`, `subMap` and `descendingMap`.
+A method that gives a part of the collection gives a readonly result. Examples are `subList`, `subMap` and `descendingMap`.
 
 ```ts
 import assert from "node:assert/strict";
@@ -253,5 +253,5 @@ assert.equal(list.size, 1);
 
 The examples of this guide found two defects. This guide does not show the functions until each defect has a fix:
 
-- `reentrantSynchronized` is not reentrant. A call from inside a locked method waits for the lock of the outer call, so the two calls do not end.
+- `reentrantSynchronized` was not reentrant. A call from inside a locked method waited for the lock of the outer call, so the two calls did not end. Version 0.10.0 removes it.
 - The generic `safe()` gives the collection with no change, and adds no property `safe`. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.

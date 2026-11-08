@@ -9,7 +9,6 @@
         "src/api-review.test.ts": "it reads docs/API-REVIEW.md at the repository root, which is not in the copy of Stryker",
         "src/contracts/docs.test.ts": "it reads the guides at the repository root, and its examples import the source outside the copy",
         "src/contracts/bundle-weight.test.ts": "it measures the bytes of the source, and Stryker adds code to each mutated file",
-        "src/async/channels-deprecation.test.ts": "it reads the doc comments of channels.ts as text, which Stryker changes",
         "src/core/layers-entry.test.ts": "it reads layers.ts as text, and Stryker adds code at the top level of a mutated file"
       },
       "parts": {

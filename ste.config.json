@@ -21,6 +21,7 @@
     "**/*.spec.ts",
     "**/*.spec.tsx"
   ],
+  "rules": { "doc-subject": "error" },
   "technicalNouns": [],
   "technicalVerbs": ["peek", "pop", "dequeue", "compact"],
   "properNouns": [

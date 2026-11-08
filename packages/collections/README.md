@@ -109,6 +109,7 @@ Each guide has examples, and a test runs each example:
 - [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
 - [Iterables and collectors](https://github.com/mark1russell7/collections/blob/main/docs/guides/iterables.md): lazy functions, reducers, collectors and the names of the root
 - [Rank keys](https://github.com/mark1russell7/collections/blob/main/docs/guides/rank-keys.md): the keys of a list that a user can reorder, and the writes of a move
+- [Summary trees](https://github.com/mark1russell7/collections/blob/main/docs/guides/summary-tree.md): the spec, a search by a summary, positions in a text, the edits and `merge`
 
 ## Contract checks
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package",
   "name": "@mark1russell7/collections",
-  "version": "0.9.6",
-  "description": "Collections with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.",
+  "version": "0.10.0",
+  "description": "Collections with no dependencies: lists, maps, queues, a summary tree, async queues, lazy operations and dependency graphs.",
   "keywords": [
     "collections",
     "data-structures",
@@ -10,7 +10,6 @@
     "priority-queue",
     "lru",
     "summary-tree",
-    "channels",
     "dag",
     "topological-sort",
     "typescript"

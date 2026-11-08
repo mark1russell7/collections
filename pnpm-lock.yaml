@@ -211,6 +211,9 @@ importers:
 
   packages/collections:
     dependencies:
+      '@mark1russell7/algebra':
+        specifier: ^0.8.3
+        version: 0.8.3(zod@4.6.7)
       '@mark1russell7/optional':
         specifier: ^1.2.0
         version: 1.2.0
@@ -831,6 +834,15 @@ packages:
   '@loaderkit/resolve@1.0.6':
     resolution: {integrity: sha512-G8FdIoF5CypfwmD9rl8BXod5HDn8JqB0CCNBXDTaRZ+yRYhARrrSToX1zg1zy9jX3zLqigsELwhT4gNtkdQAUg==}
 
+  '@mark1russell7/algebra@0.8.3':
+    resolution: {integrity: sha512-Z0saYxCDcqZu1leABWqksrIa9y9dbeTjR5l36ZRBqsDW6XfUcM4mWoE90YgzSW86YFP+dcV8y+WCKu8446e/ng==}
+    engines: {node: '>=22.19'}
+    peerDependencies:
+      zod: ^4.1.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
   '@mark1russell7/api-report@0.4.1':
     resolution: {integrity: sha512-kx3vmIdzwGJf+aZ66qoYWm65IlrEzrbSXckAQed0I+fxs6+wFygVoum6ZVBeKdz05rHHLD9kiarwQQcI5LhsDQ==}
     engines: {node: '>=22'}
@@ -861,6 +873,19 @@ packages:
   '@mark1russell7/optional@1.2.0':
     resolution: {integrity: sha512-vS5jF21WC/VApRv4p8afRZahcMl9cuNp03LxbVngY9nYkzq+S7Oit6ksySt2baML+tp46UF60sxnHxn1jlwtTg==}
     engines: {node: '>=22.12'}
+
+  '@mark1russell7/quantity@0.3.0':
+    resolution: {integrity: sha512-psfyKmVrOz5ynHgr2ED7WM5Pa/XVy6DR28jCaSGY42gvV0CJEq7HJRpV6sgkvWx8s3Et7evJWR56aG5tjCHZIw==}
+    engines: {node: '>=22.19'}
+    peerDependencies:
+      zod: ^4.1.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
+  '@mark1russell7/rational@0.1.2':
+    resolution: {integrity: sha512-hn2C5jjOFCGKJqFQPHt57C/Cn1l9Lb9MltVNtL71KSu+nRrfPOmg8ujYB5n3oDFFWNdNA4bE/8LLT4tG3lmrGA==}
+    engines: {node: '>=22'}
 
   '@mark1russell7/rigor-bench@0.2.23':
     resolution: {integrity: sha512-/zuSClxNKIwZ1RFy+9giLK0kIpvNNkrD184EP6onk/4vYRJXKV8pB4+EPpuZOvRuND2lTVY3PUFnm+Amvf9BBw==}
@@ -2834,6 +2859,12 @@ snapshots:
     dependencies:
       '@braidai/lang': 1.1.2
 
+  '@mark1russell7/algebra@0.8.3(zod@4.6.7)':
+    dependencies:
+      '@mark1russell7/quantity': 0.3.0(zod@4.6.7)
+    optionalDependencies:
+      zod: 4.6.7
+
   '@mark1russell7/api-report@0.4.1': {}
 
   '@mark1russell7/boundaries@0.2.0(@swc/core@1.16.21)(dependency-cruiser@18.7.2)':
@@ -2848,6 +2879,14 @@ snapshots:
   '@mark1russell7/cue@2.1.1': {}
 
   '@mark1russell7/optional@1.2.0': {}
+
+  '@mark1russell7/quantity@0.3.0(zod@4.6.7)':
+    dependencies:
+      '@mark1russell7/rational': 0.1.2
+    optionalDependencies:
+      zod: 4.6.7
+
+  '@mark1russell7/rational@0.1.2': {}
 
   '@mark1russell7/rigor-bench@0.2.23(esbuild@0.28.2)':
     dependencies:

@@ -1459,7 +1459,7 @@ export declare class SummaryTree<Leaf, Summary> implements Iterable<Leaf> {
 
 ### build/index.d.ts#TTLCache
 export declare class TTLCache<K, V> {
-  constructor(ttl: number, checkInterval?: number, onExpire?: ((key: K, value: V) => void) | undefined);
+  constructor(ttl: number, checkInterval?: number, onExpire?: ((key: K, value: V) => void) | undefined, clock?: Clock);
   get size(): number;
   get(key: K): V | undefined;
   set(key: K, value: V, customTTL?: number): void;
@@ -1485,6 +1485,7 @@ export interface TTLOptions {
     createdAt: number;
     expiredAt: number;
   }) => void;
+  clock?: Clock;
 }
 
 ### build/index.d.ts#TreeMap
@@ -2091,6 +2092,7 @@ export declare function treeSet<T>(optionsOrElements?: TreeSetOptions<T> | Itera
 export declare function ttlCache<K, V>(ttl: number, options?: {
   checkInterval?: number;
   onExpire?: (key: K, value: V) => void;
+  clock?: Clock;
 }): TTLCache<K, V>;
 
 ### build/index.d.ts#ttlCollection

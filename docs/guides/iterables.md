@@ -65,6 +65,32 @@ assert.deepEqual(toArray(zip(["a", "b", "c"], [1, 2])), [["a", 1], ["b", 2]]);
 assert.deepEqual(toArray(enumerate(["x", "y"])), [[0, "x"], [1, "y"]]);
 ```
 
+## Parts of an iterable: skip, the conditions, flatten and tap
+
+`skip` removes the first values. `takeWhile` gives the values until the first value that fails the condition. `skipWhile` removes the values until that value.
+
+`flatten` gives the values of each inner iterable in order. `flatMap` gives an iterable for each value and its index, and it flattens them. `distinctConsecutive` removes a value with the same key as the value before it. `tap` gives each value and its index to a function, and it does not change the values.
+
+```ts
+import assert from "node:assert/strict";
+import { distinctConsecutive, flatMap, flatten, skip, skipWhile, takeWhile, tap, toArray } from "@mark1russell7/collections";
+
+assert.deepEqual(toArray(skip([1, 2, 3, 4], 2)), [3, 4]);
+assert.deepEqual(toArray(takeWhile([1, 2, 5, 1], (value) => value < 3)), [1, 2]);
+assert.deepEqual(toArray(skipWhile([1, 2, 5, 1], (value) => value < 3)), [5, 1]);
+assert.deepEqual(toArray(flatten([[1, 2], [], [3]])), [1, 2, 3]);
+assert.deepEqual(toArray(flatMap(["ab", "c"], (word, index) => [...word].map((letter) => `${letter}${String(index)}`))), ["a0", "b0", "c1"]);
+assert.deepEqual(toArray(distinctConsecutive([1, 1, 2, 1, 1])), [1, 2, 1]);
+assert.deepEqual(toArray(distinctConsecutive(["a", "A", "b"], (text) => text.toLowerCase())), ["a", "b"]);
+
+const log: string[] = [];
+const values = toArray(tap(["x", "y"], (value, index) => log.push(`${String(index)}:${value}`)));
+assert.deepEqual(values, ["x", "y"]);
+assert.deepEqual(log, ["0:x", "1:y"]);
+```
+
+`takeWhile` reads the first value that fails, and it does not give that value. `skipWhile` gives that value and each value after it, also a value that agrees with the condition.
+
 ## distinct: keys by identity
 
 `distinct` keeps the first value of each key. It keeps the keys in a JavaScript `Set`, so two objects with the same fields are two keys. Give a key function to compare a field.

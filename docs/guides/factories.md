@@ -124,6 +124,39 @@ assert.equal(byLetter.get("a"), "avocado");
 
 The root name `toList` is the factory of this guide. The collector with the same name has the root name `collectToList`. The guide of the iterables tells the names of the root.
 
+## The classes of the factories
+
+Each factory of a collection gives an object of a class of the root. The class has the name of the factory with a capital letter: `treeSet` gives a `TreeSet`. A `new` of the class with options is the same as the factory with these options. Use the class for `instanceof` and for the type of a field.
+
+```ts
+import assert from "node:assert/strict";
+import {
+  ArrayDeque, AsyncQueue, LinkedHashMap, LinkedList, PriorityQueue, TreeMap, TreeSet,
+  arrayDeque, asyncQueue, linkedHashMap, linkedList, priorityQueue, treeMap, treeSet,
+} from "@mark1russell7/collections";
+
+assert.ok(arrayDeque<number>() instanceof ArrayDeque);
+assert.ok(linkedList<number>() instanceof LinkedList);
+assert.ok(linkedHashMap<string, number>() instanceof LinkedHashMap);
+assert.ok(treeMap<string, number>() instanceof TreeMap);
+assert.ok(asyncQueue<number>() instanceof AsyncQueue);
+
+const descending = (a: number, b: number): number => b - a;
+const set = new TreeSet<number>({ compare: descending });
+const same = treeSet<number>({ compare: descending });
+for (const n of [2, 9, 4]) {
+  set.add(n);
+  same.add(n);
+}
+assert.deepEqual([...set], [9, 4, 2]);
+assert.deepEqual([...same], [...set]);
+
+const queue = new PriorityQueue<number>({ compare: descending });
+for (const n of [2, 9, 4]) queue.enqueue(n);
+assert.equal(queue.dequeue(), 9);
+assert.ok(priorityQueue<number>() instanceof PriorityQueue);
+```
+
 ## Known defects
 
 The reading for this guide found three defects of `range` and `nCopies`. Roadmap row C40 has them.

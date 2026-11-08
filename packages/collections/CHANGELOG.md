@@ -30,6 +30,10 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
   - 24 policy types and their default values, with `RetryPolicy` and `DEFAULT_RETRY_POLICY`. Retries have a home: `@mark1russell7/service`;
   - `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` and `KEY_DIGITS`;
   - 14 names of `utils/helpers.ts`, from `checkBounds` to `stringHashCode`. `toArray` stays.
+- The second names of one function (D4). Use the first name:
+  - `unmodifiableList`, `unmodifiableMap` and `unmodifiableCollection`: use `readonlyList`, `readonlyMap` and `readonlyCollection`;
+  - `mutableListOf` and `mutableMapOf`: use `listOf` and `mapOf`;
+  - `toList` of an iterable: use `arrayList(iterable)`. The collector `collectToList` stays.
 - `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
 
 ## 0.9.6

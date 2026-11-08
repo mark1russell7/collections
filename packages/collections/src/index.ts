@@ -209,7 +209,6 @@ export {
   mapOf,
   range,
   rangeTo,
-  toList,
   toMap,
   groupBy,
 } from "./utils/factories.js";

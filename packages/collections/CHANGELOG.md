@@ -15,6 +15,10 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
 - Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
 - `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
 
+### Deprecated
+
+- The options `keyEq` and `keyHash` of `hashMap` (D2). Use `eq` and `hash`, the names that `linkedHashMap` and `hashSet` take. When both are given, `eq` and `hash` win. Version 0.11.0 removes the old names. The member `keyEq` of each map does not change.
+
 ### Removed
 
 - The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.

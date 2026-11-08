@@ -31,7 +31,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `arrayList`, `ArrayList`, `ArrayListOptions`, `arrayDeque`, `ArrayDeque`, `ArrayDequeOptions`, `treeMap`, `TreeMap`, `TreeMapOptions`, `treeSet`, `TreeSet`, `TreeSetOptions`, `linkedList`, `LinkedList`, `LinkedListOptions`, `priorityQueue`, `PriorityQueue`, `PriorityQueueOptions` | keep | The contracts of C10 test each implementation against a model. |
-| `hashMap`, `HashMap`, `HashMapOptions`, `linkedHashMap`, `LinkedHashMap`, `LinkedHashMapOptions`, `hashSet`, `HashSet`, `HashSetOptions` | change | `HashMapOptions` has `keyEq` and `keyHash`. The other two have `eq` and `hash`. Decision D2 picks one set. |
+| `hashMap`, `HashMap`, `HashMapOptions`, `linkedHashMap`, `LinkedHashMap`, `LinkedHashMapOptions`, `hashSet`, `HashSet`, `HashSetOptions` | change | `HashMapOptions` had `keyEq` and `keyHash`. The other two have `eq` and `hash`. Decision D2 picks one set. Version 0.10.0 gives `hashMap` the names `eq` and `hash`, and version 0.11.0 removes the old names. |
 | `SummaryTree`, `summaryTree`, `SummaryLocation`, `SummaryMonoid`, `SummarySearch`, `SummarySpec` | keep | typeset uses the summary tree for line breaking. |
 
 ### The interfaces
@@ -169,7 +169,7 @@ Version 0.9.3 adds the entry `./summary-tree` and two types of the root entry.
 Each decision changes the API. Before 1.0, a change of the API raises the MINOR version.
 
 - **D1. `subList`: a copy or a view.** The code gives a copy, and since C13 the doc tells a copy. A view follows the changes of its list, as in Java. A copy is simpler and safe. The recommendation is a copy.
-- **D2. One set of option names.** `hashMap` takes `keyEq` and `keyHash`. `linkedHashMap` and `hashSet` take `eq` and `hash`. The recommendation is `eq` and `hash` for each one, with the old names for one MINOR version.
+- **D2. One set of option names.** `hashMap` takes `keyEq` and `keyHash`. `linkedHashMap` and `hashSet` take `eq` and `hash`. The recommendation is `eq` and `hash` for each one, with the old names for one MINOR version. Version 0.10.0 does this. The old names have `@deprecated`, and `eq` and `hash` win when both are given.
 - **D3. The 70 removals.** Remove the names with the verdict "remove" in one MINOR version. `@procedures/collections` then removes the same names when it updates. The review first had 75. The guide to write a layer then used five tools of the middleware, so they stay. Version 0.10.0 removes the 70 names. C28 removes `reentrantSynchronized`, the 71st name with the verdict "remove". The code of `KEY_DIGITS` stays inside `rank.ts`.
 - **D4. One name for each function.** Remove the aliases `unmodifiableList`, `unmodifiableMap`, `unmodifiableCollection`, `mutableListOf` and `mutableMapOf`. Three functions make a list from an iterable: `toList`, `collectToList` and `toArray`. Keep one of them.
 - **D5. A clock for the TTL behaviors.** `TTLCache` takes a clock as an option. The default is the clock of the system, so the change is backward compatible.

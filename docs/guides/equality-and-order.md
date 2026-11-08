@@ -105,11 +105,11 @@ A hash can change in a new version of the package. Do not store a hash.
 
 | Values | The order of `defaultCompare` |
 | --- | --- |
-| `null` and `undefined` | before each other value |
+| `null` and `undefined` | `null`, then `undefined`, before each other value |
 | numbers | by value, with `NaN` first |
 | strings | by `localeCompare` |
 | booleans | `false` before `true` |
-| dates | by time |
+| dates | by time, with invalid dates first |
 | two values of different types | by their text, with `String` |
 
 A comparator for one type gives the same order for its type: `numberCompare`, `stringCompare`, `stringCompareIgnoreCase`, `booleanCompare` and `dateCompare`.
@@ -175,18 +175,17 @@ assert.deepEqual(["ccc", "a", "bb"].sort(byLength), ["a", "bb", "ccc"]);
 assert.deepEqual([3, null, 1].sort(nullsLast(numberCompare)), [1, 3, null]);
 ```
 
-## Known defects
+## Edge values and values of different types
 
-The reading for this guide found two defects of the comparators. Roadmap row C38 has the fix.
+Each comparator gives a number for each pair of its type, also for edge values. Two equal infinities give 0, and two invalid dates give 0. A sorted collection then holds each of these keys one time.
 
-- `numberCompare` gives `NaN` for two equal infinities. `dateCompare` gives `NaN` for two invalid dates, and `defaultCompare` does too. A `treeMap` or a `treeSet` with such a key then holds the key two times. Then `has` of the map and `contains` of the set give `false`. `defaultCompare` gives 0 for two equal infinities, because it examines `===` first. Thus use `defaultCompare` for keys that can be infinite.
-- `defaultCompare(null, undefined)` and `defaultCompare(undefined, null)` both give -1. Thus the sign does not change with a swap. Do not use `null` and `undefined` as two keys of one sorted collection.
+Do not put values of different types in one sorted collection with `defaultCompare`. For two values of different types, it compares their text. This order is not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. It also gives 0 for `1` and `"1"`, and for two different objects. Roadmap row C39 has this defect.
 
 ```ts
 import assert from "node:assert/strict";
-import { treeSet } from "@mark1russell7/collections";
+import { numberCompare, treeSet } from "@mark1russell7/collections";
 
-const limits = treeSet<number>();
+const limits = treeSet<number>({ compare: numberCompare });
 limits.add(Infinity);
 limits.add(Infinity);
 limits.add(-Infinity);

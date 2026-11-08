@@ -195,8 +195,6 @@ maxBy: build/index.d.ts#maxBy
 merge: build/index.d.ts#merge
 min: build/index.d.ts#min
 minBy: build/index.d.ts#minBy
-mutableListOf: build/index.d.ts#mutableListOf
-mutableMapOf: build/index.d.ts#mutableMapOf
 nCopies: build/index.d.ts#nCopies
 none: build/index.d.ts#none
 nullsFirst: build/index.d.ts#nullsFirst
@@ -260,7 +258,7 @@ thenComparing: build/index.d.ts#thenComparing
 ticker: build/index.d.ts#ticker
 timeout: build/index.d.ts#timeout
 toArray: build/index.d.ts#toArray$1
-toList: build/index.d.ts#toList$1
+toList: build/index.d.ts#toList
 toMap: build/index.d.ts#toMap$2
 toSet: build/index.d.ts#toSet$1
 treeMap: build/index.d.ts#treeMap
@@ -269,9 +267,6 @@ ttlCache: build/index.d.ts#ttlCache
 ttlCollection: build/index.d.ts#ttlCollection
 ttlMap: build/index.d.ts#ttlMap
 unbuffered: build/index.d.ts#unbuffered
-unmodifiableCollection: build/index.d.ts#unmodifiableCollection
-unmodifiableList: build/index.d.ts#unmodifiableList
-unmodifiableMap: build/index.d.ts#unmodifiableMap
 window: build/index.d.ts#window
 workerPool: build/index.d.ts#workerPool
 zip: build/index.d.ts#zip
@@ -1933,12 +1928,6 @@ export declare function min<T>(iterable: Iterable<T>, compare?: (a: T, b: T) => 
 ### build/index.d.ts#minBy
 export declare function minBy<T>(comparator: (a: T, b: T) => number): Collector<T, T | undefined, T | undefined>;
 
-### build/index.d.ts#mutableListOf
-export declare function mutableListOf<T>(...elements: T[]): ArrayList<T>;
-
-### build/index.d.ts#mutableMapOf
-export declare function mutableMapOf<K, V>(...entries: [K, V][]): HashMap<K, V>;
-
 ### build/index.d.ts#nCopies
 export declare function nCopies<T>(n: number, element: T): List<T>;
 
@@ -2142,10 +2131,7 @@ declare function toArray<T>(): Collector<T, T[], T[]>;
 declare function toArray$1<T>(iterable: Iterable<T>): T[];
 
 ### build/index.d.ts#toList
-declare function toList<T>(): Collector<T, ArrayList<T>, ArrayList<T>>;
-
-### build/index.d.ts#toList$1
-declare function toList$1<T>(iterable: Iterable<T>): ArrayList<T>;
+export declare function toList<T>(): Collector<T, ArrayList<T>, ArrayList<T>>;
 
 ### build/index.d.ts#toMap
 declare function toMap<T, K, V>(keyExtractor: (element: T) => K, valueExtractor: (element: T) => V): Collector<T, HashMap<K, V>, HashMap<K, V>>;
@@ -2193,15 +2179,6 @@ export declare function ttlMap<K, V>(options: TTLOptions): Middleware<MapLike<K,
 
 ### build/index.d.ts#unbuffered
 export declare function unbuffered<T>(): Channel<T>;
-
-### build/index.d.ts#unmodifiableCollection
-export declare const unmodifiableCollection: typeof readonlyCollection;
-
-### build/index.d.ts#unmodifiableList
-export declare const unmodifiableList: typeof readonlyList;
-
-### build/index.d.ts#unmodifiableMap
-export declare const unmodifiableMap: typeof readonlyMap;
 
 ### build/index.d.ts#window
 export declare function window<T>(iterable: Iterable<T>, size: number): Generator<T[]>;

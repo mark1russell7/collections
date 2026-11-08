@@ -150,28 +150,6 @@ export function mapOf<K, V>(...entries: [K, V][]): HashMap<K, V> {
 }
 
 // ============================================================================
-// Mutable collection factories
-// ============================================================================
-
-/**
- * This function makes a new mutable ArrayList with optional initial elements.
- *
- * @example
- * const list = mutableListOf(1, 2, 3)
- * list.add(4)
- */
-export function mutableListOf<T>(...elements: T[]): ArrayList<T> {
-  return arrayList(elements);
-}
-
-/**
- * This function makes a new mutable HashMap with optional initial entries.
- */
-export function mutableMapOf<K, V>(...entries: [K, V][]): HashMap<K, V> {
-  return hashMap(entries);
-}
-
-// ============================================================================
 // Immutable collection factories
 // ============================================================================
 
@@ -283,17 +261,6 @@ export function buildMap<K, V>(builder: (map: HashMap<K, V>) => void): HashMap<K
 // ============================================================================
 // Conversion utilities
 // ============================================================================
-
-/**
- * This function converts an iterable to an ArrayList.
- *
- * @example
- * const set = new Set([1, 2, 3])
- * const list = toList(set)
- */
-export function toList<T>(iterable: Iterable<T>): ArrayList<T> {
-  return arrayList(iterable);
-}
 
 /**
  * This function converts an iterable to a HashMap using a key extractor function.

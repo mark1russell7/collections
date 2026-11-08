@@ -249,18 +249,3 @@ export function readonly<C extends object>(
   const errorMessage = options.errorMessage ?? "Cannot modify readonly collection";
   return createReadonly<C>(errorMessage);
 }
-
-/**
- * Alias for Java compatibility: unmodifiableList
- */
-export const unmodifiableList : typeof readonlyList = readonlyList;
-
-/**
- * Alias for Java compatibility: unmodifiableMap
- */
-export const unmodifiableMap : typeof readonlyMap = readonlyMap;
-
-/**
- * Alias for Java compatibility: unmodifiableCollection
- */
-export const unmodifiableCollection : typeof readonlyCollection = readonlyCollection;

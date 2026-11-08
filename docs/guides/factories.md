@@ -4,9 +4,9 @@ A factory makes a collection from a list of values. The factories are in the roo
 
 | Factory | Result | Writes |
 | --- | --- | --- |
-| `listOf`, `mutableListOf`, `toList` | an `arrayList` | yes |
+| `listOf` | an `arrayList` | yes |
 | `queueOf` | an `arrayDeque` | yes |
-| `mapOf`, `mutableMapOf` | a `hashMap` | yes |
+| `mapOf` | a `hashMap` | yes |
 | `immutableListOf`, `immutableMapOf` | a readonly list or map | no |
 | `emptyList`, `emptyQueue`, `emptyMap` | one readonly empty collection | no |
 | `singletonList`, `singletonMap`, `nCopies` | a readonly list or map | no |
@@ -37,7 +37,7 @@ assert.equal(fixed.get(0), 1);
 assert.throws(() => fixed.add(4), /readonly/);
 ```
 
-`mutableListOf` and `mutableMapOf` are the same functions as `listOf` and `mapOf`. Their names tell the reader that the code changes the result.
+To make a list from an iterable, give the iterable to `arrayList`. Version 0.10.0 removes `mutableListOf`, `mutableMapOf` and `toList`, the second names of `listOf`, `mapOf` and `arrayList`.
 
 ## Empty collections, one value and copies
 
@@ -77,7 +77,7 @@ assert.throws(() => range(0, 5, 0), /step/);
 
 ```ts
 import assert from "node:assert/strict";
-import { buildList, groupBy, rangeTo, toList, toMap } from "@mark1russell7/collections";
+import { arrayList, buildList, groupBy, rangeTo, toMap } from "@mark1russell7/collections";
 
 const users = [
   { id: 1, team: "core", name: "Ada" },
@@ -108,7 +108,7 @@ const evens = buildList<number>((list) => {
 });
 assert.deepEqual(evens.toArray(), [0, 2, 4]);
 
-assert.deepEqual(toList(new Set([3, 1])).toArray(), [3, 1]);
+assert.deepEqual(arrayList(new Set([3, 1])).toArray(), [3, 1]);
 ```
 
 For two values with the same key, `toMap` keeps the last value, and gives no error.

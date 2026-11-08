@@ -132,17 +132,20 @@ import { compose, eventedMap, hashMap, lruMap } from "@mark1russell7/collections
 const cache = compose(eventedMap<string, number>(), lruMap<string, number>({ capacity: 2 }))(hashMap<string, number>());
 
 const sets: string[] = [];
+const deletes: string[] = [];
 cache.on("set", ({ key }) => sets.push(key));
+cache.on("delete", ({ key, reason }) => deletes.push(`${key} (${reason ?? "a call"})`));
 cache.set("a", 1);
 cache.set("b", 2);
 assert.equal(cache.isFull, true);
 cache.set("c", 3);
 
 assert.deepEqual(sets, ["a", "b", "c"]);
+assert.deepEqual(deletes, ["a (evict)"]);
 assert.equal(cache.has("a"), false);
 assert.equal(cache.get("c"), 3);
 ```
 
 `on` comes from `eventedMap`, `isFull` comes from `lruMap`, and `get` comes from the base. The `compose` of `./layers` gives only the type of the first layer. Use the root `compose` when each layer keeps the capabilities under it.
 
-A behavior in a stack sees only the calls that come through it. In the example, the eviction of `"a"` gives no `delete` event, because `lruMap` is under `eventedMap`. Item C23 of the roadmap adds a channel that tells the layers above about a removal.
+A behavior in a stack sees the calls that come through it. It also hears each removal by a layer below it. In the example, the eviction of `"a"` gives a `delete` event with the reason `"evict"`. The guide [Events and caches](caches.md) shows more stacks.

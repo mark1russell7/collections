@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0
+
+The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
+
+### Changed
+
+- `defaultCompare` orders values by type first (C39): `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values. Before, it compared the text of two values of different types. That order was not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. A sort of values of mixed types gives a different order.
+- `defaultCompare` gives -1 or 1 for `1` and `"1"`, and for two different objects with the same text. Before, it gave 0, so a `treeSet` held one of the two. Two objects with the same text keep the order of their first comparison.
+- `defaultCompare` compares bigints by value. An object with no prototype compares by its tag, because `String` refuses it.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

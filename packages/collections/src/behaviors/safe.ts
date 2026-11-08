@@ -294,11 +294,3 @@ export function safeMap<K, V>(): Middleware<
     return Object.assign(next, { safe });
   };
 }
-
-/**
- * Generic safe middleware that works with any collection.
- */
-export function safe<C extends object>(): Middleware<C> {
-  // Return as-is for now; specialized versions handle specific types
-  return (next: C): C => next;
-}

@@ -215,7 +215,6 @@ removalsOf: build/index.d.ts#removalsOf
 reportListenerError: build/index.d.ts#reportListenerError
 reverse: build/index.d.ts#reverse
 reversed: build/index.d.ts#reversed
-safe: build/index.d.ts#safe
 safeDeque: build/index.d.ts#safeDeque
 safeList: build/index.d.ts#safeList
 safeMap: build/index.d.ts#safeMap
@@ -1958,9 +1957,6 @@ export declare function reverse<T>(iterable: Iterable<T>): Generator<T>;
 
 ### build/index.d.ts#reversed
 export declare const reversed: <T>(compare: Compare<T>) => Compare<T>;
-
-### build/index.d.ts#safe
-export declare function safe<C extends object>(): Middleware<C>;
 
 ### build/index.d.ts#safeDeque
 export declare function safeDeque<T>(): Middleware<Deque<T>, Deque<T> & {

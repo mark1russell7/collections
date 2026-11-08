@@ -78,8 +78,8 @@ export class HashSet<T> implements Set<T> {
     this._map = new HashMap<T, symbol>({
       initialCapacity,
       loadFactor,
-      keyEq: eq,
-      keyHash: hash,
+      eq,
+      hash,
     });
   }
 

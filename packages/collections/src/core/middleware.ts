@@ -68,8 +68,8 @@ export function compose<const L extends readonly Layer[]>(...layers: L & Chain<L
 }
 
 /**
- * Utility to check if a collection has a specific capability.
- * Useful for middleware that wants to conditionally enhance behavior.
+ * This function tells if a collection has a member. A layer proxy can add the member in its `get` trap
+ * only, so the function also reads the member through the layer (C41).
  *
  * @example
  * if (hasCapability(collection, 'on')) {
@@ -81,7 +81,7 @@ export const hasCapability = <C extends Collection<any>, K extends keyof any>(
   collection: C,
   capability: K
 ): collection is C & Record<K, unknown> => {
-  return capability in collection;
+  return capability in collection || Reflect.get(collection, capability) !== undefined;
 };
 
 /**

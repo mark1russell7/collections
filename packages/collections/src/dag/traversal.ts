@@ -8,7 +8,7 @@
 import type { DAGNode, DependencyDAG } from "./types.js";
 
 /**
- * Build a leveled DAG from nodes using Kahn's algorithm
+ * This function builds a leveled DAG from nodes, with Kahn's algorithm.
  *
  * This assigns levels to each node where:
  * - Level 0: Nodes with no dependencies (leaves)
@@ -97,7 +97,7 @@ export function buildLeveledDAG<TNode extends DAGNode>(
 }
 
 /**
- * Get the topological order (flat list, leaves first)
+ * This function gives the topological order: a flat list, leaves first.
  */
 export function getTopologicalOrder<TNode extends DAGNode>(
   dag: DependencyDAG<TNode>

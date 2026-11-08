@@ -34,7 +34,7 @@ export interface HashSetOptions<T> {
   initialCapacity?: number;
 
   /**
-   * Load factor threshold for resizing.
+   * This option is the load factor threshold for a resize.
    * @default 0.75
    */
   loadFactor?: number;

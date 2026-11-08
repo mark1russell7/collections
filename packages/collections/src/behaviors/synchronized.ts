@@ -1,5 +1,5 @@
 /**
- * Synchronized behavior - Gives thread-safe access with mutex locking.
+ * Synchronized behavior: this module gives thread-safe access with mutex locking.
  *
  * This module wraps collections to serialize all operations using a mutex, making sure that
  * thread-safe access in concurrent environments. Mirrors Java's

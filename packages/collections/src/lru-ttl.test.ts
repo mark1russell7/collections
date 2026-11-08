@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { fakeClock } from "@mark1russell7/algebra/clock";
-import { arrayList, compose, hashMap, lruMap, ttlCache, ttlMap, ttlCollection, TTLCache } from "./index.js";
+import { arrayList, boundedList, boundedMap, compose, hashMap, lruMap, ttlCache, ttlMap, ttlCollection, TTLCache } from "./index.js";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -221,5 +221,41 @@ describe("the clock of the TTL behaviors (D5)", () => {
     cache.dispose();
     direct.dispose();
     expect(clock.pending).toBe(0);
+  });
+});
+
+describe("the clock of the LRU and bounded behaviors (D5)", () => {
+  it("lruMap gives the last access time of the clock to onEvict", async () => {
+    const clock = fakeClock(100);
+    const evicted: Array<{ key: string; timestamp: number }> = [];
+    const map = lruMap<string, number>({ capacity: 2, clock, onEvict: ({ key, timestamp }) => evicted.push({ key, timestamp }) })(
+      hashMap<string, number>(),
+    );
+    map.set("a", 1);
+    await clock.advance(10);
+    map.set("b", 2);
+    await clock.advance(10);
+    map.get("a");
+    await clock.advance(10);
+    map.set("c", 3);
+    // "b" is the least recent entry, and the clock read 110 at its last access.
+    expect(evicted).toEqual([{ key: "b", timestamp: 110 }]);
+  });
+
+  it("boundedList and boundedMap give the time of the clock to onOverflow", async () => {
+    const clock = fakeClock(500);
+    const times: number[] = [];
+    const list = boundedList<number>({ capacity: 1, policy: "drop-newest", clock, onOverflow: ({ timestamp }) => void times.push(timestamp) })(
+      arrayList<number>(),
+    );
+    const map = boundedMap<string, number>({ capacity: 1, policy: "drop-newest", clock, onOverflow: ({ timestamp }) => void times.push(timestamp) })(
+      hashMap<string, number>(),
+    );
+    list.add(1);
+    map.set("a", 1);
+    await clock.advance(25);
+    list.add(2);
+    map.set("b", 2);
+    expect(times).toEqual([525, 525]);
   });
 });

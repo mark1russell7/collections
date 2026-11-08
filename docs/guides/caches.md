@@ -227,6 +227,8 @@ assert.equal(clock.pending, 0);
 
 The default clock reads `Date.now()`. A monotonic clock, for example `realClock` of `@mark1russell7/algebra/clock`, keeps the order of expiry also when the wall clock goes back.
 
+`lruMap` takes the option `clock` too. The `timestamp` of `onEvict` is the time of the clock at the last use of the entry.
+
 ## LRU and TTL together
 
 In `compose(lruMap, ttlMap)`, an entry leaves at its expiry or at an eviction. An expiry is not an eviction, so `onEvict` does not occur for it.

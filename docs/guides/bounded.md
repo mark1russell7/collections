@@ -171,6 +171,8 @@ assert.deepEqual(seen, ["3 at 2 of 2", "4 at 2 of 2"]);
 
 A handler that throws stops the add, and the collection does not change.
 
+The `timestamp` of the context comes from the option `clock`. A test gives `fakeClock()` of `@mark1russell7/algebra/clock`, and the time is then exact. The default clock reads `Date.now()`.
+
 ## The rules of the layers
 
 - An add of many elements (`addAll`, `insertAll`) is the adds of its elements, one after the other. A throw stops it, and the elements before the throw stay.

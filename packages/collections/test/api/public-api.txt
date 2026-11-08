@@ -701,6 +701,7 @@ interface BoundedOptions<T> {
   capacity: number;
   policy?: OverflowPolicy;
   onOverflow?: OverflowHandler<T>;
+  clock?: Clock;
 }
 
 ### build/index.d.ts#Collection
@@ -935,6 +936,7 @@ export interface LRUOptions {
     value: any;
     timestamp: number;
   }) => void;
+  clock?: Clock;
 }
 
 ### build/index.d.ts#LinkedHashMap

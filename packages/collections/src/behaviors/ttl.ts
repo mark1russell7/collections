@@ -19,16 +19,8 @@ import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
 import type { Collection } from "../interfaces/collection.js";
 import { hasMembers } from "./members.js";
-import { realClock, type Cancel, type Clock } from "@mark1russell7/algebra/clock";
-
-/**
- * This clock is the default of the TTL behaviors. It reads `Date.now()`, as the behaviors did before the option
- * `clock`. Its timers are the timers of `realClock`, so they do not keep a Node.js process alive.
- */
-const systemClock: Clock = {
-  now: () => Date.now(),
-  after: (ms, run) => realClock.after(ms, run),
-};
+import type { Cancel, Clock } from "@mark1russell7/algebra/clock";
+import { systemClock } from "../core/system-clock.js";
 
 /**
  * This function starts the background expiration checker on a clock, and gives the function that stops it.

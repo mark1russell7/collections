@@ -156,16 +156,18 @@ const waiting = queue.put("b");
 queue.close();
 
 // The waiting put rejects, and a new put rejects
-await assert.rejects(waiting, /closed/);
-await assert.rejects(queue.put("c"), /closed/);
+await assert.rejects(waiting, { message: "Queue is closed" });
+await assert.rejects(queue.put("c"), { message: "Queue is closed" });
 assert.equal(queue.tryPut("c"), false);
 
 // The element in the queue stays
 assert.equal(await queue.take(), "a");
-await assert.rejects(queue.take(), /closed and empty/);
+await assert.rejects(queue.take(), { message: "Queue is closed and empty" });
 ```
 
-The text of an error is not the same in each case yet: `Queue is closed` for a new put, and `Queue closed` for a waiting put. Match the word `closed` only.
+Each error has one text. A put on a closed queue, new or waiting, gives `Queue is closed`. A take, a peek or a wait on a closed and empty queue gives `Queue is closed and empty`.
+
+The capacity is a whole number of 0 or more, or `Infinity`. A capacity of -1, 1.5 or `NaN` gives a `RangeError`.
 
 ## A bound on the tasks: semaphore
 

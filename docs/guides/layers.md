@@ -149,3 +149,28 @@ assert.equal(cache.get("c"), 3);
 `on` comes from `eventedMap`, `isFull` comes from `lruMap`, and `get` comes from the base. The `compose` of `./layers` gives only the type of the first layer. Use the root `compose` when each layer keeps the capabilities under it.
 
 A behavior in a stack sees the calls that come through it. It also hears each removal by a layer below it. In the example, the eviction of `"a"` gives a `delete` event with the reason `"evict"`. The guide [Events and caches](caches.md) shows more stacks.
+
+## A stack with a name: bundle
+
+`bundle` is the root `compose` with a second name. It gives a name to a stack of behaviors. Each collection that gets the stack gets its own layers.
+
+```ts
+import assert from "node:assert/strict";
+import { bundle, compose, eventedMap, hashMap, lruMap } from "@mark1russell7/collections";
+
+assert.equal(bundle, compose);
+
+const cacheLayers = bundle(eventedMap<string, number>(), lruMap<string, number>({ capacity: 1 }));
+const prices = cacheLayers(hashMap<string, number>());
+const stock = cacheLayers(hashMap<string, number>());
+
+const evicted: string[] = [];
+prices.on("delete", ({ key }) => evicted.push(key));
+prices.set("tea", 3);
+stock.set("bun", 9);
+prices.set("cake", 4);
+
+assert.deepEqual(evicted, ["tea"]);
+assert.equal(prices.get("cake"), 4);
+assert.equal(stock.get("bun"), 9);
+```

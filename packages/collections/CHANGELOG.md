@@ -55,6 +55,68 @@ The breaking changes of the API review ship in one version, with the drop end of
 - Each element of `addAll` of a bounded list goes through `add` of the top layer, as for a queue and a deque. So `eventedList` above `boundedList` gives an `add` event for each element of `addAll`. Before, it gave no event.
 - `eventedDeque` gives an `addLast` event for `enqueue`. Before, it gave the event only when the base called `addLast` through the layer.
 
+## 0.9.11
+
+The entry `./graph` gets a search of the strongly connected components (C43). PATCH: a new feature before 1.0.0, with no change of the old names.
+
+### Added
+
+- `stronglyConnectedComponents(nodes, successors)` gives the components of a directed graph, the deepest component first.
+- `strongComponentsCompact(n, start, targets)` is the same search on a compact graph. It also gives the component of each node.
+- Both functions use the algorithm of Tarjan with their own stack, so a chain of 100000 nodes does not overflow.
+
+## 0.9.10
+
+The helpers of `core/middleware.ts` get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.
+
+### Fixed
+
+- `delegate` ran a getter of the target with the proxy as `this`, so the getter read the keys of the wrapper. A method of the target read the target. In this version, a getter also reads the target.
+
+### Added
+
+- Tests of `hasCapability`, `interceptMethods`, `blockMethods`, `delegate`, `enhanceMethod` and `CollectionBuilder`.
+
+## 0.9.9
+
+The emitters of `core/events.ts` and the listeners of the storage get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.
+
+### Fixed
+
+- After `off(event)` of `Emitter` or `AsyncEmitter`, an unsubscribe from before the `off` removed the new listeners of the event. In this version, the unsubscribe removes only its own listener.
+
+### Added
+
+- A model test of `Emitter`: each sequence of `on`, `once`, unsubscribe, `off` and `emit` agrees with a model of the subscriptions.
+- Tests of `AsyncEmitter`, `EventBatcher`, `forwardEvent`, `onWhen`, `createEmitter`, `StorageListeners` and `reportListenerError`.
+
+## 0.9.8
+
+The evented layers give an event for each element of a bulk change, so a replay of the events gives the contents (C24). PATCH: a fix, and new event keys that keep the old events.
+
+### Fixed
+
+- `eventedList` gave no event for `addAll`, `insertAll`, `removeAll`, `retainAll` and `removeRange`. With this version, each element gives an `add` or a `remove` event. The index of a `remove` is the place of the element at the time of the event.
+- `eventedQueue`, `eventedDeque` and `evented` gave no event for `addAll`, `removeAll` and `retainAll`. `remove` of a queue or a deque and `pollOrUndefined` also gave no event.
+- `eventedMap` gave no event for `setIfAbsent`, `replace`, `computeIfAbsent`, `computeIfPresent`, `compute`, `merge` and `putAll` on a base that writes its storage directly. In this version, these methods use the `set` and `delete` of the layer.
+- `evented` gives `remove` for `pollFirst` and `pollLast` of a sorted set. `eventedMap` gives `delete` for `pollFirstEntry` and `pollLastEntry`.
+- The layer adds the elements of `addAll` and `insertAll` one at a time. Thus a `bounded` layer below drops or refuses each element with the rules of a single add.
+
+### Added
+
+- The event `remove` of `QueueEvents` (`{ value }`) and of `DequeEvents` (`{ value, index }`).
+- The replay law of `src/contracts/removals.test.ts` has the bulk methods as steps, and a new law for `eventedMap` over `hashMap`, `lruMap` and `boundedMap` with each policy.
+
+## 0.9.7
+
+`readWriteLock` lets `for of` and the iterators work (C32). PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A loop with `for of` over a view of `readWriteLock` works. Before, the lock made `Symbol.iterator` async, so the loop threw `is not iterable`. A method with a symbol key stays synchronous.
+- `keys`, `values`, `entries` and `descendingIterator` give a promise of a copy. The lock reads the copy, so a write after the read does not change it. Before, the iteration started after the lock released the read.
+- `descendingIterator` is a read. Before, it took the lock of a write.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

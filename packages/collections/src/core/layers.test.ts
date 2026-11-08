@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { boundedList, boundedMap } from "../behaviors/bounded.js";
@@ -16,29 +15,6 @@ const double: Layer<number> = (n) => n * 2;
 const square: Layer<number> = (n) => n * n;
 const layer = fc.constantFrom(add, double, square);
 const value = fc.integer({ min: -1000, max: 1000 });
-
-describe("the entry of the core", () => {
-  const source = readFileSync(new URL("./layers.ts", import.meta.url), "utf8");
-  const code = source.replace(/\/\*[\s\S]*?\*\//g, "");
-  const manifest = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-
-  it("has no imports", () => {
-    expect(code).not.toMatch(/^\s*import\b/m);
-    expect(code).not.toMatch(/^\s*export\s[^\n]*\bfrom\b/m);
-    expect(code).not.toMatch(/\b(require|import)\(/);
-  });
-
-  it("does no work at load", () => {
-    const top = code.split("\n").filter((line) => /^\S/.test(line));
-    for (const line of top) expect(line).toMatch(/^(export type |export function |\}$)/);
-    expect(manifest.sideEffects).toBe(false);
-  });
-
-  it("has its own line in the exports", () => {
-    expect(manifest.exports["./layers"]).toBe("./src/core/layers.ts");
-    expect(manifest.publishConfig.exports["./layers"].default).toBe("./build/core/layers.js");
-  });
-});
 
 describe("the laws of compose", () => {
   it("keeps the base with no layers", () => {

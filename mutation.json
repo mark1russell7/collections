@@ -1,0 +1,25 @@
+{
+  "packages": {
+    "collections": {
+      "dir": "packages/collections",
+      "mutate": ["src/**/*.ts", "!src/**/*.test.ts", "!src/index.ts"],
+      "vitestConfig": "vitest.mutation.config.ts",
+      "stryker": { "tsconfigFile": "tsconfig.no-stryker-rewrite.json" },
+      "notRead": {
+        "src/api-review.test.ts": "it reads docs/API-REVIEW.md at the repository root, which is not in the copy of Stryker",
+        "src/contracts/docs.test.ts": "it reads the guides at the repository root, and its examples import the source outside the copy",
+        "src/contracts/bundle-weight.test.ts": "it measures the bytes of the source, and Stryker adds code to each mutated file",
+        "src/async/channels-deprecation.test.ts": "it reads the doc comments of channels.ts as text, which Stryker changes",
+        "src/core/layers-entry.test.ts": "it reads layers.ts as text, and Stryker adds code at the top level of a mutated file"
+      },
+      "parts": {
+        "maps": ["src/impl/tree-map.ts", "src/impl/hash-map.ts", "src/impl/linked-hash-map.ts", "src/impl/hash-set.ts", "src/impl/tree-set.ts"],
+        "sequences": ["src/impl/array-list.ts", "src/impl/linked-list.ts", "src/impl/array-deque.ts", "src/impl/priority-queue.ts", "src/impl/summary-tree.ts"],
+        "behaviors": ["src/behaviors/**/*.ts"],
+        "core": ["src/core/**/*.ts", "src/interfaces/**/*.ts", "src/storage/**/*.ts"],
+        "fx": ["src/fx/**/*.ts", "src/utils/**/*.ts"],
+        "extras": ["src/async/**/*.ts", "src/dag/**/*.ts", "src/graph/**/*.ts", "src/order/**/*.ts", "src/summary-tree/**/*.ts", "src/testing/**/*.ts", "src/contracts/**/*.ts"]
+      }
+    }
+  }
+}

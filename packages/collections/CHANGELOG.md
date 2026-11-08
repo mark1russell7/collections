@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.10
+
+The helpers of `core/middleware.ts` get tests, and a law examines the keys that each layer adds (C10). The tests found two faults. PATCH: fixes with no change of the API.
+
+### Fixed
+
+- The layers added their keys only in the `get` trap of their proxy. Thus `"on" in list` was false for an evented list, and `hasCapability(list, "on")` was false. In this version, each layer also has a `has` trap for its keys: `on` (evented), `capacity`, `isFull` and `remainingCapacity` (bounded), `isFull` (lru) and `dispose` (ttl).
+- `delegate` ran a getter of the target with the proxy as `this`, so the getter read the keys of the wrapper. A method of the target read the target. In this version, a getter also reads the target.
+
+### Added
+
+- Tests of `hasCapability`, `interceptMethods`, `blockMethods`, `delegate`, `enhanceMethod` and `CollectionBuilder`.
+- The law of `src/behaviors/capabilities.test.ts`: for each layer, each added key is in the collection, and each other key is in it only if it is in the base.
+
 ## 0.9.9
 
 The emitters of `core/events.ts` and the listeners of the storage get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.

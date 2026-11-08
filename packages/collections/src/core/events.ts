@@ -71,8 +71,8 @@ export class Emitter<E extends EventMap> {
     // Return unsubscribe function
     return () => {
       listeners!.delete(listener);
-      // Clean up empty sets
-      if (listeners!.size === 0) {
+      // An off() can replace the set of the event. Remove only the set of this subscription.
+      if (listeners!.size === 0 && this.listeners.get(event) === listeners) {
         this.listeners.delete(event);
       }
     };
@@ -265,7 +265,8 @@ export class AsyncEmitter<E extends EventMap> {
 
     return () => {
       listeners!.delete(listener);
-      if (listeners!.size === 0) {
+      // An off() can replace the set of the event. Remove only the set of this subscription.
+      if (listeners!.size === 0 && this.listeners.get(event) === listeners) {
         this.listeners.delete(event);
       }
     };

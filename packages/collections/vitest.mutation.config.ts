@@ -11,7 +11,6 @@ const notRead: readonly string[] = [
   "src/api-review.test.ts",
   "src/contracts/docs.test.ts",
   "src/contracts/bundle-weight.test.ts",
-  "src/async/channels-deprecation.test.ts",
   "src/core/layers-entry.test.ts",
 ];
 

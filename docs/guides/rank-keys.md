@@ -182,4 +182,4 @@ assert.throws(() => keysForDrop(others, 3, "c"), RangeError);
 assert.throws(() => keysForDrop(others, 1, "a"), RangeError);
 ```
 
-The index of a drop comes from the place of the pointer on the screen. `dropIndex` gives this index. The API review moves `dropIndex` and `Point` to `@mark1russell7/layout-contract`, because a hit test on the screen is geometry.
+The index of a drop comes from the place of the pointer on the screen. `dropIndex` of `@mark1russell7/layout-contract` (0.6.2 or later) gives this index. A hit test on the screen is geometry, so its home is `layout-contract`. The `dropIndex` and `Point` of this package are deprecated, and version 0.11.0 removes them.

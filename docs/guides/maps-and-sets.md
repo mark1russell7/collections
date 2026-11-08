@@ -84,7 +84,7 @@ assert.equal(stock.has("apples"), false);
 
 ## Keys that are objects
 
-The default equality of keys is `===`. Thus two objects with the same fields are two keys. Give `keyEq` and `keyHash` to `hashMap` to find a key by its fields. Equal keys must have the same hash.
+The default equality of keys is `===`. Thus two objects with the same fields are two keys. Give `eq` and `hash` to `hashMap` to find a key by its fields. Equal keys must have the same hash.
 
 ```ts
 import assert from "node:assert/strict";
@@ -97,8 +97,8 @@ byIdentity.set({ row: 1, column: 2 }, "x");
 assert.equal(byIdentity.has({ row: 1, column: 2 }), false);
 
 const byFields = hashMap<Cell, string>({
-  keyEq: (a, b) => a.row === b.row && a.column === b.column,
-  keyHash: (cell) => cell.row * 31 + cell.column,
+  eq: (a, b) => a.row === b.row && a.column === b.column,
+  hash: (cell) => cell.row * 31 + cell.column,
 });
 byFields.set({ row: 1, column: 2 }, "x");
 assert.equal(byFields.get({ row: 1, column: 2 }), "x");

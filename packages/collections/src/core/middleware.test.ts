@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { arrayList } from "../impl/array-list.js";
-import { blockMethods, CollectionBuilder, compose, delegate, enhanceMethod, hasCapability, interceptMethods, type Middleware } from "./middleware.js";
+import { blockMethods, compose, delegate, enhanceMethod, hasCapability, interceptMethods, type Middleware } from "./middleware.js";
 
 // C10: the first full mutation run found no test for the helpers of this file.
 
@@ -127,28 +127,5 @@ describe("enhanceMethod", () => {
     const proxy = compose(tag("outer"), tag("inner"))(new Counter());
     proxy.add(1);
     expect(log).toEqual(["outer", "inner"]);
-  });
-});
-
-describe("CollectionBuilder", () => {
-  /** A builder that applies its middleware in the order of use. */
-  class CounterBuilder extends CollectionBuilder<Counter> {
-    build(): Counter {
-      return this.middleware.reduce<Counter>((c, m) => m(c), new Counter());
-    }
-  }
-
-  it("keeps each middleware in the order of use, and use returns the builder", () => {
-    const log: string[] = [];
-    const builder = new CounterBuilder();
-    const mark =
-      (name: string): Middleware<Counter> =>
-      (next) => {
-        log.push(name);
-        return next;
-      };
-    expect(builder.use(mark("a")).use(mark("b"))).toBe(builder);
-    expect(builder.build()).toBeInstanceOf(Counter);
-    expect(log).toEqual(["a", "b"]);
   });
 });

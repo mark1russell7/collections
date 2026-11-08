@@ -130,64 +130,6 @@ export const synchronizedCollection : typeof synchronized = synchronized;
 export const synchronizedSet : typeof synchronized = synchronized;
 
 /**
- * Advanced synchronized middleware with reentrant locking.
- *
- * With this function, the same "thread" (async context) can acquire the lock multiple times.
- * Useful for methods that call other synchronized methods internally.
- *
- * Note: JavaScript has no true thread IDs. This function uses async context
- * tracking if available. If not, the behavior is non-reentrant.
- */
-export function reentrantSynchronized<C extends object>(): Middleware<C> {
-  return (next: C): C => {
-    const mutex = new Mutex();
-    let lockHolder: symbol | null = null;
-    let lockCount = 0;
-
-    return new Proxy(next, {
-      get(target, prop, receiver) {
-        const value = Reflect.get(target, prop, receiver);
-
-        if (typeof value !== "function") {
-          return value;
-        }
-
-        return async function (this: any, ...args: any[]) {
-          // Generate a unique ID for this call context
-          const callerId = Symbol("caller");
-
-          // If we already hold the lock, execute directly (reentrant)
-          if (lockHolder === callerId) {
-            lockCount++;
-            try {
-              const result = (value as Function).apply(target, args);
-              return result instanceof Promise ? await result : result;
-            } finally {
-              lockCount--;
-            }
-          }
-
-          // Otherwise, acquire the lock
-          return mutex.lock(async () => {
-            lockHolder = callerId;
-            lockCount = 1;
-            try {
-              const result = (value as Function).apply(target, args);
-              return result instanceof Promise ? await result : result;
-            } finally {
-              lockCount--;
-              if (lockCount === 0) {
-                lockHolder = null;
-              }
-            }
-          });
-        };
-      },
-    }) as C;
-  };
-}
-
-/**
  * Read-write lock implementation for collections.
  *
  * With this function, multiple concurrent readers can read, but a writer is exclusive.

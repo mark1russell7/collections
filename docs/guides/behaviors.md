@@ -10,7 +10,7 @@ This guide shows three behaviors:
 | Safe | `safeList`, `safeQueue`, `safeDeque`, `safeMap` | a read of a missing element gives an `Optional` or a `Result`, not an error |
 | Locks | `synchronized`, `readWriteLock` | the async calls run in a fixed order |
 
-The guide [Events and caches](caches.md) shows `evented`, `lruMap` and `ttlMap`. A later guide shows `bounded`. An open pull request changes it.
+The guide [Events and caches](caches.md) shows `evented`, `lruMap` and `ttlMap`. The guide [Bounded collections](bounded.md) shows `bounded` and its policies.
 
 ## Readonly: a change throws an error
 
@@ -52,7 +52,7 @@ To give a value that does not change, copy it first: `compose(readonly())(arrayL
 
 ## Readonly: a sublist and a submap are readonly too
 
-A method that gives a view gives a readonly result. Examples are `subList`, `subMap` and `descendingMap`.
+A method that gives a part of the collection gives a readonly result. Examples are `subList`, `subMap` and `descendingMap`.
 
 ```ts
 import assert from "node:assert/strict";
@@ -284,5 +284,5 @@ assert.deepEqual([...keys], ["a"]);
 
 The examples of this guide found two defects. This guide does not show the functions until each defect has a fix:
 
-- `reentrantSynchronized` is not reentrant. A call from inside a locked method waits for the lock of the outer call, so the two calls do not end.
-- The generic `safe()` gives the collection with no change, and adds no property `safe`. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.
+- `reentrantSynchronized` was not reentrant. A call from inside a locked method waited for the lock of the outer call, so the two calls did not end. Version 0.10.0 removes it.
+- Version 0.10.0 removes the generic `safe()`. It gave the collection with no change. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.

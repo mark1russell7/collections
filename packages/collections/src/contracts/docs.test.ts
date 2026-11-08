@@ -54,25 +54,10 @@ const entries: Readonly<Record<string, object>> = {
 };
 
 /**
- * The values that no guide names, with the reason. The branch `next` (0.10.0) removes the first group, and it has the
- * guide `bounded.md` of the second group. The merge of `main` into `next` empties this list. The test fails on a
+ * The values that no guide names, with the reason. The list is empty: each value has a guide. The test fails on a
  * name that the package does not export, or that a guide names.
  */
-const UNNAMED: Readonly<Record<string, readonly string[]>> = {
-  "0.10.0 removes it": [
-    // D3 of the API review: the names of utils/helpers.ts
-    "arrayContains", "arrayIterator", "arrayRemove", "arrayRemoveAll", "checkBounds", "checkInsertBounds", "checkRangeBounds",
-    "clamp", "findIndex", "findLastIndex", "requireNonEmpty", "requireNonNull", "reverseArrayIterator", "stringHashCode",
-    // C26: the channels move to @mark1russell7/service/channel
-    "AsyncEmitter", "Channel", "EventBatcher", "buffered", "fanIn", "fanOut", "forwardEvent", "onWhen", "pipeline", "ticker",
-    "unbuffered", "workerPool",
-    // The policy defaults, the builder and the unmodifiable views
-    "CollectionBuilder", "DEFAULT_CONFLICT_POLICY", "DEFAULT_EVICTION_POLICY", "DEFAULT_GROWTH_POLICY", "DEFAULT_OVERFLOW_POLICY",
-    "DEFAULT_RETRY_POLICY", "DEFAULT_UNDERFLOW_POLICY", "DEFAULT_VALIDATION_POLICY", "KEY_DIGITS", "unmodifiableCollection",
-    "unmodifiableList", "unmodifiableMap",
-  ],
-  "the guide bounded.md of next names it": ["boundedDeque", "boundedList", "boundedMap", "boundedQueue"],
-};
+const UNNAMED: Readonly<Record<string, readonly string[]>> = {};
 
 describe("the guides name each value of the package (C13)", () => {
   const words = new Set(files.flatMap((file) => readFileSync(join(root, file), "utf8").match(/[A-Za-z_$][\w$]*/gu) ?? []));

@@ -24,6 +24,7 @@ import type { Collection } from "../interfaces/collection.js";
 import { Emitter, type Unsubscribe } from "../core/events.js";
 import { removalsOf, type ElementRemoval, type MapRemoval, type RemovalReason } from "../core/removals.js";
 import { compositeMapMethod } from "./composite.js";
+import { hasMembers } from "./members.js";
 
 /** The number of removals that a layer heard from the layers below it, and the number from the first end. */
 interface Heard {
@@ -209,6 +210,7 @@ export function eventedList<T>(): Middleware<
     );
 
     return new Proxy(next, {
+      has: hasMembers("on"),
       get(target, prop, receiver) {
         // Expose event subscription
         if (prop === "on") {
@@ -370,6 +372,7 @@ export function eventedQueue<T>(): Middleware<
     hear<ElementRemoval<T>>(next, ({ value, reason }) => emitter.emit("dequeue", { value, reason }));
 
     return new Proxy(next, {
+      has: hasMembers("on"),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);
@@ -452,6 +455,7 @@ export function eventedDeque<T>(): Middleware<
     );
 
     return new Proxy(next, {
+      has: hasMembers("on"),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);
@@ -461,12 +465,13 @@ export function eventedDeque<T>(): Middleware<
 
         if (typeof value === "function") {
           switch (prop) {
-            // push of a deque adds at the end (see Deque.push). A layer below can refuse the element.
+            // push and enqueue of a deque add at the end (see Deque.push). A layer below can refuse the element (C42).
             case "addFirst":
             case "offerFirst":
             case "addLast":
             case "offerLast":
             case "offer":
+            case "enqueue":
             case "add":
             case "push":
               return function (element: T): any {
@@ -563,9 +568,13 @@ export function eventedMap<K, V>(): Middleware<
 > {
   return (next: MapLike<K, V>) => {
     const emitter = new Emitter<MapEvents<K, V>>();
-    const heard = hear<MapRemoval<K, V>>(next, ({ key, value, reason }) => emitter.emit("delete", { key, value, reason }));
+    // During a set, the removals of the layers below wait for the set event (C41)
+    let held: MapRemoval<K, V>[] | undefined;
+    const tell = ({ key, value, reason }: MapRemoval<K, V>): void => emitter.emit("delete", { key, value, reason });
+    const heard = hear<MapRemoval<K, V>>(next, (removal) => (held ? held.push(removal) : tell(removal)));
 
     return new Proxy(next, {
+      has: hasMembers("on"),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);
@@ -586,11 +595,21 @@ export function eventedMap<K, V>(): Middleware<
               return function (key: K, val: V): V | undefined {
                 const size = target.size;
                 const all = heard.all;
-                const oldValue = (value as Function).call(target, key, val);
-                // A new key that a layer below refused (reject, drop-newest) gives no event
-                if (oldValue !== undefined || added(target.size, size, heard, all)) {
-                  emitter.emit("set", { key, value: val, oldValue });
+                const outer = held;
+                const removed: MapRemoval<K, V>[] = (held = []);
+                let oldValue: V | undefined;
+                try {
+                  oldValue = (value as Function).call(target, key, val);
+                } finally {
+                  held = outer;
                 }
+                // A new key that a layer below refused (reject, drop-newest) gives no event
+                const changed = oldValue !== undefined || added(target.size, size, heard, all);
+                // A layer below that removed the key of this set removed it after the set: its removal comes last
+                const after = changed && !target.has(key);
+                if (!after) removed.forEach(tell);
+                if (changed) emitter.emit("set", { key, value: val, oldValue } as MapEvents<K, V>["set"]);
+                if (after) removed.forEach(tell);
                 return oldValue;
               };
 
@@ -643,6 +662,7 @@ export function evented<T>(): Middleware<
     hear<ElementRemoval<T>>(next, ({ value, reason }) => emitter.emit("remove", { value, reason }));
 
     return new Proxy(next, {
+      has: hasMembers("on"),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);

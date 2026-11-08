@@ -2,13 +2,13 @@
 
 [![npm](https://img.shields.io/npm/v/@mark1russell7/collections?color=2346c4)](https://www.npmjs.com/package/@mark1russell7/collections)
 
-Collections for TypeScript with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.
+Collections for TypeScript: lists, maps, queues, a summary tree, async queues, lazy operations and dependency graphs.
 
 ```sh
 npm i @mark1russell7/collections
 ```
 
-> The channels moved to `@mark1russell7/service/channel` (service 0.6.6 or later). Their names in collections are deprecated. The next MINOR version of collections removes them.
+> The channels are in `@mark1russell7/service/channel` (service 0.6.6 or later). Version 0.10.0 of collections removed them.
 
 ## Lists, maps and behaviors
 
@@ -110,6 +110,7 @@ Each guide has examples, and a test runs each example:
 - [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
 - [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
 - [Events and caches](https://github.com/mark1russell7/collections/blob/main/docs/guides/caches.md): `eventedMap`, `eventedList`, `lruMap`, `ttlMap` and their stacks
+- [Bounded collections](https://github.com/mark1russell7/collections/blob/main/docs/guides/bounded.md): `boundedList`, `boundedQueue`, `boundedDeque`, `boundedMap` and the overflow policies
 - [Write a layer](https://github.com/mark1russell7/collections/blob/main/docs/guides/writing-layers.md): `delegate`, `enhanceMethod`, `interceptMethods`, `blockMethods` and the removal channel
 - [Iterables and collectors](https://github.com/mark1russell7/collections/blob/main/docs/guides/iterables.md): lazy functions, reducers, collectors and the names of the root
 - [Factories](https://github.com/mark1russell7/collections/blob/main/docs/guides/factories.md): `listOf`, `mapOf`, `range`, `toMap`, `groupBy` and the empty and readonly collections
@@ -124,7 +125,7 @@ The entry `./testing` gives the small checks of a contract suite: `holds`, `same
 
 | Entry | Contents |
 | --- | --- |
-| `@mark1russell7/collections` | Lists, sets, maps, queues, the summary tree, behaviors, channels, lazy operations, `keyBetween` and the other functions of ranks |
+| `@mark1russell7/collections` | Lists, sets, maps, queues, the summary tree, behaviors, async queues, lazy operations, `keyBetween` and the other functions of ranks |
 | `@mark1russell7/collections/dag` | Levels, topological order, a run with a limit of concurrency, filters |
 | `@mark1russell7/collections/graph` | `hubBreadthFirstOrder` |
 | `@mark1russell7/collections/summary-tree` | The summary tree as plain functions over a plain record |

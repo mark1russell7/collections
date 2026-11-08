@@ -7,9 +7,10 @@
  * - An insert into a full collection calls `onOverflow` one time, before the policy (not with `grow`).
  * - `throw` changes nothing and throws. `reject` and `drop-newest` change nothing and give `false`.
  * - `drop-oldest` removes one element at the end opposite to the insert, and then inserts.
- *   A front insert (unshift, addFirst, offerFirst) drops the last element. Each other insert drops the first.
+ *   A front insert (unshift, addFirst, offerFirst, an insert at 0) drops the last element. Each other insert drops the first.
  * - An insert of many elements (addAll, insertAll) is the inserts of its elements one after the other.
- *   A throw stops it, and the elements before the throw stay.
+ *   The index of the call gives the drop end of each element. A throw stops it, and the elements before the throw stay.
+ * - An insert at an index that the base refuses changes nothing: the base throws before a drop.
  */
 
 import { describe, it, expect } from "vitest";
@@ -22,6 +23,7 @@ import { linkedHashMap } from "../impl/linked-hash-map.js";
 import { treeMap } from "../impl/tree-map.js";
 import { boundedDeque, boundedList, boundedMap, boundedQueue, type BoundedCollection } from "../behaviors/bounded.js";
 import type { OverflowPolicy } from "../core/policies.js";
+import { removalsOf, type ElementRemoval } from "../core/removals.js";
 import type { List } from "../interfaces/list.js";
 import type { Deque, Queue } from "../interfaces/queue.js";
 import type { MapLike } from "../interfaces/map.js";
@@ -43,17 +45,19 @@ class Full extends Error {}
 
 /**
  * This function inserts one element into the model, with the policy. `at` is "front", "back" or an index.
- * It gives true when the element goes in, and it throws `Full` for the policy `throw`.
+ * A front insert drops the last element. It gives true when the element goes in, and it throws `Full` for `throw`.
  */
-function insert(m: Seq, x: number, at: "front" | "back" | number): boolean {
+function insert(m: Seq, x: number, at: "front" | "back" | number, front = at === "front" || at === 0): boolean {
   let index = at;
   if (m.items.length >= m.capacity && m.policy !== "grow") {
     m.overflows++;
     if (m.policy === "throw") throw new Full();
     if (m.policy === "reject" || m.policy === "drop-newest") return false;
-    if (at === "front") m.items.pop();
-    else m.items.shift();
-    if (typeof index === "number") index = Math.max(0, index - 1);
+    if (front) m.items.pop();
+    else {
+      m.items.shift();
+      if (typeof index === "number") index = Math.max(0, index - 1);
+    }
   }
   if (index === "front") m.items.unshift(x);
   else if (index === "back") m.items.push(x);
@@ -61,16 +65,20 @@ function insert(m: Seq, x: number, at: "front" | "back" | number): boolean {
   return true;
 }
 
-/** This function inserts many elements into the model, one after the other. It gives true when one goes in. */
+/**
+ * This function inserts many elements into the model, one after the other. It gives true when one goes in.
+ * An insert at 0 is a front insert for each element, so each drop takes the last element.
+ */
 function insertMany(m: Seq, xs: readonly number[], at: "back" | number): boolean {
   let added = false;
   let index = at;
+  const front = at === 0;
   for (const x of xs) {
     const before = m.items.length;
     const full = before >= m.capacity && m.policy !== "grow";
-    if (!insert(m, x, index)) break;
+    if (!insert(m, x, index, front)) break;
     added = true;
-    if (typeof index === "number") index = (full && m.policy === "drop-oldest" ? Math.max(0, index - 1) : index) + 1;
+    if (typeof index === "number") index = (full && m.policy === "drop-oldest" && !front ? Math.max(0, index - 1) : index) + 1;
   }
   return added;
 }
@@ -132,6 +140,14 @@ const listSteps: fc.Arbitrary<Step<LS, Seq>> = fc.oneof(
       both(sut, () => insertMany(m, xs, index), (s) => s.insertAll(index, xs), false, true);
     }),
   ),
+  fc.tuple(fc.integer({ min: 1, max: 3 }), fc.boolean(), smallInt).map(([d, below, x]) =>
+    step<LS, Seq>(`insert(bad ${below ? -d : `size+${d}`}, ${x})`, ({ sut }, m) => {
+      const index = below ? -d : m.items.length + d;
+      // The base refuses the index, so no layer drops or counts an overflow
+      expect(() => sut.insert(index, x)).toThrow();
+      expect(() => sut.insertAll(index, [x, x])).toThrow();
+    }),
+  ),
   fc.nat().map((i) =>
     step<LS, Seq>(`removeAt(${i})`, ({ sut }, m) => {
       if (m.items.length === 0) return;
@@ -177,6 +193,47 @@ for (const [name, base] of [
     }
   });
 }
+
+describe("boundedList: a front insert", () => {
+  // One rule for each front insert (C21): insert(0, x) and unshift(x) give the same list and the same drop
+  it("insert(0, x) does what unshift(x) does, at each policy", () => {
+    fc.assert(
+      fc.property(capacity, fc.array(smallInt, { maxLength: 8 }), smallInt, fc.constantFrom(...POLICIES), (cap, items, x, policy) => {
+        const make = () => {
+          const drops: unknown[] = [];
+          const list = boundedList<number>({ capacity: cap, policy: policy === "throw" ? "grow" : policy })(arrayList<number>());
+          for (const item of items.slice(0, cap)) list.push(item);
+          removalsOf<ElementRemoval<number>>(list)?.on((removal) => drops.push(removal));
+          return { list, drops };
+        };
+        const a = make();
+        const b = make();
+        a.list.insert(0, x);
+        b.list.unshift(x);
+        expect(a.list.toArray()).toEqual(b.list.toArray());
+        expect(a.drops).toEqual(b.drops);
+      }),
+    );
+  });
+
+  it("insertAll(0, xs) keeps the order of xs and drops from the last end", () => {
+    const list = boundedList<number>({ capacity: 4, policy: "drop-oldest" })(arrayList<number>());
+    for (const item of [1, 2, 3, 4]) list.push(item);
+    const drops: unknown[] = [];
+    removalsOf<ElementRemoval<number>>(list)?.on(({ value, end }) => drops.push([value, end]));
+    list.insertAll(0, [8, 9]);
+    expect(list.toArray()).toEqual([8, 9, 1, 2]);
+    expect(drops).toEqual([[4, "last"], [3, "last"]]);
+  });
+
+  it("an insert at a bad index throws and drops nothing", () => {
+    const list = boundedList<number>({ capacity: 3, policy: "drop-oldest" })(arrayList<number>());
+    for (const item of [1, 2, 3]) list.push(item);
+    expect(() => list.insert(9, 0)).toThrow();
+    expect(() => list.insertAll(-1, [7, 8])).toThrow();
+    expect(list.toArray()).toEqual([1, 2, 3]);
+  });
+});
 
 // ---------------------------------------------------------------------------------------------------------------------
 // boundedQueue and boundedDeque
@@ -360,12 +417,79 @@ function checkMap({ sut, calls }: MS, m: MM, ordered: boolean): void {
   expect(calls.overflows).toBe(m.overflows);
 }
 
+// Each add method of one element, its call with the element 9, and the end that drop-oldest takes for it (C42)
+const ADDS: readonly (readonly [string, (c: any) => unknown, "first" | "last", "boolean" | "void"])[] = [
+  ["add", (c) => c.add(9), "first", "boolean"],
+  ["push", (c) => c.push(9), "first", "void"],
+  ["addLast", (c) => c.addLast(9), "first", "void"],
+  ["offer", (c) => c.offer(9), "first", "boolean"],
+  ["offerLast", (c) => c.offerLast(9), "first", "boolean"],
+  ["enqueue", (c) => c.enqueue(9), "first", "boolean"],
+  ["unshift", (c) => c.unshift(9), "last", "void"],
+  ["addFirst", (c) => c.addFirst(9), "last", "void"],
+  ["offerFirst", (c) => c.offerFirst(9), "last", "boolean"],
+  ["insert(0)", (c) => c.insert(0, 9), "last", "void"],
+  ["insert(1)", (c) => c.insert(1, 9), "first", "void"],
+  ["addAll", (c) => c.addAll([9]), "first", "boolean"],
+  ["insertAll(0)", (c) => c.insertAll(0, [9]), "last", "boolean"],
+  ["insertAll(1)", (c) => c.insertAll(1, [9]), "first", "boolean"],
+];
+
+const LAYERS = [
+  ["boundedList", "List", (o: { capacity: number; policy: Policy }) => boundedList<number>(o)],
+  ["boundedQueue", "Queue", (o: { capacity: number; policy: Policy }) => boundedQueue<number>(o)],
+  ["boundedDeque", "Deque", (o: { capacity: number; policy: Policy }) => boundedDeque<number>(o)],
+] as const;
+
+const BASES = [
+  ["ArrayList", () => arrayList<number>()],
+  ["LinkedList", () => linkedList<number>()],
+  ["ArrayDeque", () => arrayDeque<number>()],
+] as const;
+
+describe("each add method of each bounded layer and base (C42)", () => {
+  for (const [layer, kind, make] of LAYERS) {
+    for (const [baseName, base] of BASES) {
+      // A queue or a deque layer needs a base with poll, and a list layer needs a base with get
+      if (layer === "boundedList" && baseName === "ArrayDeque") continue;
+      if (layer !== "boundedList" && baseName === "ArrayList") continue;
+      for (const policy of POLICIES) {
+        it(`${layer} over ${baseName} with the policy ${policy}`, () => {
+          for (const [method, add, end, gives] of ADDS) {
+            const sut = (make({ capacity: 3, policy }) as (b: any) => any)(base());
+            if (typeof sut[method.replace(/\(.*$/, "")] !== "function") continue;
+            for (const value of [0, 1, 2]) sut.add(value);
+            const drops: [number, string][] = [];
+            removalsOf<ElementRemoval<number>>(sut)?.on(({ value, end: from }) => drops.push([value, String(from)]));
+            const where = `${layer}(${baseName}).${method}`;
+            if (policy === "throw") {
+              expect(() => add(sut), where).toThrow(`${kind} is full (capacity: 3)`);
+              expect(sut.toArray(), where).toEqual([0, 1, 2]);
+            } else if (policy === "grow") {
+              add(sut);
+              expect(sut.size, where).toBe(4);
+            } else if (policy === "drop-oldest") {
+              add(sut);
+              expect(sut.size, where).toBe(3);
+              expect(drops, where).toEqual([[end === "first" ? 0 : 2, end]]);
+              expect(sut.toArray(), where).toContain(9);
+            } else {
+              expect(add(sut), where).toBe(gives === "boolean" ? false : undefined);
+              expect(sut.toArray(), where).toEqual([0, 1, 2]);
+            }
+          }
+        });
+      }
+    }
+  }
+});
+
 // Every key in one of two buckets: the delete of the oldest key goes through keyEq on a chain
 const colliding = { hash: (k: number) => Math.abs(k) % 2, eq: (a: number, b: number) => a === b };
 
 for (const [name, base, ordered] of [
   ["HashMap", () => hashMap<number, string>(), false],
-  ["HashMap (colliding hash)", () => hashMap<number, string>({ keyHash: colliding.hash, keyEq: colliding.eq, initialCapacity: 2 }), false],
+  ["HashMap (colliding hash)", () => hashMap<number, string>({ hash: colliding.hash, eq: colliding.eq, initialCapacity: 2 }), false],
   ["LinkedHashMap", () => linkedHashMap<number, string>(), true],
   ["TreeMap", () => treeMap<number, string>(), false],
 ] as const) {

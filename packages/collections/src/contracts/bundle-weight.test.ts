@@ -56,8 +56,8 @@ console.log(t.locate((s) => s, 0), t.at(0), t.size, t.height, t.summary, t.spec)
   "arrayList of the root entry": {
     code: `import { arrayList } from "@mark1russell7/collections";
 console.log(arrayList([1, 2]).size);`,
-    measured: 1442,
-    limit: 1587,
+    measured: 1715,
+    limit: 1887,
   },
   "getTopologicalOrder of ./dag": {
     code: `import { getTopologicalOrder } from "@mark1russell7/collections/dag";

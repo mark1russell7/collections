@@ -100,6 +100,7 @@ export function singletonMap<K, V>(key: K, value: V): MapLike<K, V> {
 
 /**
  * This function gives an immutable list consisting of n copies of the specified element.
+ * It throws a `RangeError` when `n` is not a safe integer of 0 or more.
  *
  * @example
  * const list = nCopies(5, 'hello')
@@ -107,8 +108,8 @@ export function singletonMap<K, V>(key: K, value: V): MapLike<K, V> {
  * list.get(2) // 'hello'
  */
 export function nCopies<T>(n: number, element: T): List<T> {
-  if (n < 0) {
-    throw new Error(`n must be non-negative, got ${n}`);
+  if (!Number.isSafeInteger(n) || n < 0) {
+    throw new RangeError(`n must be a safe integer of 0 or more, got ${n}`);
   }
 
   const list = arrayList<T>();
@@ -212,30 +213,43 @@ export function immutableMapOf<K, V>(...entries: [K, V][]): MapLike<K, V> {
 // Range factories
 // ============================================================================
 
+/** The maximum length of a JavaScript array. */
+const maxLength = 2 ** 32 - 1;
+
 /**
- * This function makes a list containing integers from start (inclusive) to end (exclusive).
+ * This function makes a list of the numbers `start + i * step` from `start` (inclusive) up to `end` (exclusive).
+ * Each number comes from `start` and its index, so the error of a fraction does not grow along the list.
+ * A negative `step` counts down to `end`.
+ * It throws a `RangeError` when `start`, `end` or `step` is not finite, when `step` is 0, or when the list is longer than an array.
  *
  * @example
  * const list = range(0, 5) // [0, 1, 2, 3, 4]
  * const list2 = range(10, 15) // [10, 11, 12, 13, 14]
  */
 export function range(start: number, end: number, step: number = 1): ArrayList<number> {
+  if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(step)) {
+    throw new RangeError(`start, end and step must be finite, got ${start}, ${end} and ${step}`);
+  }
   if (step === 0) {
-    throw new Error("step cannot be zero");
+    throw new RangeError("step cannot be zero");
+  }
+
+  const before = (value: number): boolean => (step > 0 ? value < end : value > end);
+  // The quotient is an estimate: a rounding can make it one too high or one too low.
+  let count = Math.max(0, Math.ceil((end - start) / step));
+  if (!(count <= maxLength + 1)) {
+    throw new RangeError(`range(${start}, ${end}, ${step}) has more numbers than an array holds`);
+  }
+  while (count > 0 && !before(start + (count - 1) * step)) count--;
+  while (before(start + count * step)) count++;
+  if (count > maxLength) {
+    throw new RangeError(`range(${start}, ${end}, ${step}) has more numbers than an array holds`);
   }
 
   const list = arrayList<number>();
-
-  if (step > 0) {
-    for (let i = start; i < end; i += step) {
-      list.add(i);
-    }
-  } else {
-    for (let i = start; i > end; i += step) {
-      list.add(i);
-    }
+  for (let i = 0; i < count; i++) {
+    list.add(start + i * step);
   }
-
   return list;
 }
 

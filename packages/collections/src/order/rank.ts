@@ -16,7 +16,7 @@
  */
 
 /** The digits of a key, in ascending order of their code units. */
-export const KEY_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const KEY_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 const ZERO = KEY_DIGITS[0]!;
 const LAST = KEY_DIGITS[KEY_DIGITS.length - 1]!;

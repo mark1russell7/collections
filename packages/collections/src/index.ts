@@ -1,7 +1,7 @@
 /**
  * `@mark1russell7/collections`: collections with no dependencies.
  *
- * This entry gives the lists, sets, maps, queues, the summary tree, the behaviors, the channels and the lazy
+ * This entry gives the lists, sets, maps, queues, the summary tree, the behaviors, the async queues and the lazy
  * operations. The entries `./dag` and `./graph` give the graph code. The entry `./testing` gives the checks.
  */
 
@@ -34,11 +34,8 @@ export type {
   ReadonlyQueue,
   Queue,
   Deque,
-  BlockingQueue,
   PriorityQueue as IPriorityQueue,
   AsyncQueue as IAsyncQueue,
-  TransferQueue,
-  DelayQueue,
 } from "./interfaces/queue.js";
 
 // ============================================================================
@@ -91,7 +88,6 @@ export * from "./behaviors/ttl.js";
 // ============================================================================
 
 export * from "./async/async-queue.js";
-export * from "./async/channels.js";
 export * from "./async/settled.js";
 export * from "./async/semaphore.js";
 
@@ -137,19 +133,6 @@ export { ttlMap, ttlCache, TTLCache, ttlCollection } from "./behaviors/ttl.js";
 export { asyncQueue, AsyncQueue } from "./async/async-queue.js";
 export { asSettled, type Settled } from "./async/settled.js";
 export { semaphore, type Semaphore } from "./async/semaphore.js";
-export {
-  channel,
-  Channel,
-  select,
-  timeout,
-  ticker,
-  pipeline,
-  fanOut,
-  fanIn,
-  merge,
-  workerPool,
-} from "./async/channels.js";
-
 // Functional operations
 export {
   map,
@@ -230,4 +213,3 @@ export {
   toMap,
   groupBy,
 } from "./utils/factories.js";
-

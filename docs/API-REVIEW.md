@@ -8,9 +8,9 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 
 | Verdict | What it means | Names |
 |---|---|---|
-| keep | The name stays as it is. | 205 |
+| keep | The name stays as it is. | 210 |
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 57 |
-| remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. | 76 |
+| remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. Version 0.10.0 removes them (D3, C28). | 71 |
 | move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |
 | ask | The map had no home for the area. The strategist named the homes on 2026-11-07 (S1 and S2). | 0 |
 
@@ -60,7 +60,8 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `compose`, `bundle`, `Middleware`, `Evented`, `Async`, `BoundedCollection` | keep | The behaviors and the layers guide use them. The root `compose` gives a collection, and `compose` of `./layers` gives a function. |
-| `hasCapability`, `SafeCollection`, `ElementType`, `Asyncify`, `interceptMethods`, `blockMethods`, `delegate`, `WithCapability`, `CollectionBuilder`, `enhanceMethod` | remove | No other file uses these helpers. |
+| `hasCapability`, `interceptMethods`, `blockMethods`, `delegate`, `enhanceMethod` | keep | The guide to write a layer (C13) teaches them, and a layer of your own uses them. The review gave "remove" before the guide existed. |
+| `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability`, `CollectionBuilder` | remove | No other file uses these helpers. |
 | `Emitter`, `createEmitter`, `Listener`, `Unsubscribe`, `EventMap` | keep | `evented` uses the emitter. The strategist made collections its home (S1): collections is the bottom layer, so each package can use it with no new dependency. |
 | `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` | remove | No file uses them. |
 | `StorageListeners`, `reportListenerError`, `ListenerErrorHandler` | keep | The memory storage of `@procedures/collections` uses them. |
@@ -92,7 +93,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `asyncQueue`, `AsyncQueue`, `AsyncQueueOptions`, `asSettled`, `Settled` | keep | The async contracts test them. |
-| `channel`, `Channel`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `workerPool`, `buffered`, `unbuffered`, `SelectCase` | move | Channels, `select` and a worker pool are tools of concurrency. Their home is `@mark1russell7/service` (S2). There, `ticker` and `timeout` use its clock, so one fake clock tests each tool. |
+| `channel`, `Channel`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `workerPool`, `buffered`, `unbuffered`, `SelectCase` | move | Channels, `select` and a worker pool are tools of concurrency. Their home is `@mark1russell7/service` (S2). There, `ticker` and `timeout` use its clock, so one fake clock tests each tool. Version 0.10.0 removes them from collections (C26). |
 
 ### The iterables and the collectors
 
@@ -169,7 +170,7 @@ Each decision changes the API. Before 1.0, a change of the API raises the MINOR 
 
 - **D1. `subList`: a copy or a view.** The code gives a copy, and since C13 the doc tells a copy. A view follows the changes of its list, as in Java. A copy is simpler and safe. The recommendation is a copy.
 - **D2. One set of option names.** `hashMap` takes `keyEq` and `keyHash`. `linkedHashMap` and `hashSet` take `eq` and `hash`. The recommendation is `eq` and `hash` for each one, with the old names for one MINOR version. Version 0.10.0 does this. The old names have `@deprecated`, and `eq` and `hash` win when both are given.
-- **D3. The 76 removals.** Remove the names with the verdict "remove" in one MINOR version. `@procedures/collections` then removes the same names when it updates.
+- **D3. The 70 removals.** Remove the names with the verdict "remove" in one MINOR version. `@procedures/collections` then removes the same names when it updates. The review first had 75. The guide to write a layer then used five tools of the middleware, so they stay. Version 0.10.0 removes the 70 names. C28 removes `reentrantSynchronized`, the 71st name with the verdict "remove". The code of `KEY_DIGITS` stays inside `rank.ts`.
 - **D4. One name for each function.** Remove the aliases `unmodifiableList`, `unmodifiableMap`, `unmodifiableCollection`, `mutableListOf` and `mutableMapOf`. Three functions make a list from an iterable: `toList`, `collectToList` and `toArray`. Keep one of them.
 - **D5. A clock for the TTL behaviors.** `TTLCache` takes a clock as an option. The default is the clock of the system, so the change is backward compatible.
 - **D6. The iterable functions.** The iterator helpers of the language work on an iterator, but not on each iterable. The recommendation is to keep the functions, and to tell in the doc when to use the language helpers.

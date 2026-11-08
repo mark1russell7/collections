@@ -8,7 +8,7 @@ The root entry has three tools for work that waits on promises:
 | `semaphore` | a bound on the tasks that are in progress at the same time |
 | `asSettled` | the result of each promise, in the order that the promises settle |
 
-For a queue with no wait, use `arrayDeque` (refer to [Queues](queues.md)). The channels of `channels.ts` are deprecated: import them from `@mark1russell7/service/channel`.
+For a queue with no wait, use `arrayDeque` (refer to [Queues](queues.md)). The channels are in `@mark1russell7/service/channel`. Version 0.10.0 of collections removed them.
 
 ## A producer and a consumer
 

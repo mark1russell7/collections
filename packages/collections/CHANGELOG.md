@@ -4,13 +4,33 @@
 
 The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
 
+### Changed
+
+- `defaultCompare` orders values by type first (C39): `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values. Before, it compared the text of two values of different types. That order was not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. A sort of values of mixed types gives a different order.
+- `defaultCompare` gives -1 or 1 for `1` and `"1"`, and for two different objects with the same text. Before, it gave 0, so a `treeSet` held one of the two. Two objects with the same text keep the order of their first comparison.
+- `defaultCompare` compares bigints by value. An object with no prototype compares by its tag, because `String` refuses it.
+- `range` gives `start + i * step` at index `i` (C40). Before, it added `step` to the last number, so the error of a fraction grew: `range(0, 1, 0.1)` gave 11 numbers. It gives 10.
+- `range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a list that is longer than an array. Before, `range(0, Infinity)` did not stop. A `step` of 0 throws a `RangeError`, with the same text.
+- `nCopies` throws a `RangeError` when `n` is not a safe integer of 0 or more. Before, `nCopies(2.5, value)` gave 3 copies, `nCopies(NaN, value)` gave an empty list, and `nCopies(Infinity, value)` did not stop.
+- Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
+- `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
+
 ### Deprecated
 
 - The options `keyEq` and `keyHash` of `hashMap` (D2). Use `eq` and `hash`, the names that `linkedHashMap` and `hashSet` take. When both are given, `eq` and `hash` win. Version 0.11.0 removes the old names. The member `keyEq` of each map does not change.
 
 ### Removed
 
+- The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.
 - `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
+- The 70 names with the verdict "remove" of `docs/API-REVIEW.md` (D3). No file, test or doc of the repository used them:
+  - the interfaces with no class: `Vector`, `CircularList`, `MultiMap`, `BiMap`, `WeakMapLike`, `BlockingQueue`, `TransferQueue` and `DelayQueue`;
+  - the types `IsReadonly` and `ElementOf`, and the middleware types `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability` and `CollectionBuilder`;
+  - 12 traits, from `Sized` to `Disposable`. The `Disposable` of the language with `Symbol.dispose` is no longer hidden;
+  - 24 policy types and their default values, with `RetryPolicy` and `DEFAULT_RETRY_POLICY`. Retries have a home: `@mark1russell7/service`;
+  - `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` and `KEY_DIGITS`;
+  - 14 names of `utils/helpers.ts`, from `checkBounds` to `stringHashCode`. `toArray` stays.
+- `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
 
 ## 0.9.6
 

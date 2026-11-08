@@ -21,7 +21,6 @@ type BlockingQueue: build/index.d.ts#BlockingQueue
 Bounded: build/index.d.ts#Bounded
 BoundedCollection: build/index.d.ts#BoundedCollection
 type BoundedOptions: build/index.d.ts#BoundedOptions
-Channel: build/index.d.ts#Channel
 CircularList: build/index.d.ts#CircularList
 Clearable: build/index.d.ts#Clearable
 Cloneable: build/index.d.ts#Cloneable
@@ -120,7 +119,6 @@ SafeDequeOperations: build/index.d.ts#SafeDequeOperations
 SafeListOperations: build/index.d.ts#SafeListOperations
 SafeMapOperations: build/index.d.ts#SafeMapOperations
 SafeQueueOperations: build/index.d.ts#SafeQueueOperations
-SelectCase: build/index.d.ts#SelectCase
 Semaphore: build/index.d.ts#Semaphore
 Set: build/index.d.ts#Set$1
 Settled: build/index.d.ts#Settled
@@ -171,11 +169,9 @@ boundedDeque: build/index.d.ts#boundedDeque
 boundedList: build/index.d.ts#boundedList
 boundedMap: build/index.d.ts#boundedMap
 boundedQueue: build/index.d.ts#boundedQueue
-buffered: build/index.d.ts#buffered
 buildList: build/index.d.ts#buildList
 buildMap: build/index.d.ts#buildMap
 bundle: build/index.d.ts#bundle
-channel: build/index.d.ts#channel
 checkBounds: build/index.d.ts#checkBounds
 checkInsertBounds: build/index.d.ts#checkInsertBounds
 checkRangeBounds: build/index.d.ts#checkRangeBounds
@@ -216,8 +212,6 @@ eventedList: build/index.d.ts#eventedList
 eventedMap: build/index.d.ts#eventedMap
 eventedQueue: build/index.d.ts#eventedQueue
 every: build/index.d.ts#every
-fanIn: build/index.d.ts#fanIn
-fanOut: build/index.d.ts#fanOut
 filter: build/index.d.ts#filter
 filtering: build/index.d.ts#filtering
 find: build/index.d.ts#find
@@ -257,7 +251,6 @@ mapOf: build/index.d.ts#mapOf
 mapping: build/index.d.ts#mapping
 max: build/index.d.ts#max
 maxBy: build/index.d.ts#maxBy
-merge: build/index.d.ts#merge
 min: build/index.d.ts#min
 minBy: build/index.d.ts#minBy
 mutableListOf: build/index.d.ts#mutableListOf
@@ -271,7 +264,6 @@ onWhen: build/index.d.ts#onWhen
 partition: build/index.d.ts#partition
 partitioningBy: build/index.d.ts#partitioningBy
 pipe: build/index.d.ts#pipe
-pipeline: build/index.d.ts#pipeline
 priorityQueue: build/index.d.ts#priorityQueue
 queueOf: build/index.d.ts#queueOf
 range: build/index.d.ts#range
@@ -285,7 +277,6 @@ readonlyQueue: build/index.d.ts#readonlyQueue
 reduce: build/index.d.ts#reduce
 reducing: build/index.d.ts#reducing
 reducingWith: build/index.d.ts#reducingWith
-reentrantSynchronized: build/index.d.ts#reentrantSynchronized
 removalSource: build/index.d.ts#removalSource
 removals: build/index.d.ts#removals
 removalsOf: build/index.d.ts#removalsOf
@@ -301,7 +292,6 @@ safeList: build/index.d.ts#safeList
 safeMap: build/index.d.ts#safeMap
 safeQueue: build/index.d.ts#safeQueue
 scan: build/index.d.ts#scan
-select: build/index.d.ts#select
 semaphore: build/index.d.ts#semaphore
 shallowEq: build/index.d.ts#shallowEq
 singletonList: build/index.d.ts#singletonList
@@ -327,8 +317,6 @@ takeWhile: build/index.d.ts#takeWhile
 tap: build/index.d.ts#tap
 teeing: build/index.d.ts#teeing
 thenComparing: build/index.d.ts#thenComparing
-ticker: build/index.d.ts#ticker
-timeout: build/index.d.ts#timeout
 toArray: build/index.d.ts#toArray$1
 toList: build/index.d.ts#toList$1
 toMap: build/index.d.ts#toMap$2
@@ -338,12 +326,10 @@ treeSet: build/index.d.ts#treeSet
 ttlCache: build/index.d.ts#ttlCache
 ttlCollection: build/index.d.ts#ttlCollection
 ttlMap: build/index.d.ts#ttlMap
-unbuffered: build/index.d.ts#unbuffered
 unmodifiableCollection: build/index.d.ts#unmodifiableCollection
 unmodifiableList: build/index.d.ts#unmodifiableList
 unmodifiableMap: build/index.d.ts#unmodifiableMap
 window: build/index.d.ts#window
-workerPool: build/index.d.ts#workerPool
 zip: build/index.d.ts#zip
 
 ## ./dag (build/dag/index.d.ts): names
@@ -824,21 +810,6 @@ interface BoundedOptions<T> {
   capacity: number;
   policy?: OverflowPolicy;
   onOverflow?: OverflowHandler<T>;
-}
-
-### build/index.d.ts#Channel
-export declare class Channel<T> {
-  constructor(bufferSize?: number);
-  send(value: T): Promise<void>;
-  receive(): Promise<T>;
-  waitReceive(onValue: (value: T) => void, onClosed: (error: Error) => void): () => boolean;
-  trySend(value: T): boolean;
-  tryReceive(): T | undefined;
-  close(): void;
-  get isClosed(): boolean;
-  get size(): number;
-  case<R>(handler: (value: T) => R): SelectCase<R>;
-  [Symbol.asyncIterator](): AsyncIterator<T>;
 }
 
 ### build/index.d.ts#CircularList
@@ -1687,15 +1658,6 @@ export interface SafeQueueOperations<T> {
   dequeue(): Optional<T>;
 }
 
-### build/index.d.ts#SelectCase
-export interface SelectCase<R> {
-  channel: Channel<any>;
-  handler: (value: any) => R;
-  tryReceive: () => any;
-  receive: () => Promise<any>;
-  wait?: (onValue: (value: any) => void, onClosed: (error: Error) => void) => () => boolean;
-}
-
 ### build/index.d.ts#Semaphore
 export interface Semaphore {
   readonly permits: number;
@@ -2054,9 +2016,6 @@ export declare function boundedMap<K, V>(options: Omit<BoundedOptions<V>, "onOve
 ### build/index.d.ts#boundedQueue
 export declare function boundedQueue<T>(options: BoundedOptions<T>): Middleware<Queue<T>, Queue<T> & BoundedCollection$1>;
 
-### build/index.d.ts#buffered
-export declare function buffered<T>(capacity: number): Channel<T>;
-
 ### build/index.d.ts#buildList
 export declare function buildList<T>(builder: (list: ArrayList<T>) => void): ArrayList<T>;
 
@@ -2065,9 +2024,6 @@ export declare function buildMap<K, V>(builder: (map: HashMap<K, V>) => void): H
 
 ### build/index.d.ts#bundle
 export declare const bundle: typeof compose;
-
-### build/index.d.ts#channel
-export declare function channel<T>(bufferSize?: number): Channel<T>;
 
 ### build/index.d.ts#checkBounds
 export declare function checkBounds(index: number, size: number, collectionName?: string): void;
@@ -2186,12 +2142,6 @@ export declare function eventedQueue<T>(): Middleware<Queue<T>, Queue<T> & {
 
 ### build/index.d.ts#every
 export declare function every<T>(iterable: Iterable<T>, predicate: (value: T) => boolean): boolean;
-
-### build/index.d.ts#fanIn
-export declare function fanIn<T>(...inputs: Channel<T>[]): Channel<T>;
-
-### build/index.d.ts#fanOut
-export declare function fanOut<T>(input: Channel<T>, count: number, bufferSize?: number): Channel<T>[];
 
 ### build/index.d.ts#filter
 export declare function filter<T>(iterable: Iterable<T>, predicate: (value: T, index: number) => boolean): Generator<T>;
@@ -2312,9 +2262,6 @@ export declare function max<T>(iterable: Iterable<T>, compare?: (a: T, b: T) => 
 ### build/index.d.ts#maxBy
 export declare function maxBy<T>(comparator: (a: T, b: T) => number): Collector<T, T | undefined, T | undefined>;
 
-### build/index.d.ts#merge
-export declare function merge<T>(...inputs: Channel<T>[]): Channel<T>;
-
 ### build/index.d.ts#min
 export declare function min<T>(iterable: Iterable<T>, compare?: (a: T, b: T) => number): T | undefined;
 
@@ -2354,9 +2301,6 @@ export declare function partitioningBy<T>(predicate: (element: T) => boolean): C
 ### build/index.d.ts#pipe
 export declare function pipe<T>(value: T, ...fns: Array<(value: any) => any>): any;
 
-### build/index.d.ts#pipeline
-export declare function pipeline<T, U>(input: Channel<T>, transform: (value: T) => U | Promise<U>, bufferSize?: number): Channel<U>;
-
 ### build/index.d.ts#priorityQueue
 export declare function priorityQueue<T>(optionsOrElementsOrComparator?: PriorityQueueOptions<T> | Iterable<T> | Compare<T>): PriorityQueue$1<T>;
 
@@ -2395,9 +2339,6 @@ export declare function reducing<T>(identity: T, reducer: (acc: T, element: T) =
 
 ### build/index.d.ts#reducingWith
 export declare function reducingWith<T, U>(identity: U, mapper: (element: T) => U, reducer: (acc: U, mapped: U) => U): Collector<T, U, U>;
-
-### build/index.d.ts#reentrantSynchronized
-export declare function reentrantSynchronized<C extends object>(): Middleware<C>;
 
 ### build/index.d.ts#removalSource
 export declare function removalSource<R>(next: object, below?: (removal: R) => void): RemovalSource<R>;
@@ -2451,9 +2392,6 @@ export declare function safeQueue<T>(): Middleware<Queue<T>, Queue<T> & {
 
 ### build/index.d.ts#scan
 export declare function scan<T, U>(iterable: Iterable<T>, fn: (acc: U, value: T) => U, initial: U): Generator<U>;
-
-### build/index.d.ts#select
-export declare function select<R>(...cases: SelectCase<R>[]): Promise<R>;
 
 ### build/index.d.ts#semaphore
 export declare function semaphore(permits: number): Semaphore;
@@ -2530,14 +2468,6 @@ export declare function teeing<T, A1, A2, R1, R2, R>(collector1: Collector<T, A1
 ### build/index.d.ts#thenComparing
 export declare const thenComparing: <T>(...comparators: Compare<T>[]) => Compare<T>;
 
-### build/index.d.ts#ticker
-export declare function ticker(ms: number): Channel<number> & {
-  stop: () => void;
-};
-
-### build/index.d.ts#timeout
-export declare function timeout(ms: number): Channel<void>;
-
 ### build/index.d.ts#toArray
 declare function toArray<T>(): Collector<T, T[], T[]>;
 
@@ -2594,9 +2524,6 @@ export declare function ttlMap<K, V>(options: TTLOptions): Middleware<MapLike<K,
   readonly dispose: () => void;
 }>;
 
-### build/index.d.ts#unbuffered
-export declare function unbuffered<T>(): Channel<T>;
-
 ### build/index.d.ts#unmodifiableCollection
 export declare const unmodifiableCollection: typeof readonlyCollection;
 
@@ -2608,12 +2535,6 @@ export declare const unmodifiableMap: typeof readonlyMap;
 
 ### build/index.d.ts#window
 export declare function window<T>(iterable: Iterable<T>, size: number): Generator<T[]>;
-
-### build/index.d.ts#workerPool
-export declare function workerPool<T, R>(jobs: Channel<T>, worker: (job: T) => Promise<R>, options?: {
-  workers: number;
-  bufferSize?: number;
-}): Channel<R>;
 
 ### build/index.d.ts#zip
 export declare function zip<T extends any[]>(...iterables: { [K in keyof T]: Iterable<T[K]>; }): Generator<T>;

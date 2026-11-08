@@ -2,13 +2,13 @@
 
 [![npm](https://img.shields.io/npm/v/@mark1russell7/collections?color=2346c4)](https://www.npmjs.com/package/@mark1russell7/collections)
 
-Collections for TypeScript with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.
+Collections for TypeScript with no dependencies: lists, maps, queues, a summary tree, async queues, lazy operations and dependency graphs.
 
 ```sh
 npm i @mark1russell7/collections
 ```
 
-> The channels moved to `@mark1russell7/service/channel` (service 0.6.6 or later). Their names in collections are deprecated. The next MINOR version of collections removes them.
+> The channels are in `@mark1russell7/service/channel` (service 0.6.6 or later). Version 0.10.0 of collections removed them.
 
 ## Lists, maps and behaviors
 
@@ -124,7 +124,7 @@ The entry `./testing` gives the small checks of a contract suite: `holds`, `same
 
 | Entry | Contents |
 | --- | --- |
-| `@mark1russell7/collections` | Lists, sets, maps, queues, the summary tree, behaviors, channels, lazy operations, `keyBetween` and the other functions of ranks |
+| `@mark1russell7/collections` | Lists, sets, maps, queues, the summary tree, behaviors, async queues, lazy operations, `keyBetween` and the other functions of ranks |
 | `@mark1russell7/collections/dag` | Levels, topological order, a run with a limit of concurrency, filters |
 | `@mark1russell7/collections/graph` | `hubBreadthFirstOrder` |
 | `@mark1russell7/collections/summary-tree` | The summary tree as plain functions over a plain record |

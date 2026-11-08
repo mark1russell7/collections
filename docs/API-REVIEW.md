@@ -8,9 +8,9 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 
 | Verdict | What it means | Names |
 |---|---|---|
-| keep | The name stays as it is. | 206 |
+| keep | The name stays as it is. | 205 |
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 57 |
-| remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. | 75 |
+| remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. | 76 |
 | move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |
 | ask | The map had no home for the area. The strategist named the homes on 2026-11-07 (S1 and S2). | 0 |
 
@@ -82,7 +82,8 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | `unmodifiableList`, `unmodifiableMap`, `unmodifiableCollection` | change | Each one is an alias of a `readonly` function. Decision D4 removes one set of names. |
 | `safe`, `safeList`, `safeQueue`, `safeMap`, `safeDeque`, `SafeListOperations`, `SafeQueueOperations`, `SafeDequeOperations`, `SafeMapOperations` | keep | The tests examine each safe function. |
 | `evented`, `eventedList`, `eventedQueue`, `eventedMap`, `eventedDeque`, `ListEvents`, `QueueEvents`, `DequeEvents`, `MapEvents`, `CollectionEvents` | keep | These names are the evented behavior. `eventedQueue` and `eventedDeque` have no test yet. |
-| `synchronized`, `reentrantSynchronized`, `readWriteLock`, `synchronizedList`, `synchronizedMap`, `synchronizedCollection`, `synchronizedSet` | keep | These names are the lock behavior. Only `synchronized` and `readWriteLock` have tests. |
+| `synchronized`, `readWriteLock`, `synchronizedList`, `synchronizedMap`, `synchronizedCollection`, `synchronizedSet` | keep | These names are the lock behavior. Only `synchronized` and `readWriteLock` have tests. |
+| `reentrantSynchronized` | remove | It is not reentrant. Each use makes a new `Symbol`, so a nested use waits for the outer lock (C28). |
 | `lruMap`, `lruCache`, `LRUCache`, `LRUOptions` | keep | The tests examine the LRU order. |
 | `ttlMap`, `ttlCache`, `TTLCache`, `ttlCollection`, `TTLOptions` | change | `TTLCache` starts its own timer and reads `Date.now`. Decision D5 gives it a clock, so a test controls the time. |
 
@@ -168,7 +169,7 @@ Each decision changes the API. Before 1.0, a change of the API raises the MINOR 
 
 - **D1. `subList`: a copy or a view.** The code gives a copy, and since C13 the doc tells a copy. A view follows the changes of its list, as in Java. A copy is simpler and safe. The recommendation is a copy.
 - **D2. One set of option names.** `hashMap` takes `keyEq` and `keyHash`. `linkedHashMap` and `hashSet` take `eq` and `hash`. The recommendation is `eq` and `hash` for each one, with the old names for one MINOR version.
-- **D3. The 75 removals.** Remove the names with the verdict "remove" in one MINOR version. `@procedures/collections` then removes the same names when it updates.
+- **D3. The 76 removals.** Remove the names with the verdict "remove" in one MINOR version. `@procedures/collections` then removes the same names when it updates.
 - **D4. One name for each function.** Remove the aliases `unmodifiableList`, `unmodifiableMap`, `unmodifiableCollection`, `mutableListOf` and `mutableMapOf`. Three functions make a list from an iterable: `toList`, `collectToList` and `toArray`. Keep one of them.
 - **D5. A clock for the TTL behaviors.** `TTLCache` takes a clock as an option. The default is the clock of the system, so the change is backward compatible.
 - **D6. The iterable functions.** The iterator helpers of the language work on an iterator, but not on each iterable. The recommendation is to keep the functions, and to tell in the doc when to use the language helpers.

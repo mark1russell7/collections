@@ -4,9 +4,19 @@
 
 The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
 
+### Changed
+
+- `defaultCompare` orders values by type first (C39): `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values. Before, it compared the text of two values of different types. That order was not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. A sort of values of mixed types gives a different order.
+- `defaultCompare` gives -1 or 1 for `1` and `"1"`, and for two different objects with the same text. Before, it gave 0, so a `treeSet` held one of the two. Two objects with the same text keep the order of their first comparison.
+- `defaultCompare` compares bigints by value. An object with no prototype compares by its tag, because `String` refuses it.
+- `range` gives `start + i * step` at index `i` (C40). Before, it added `step` to the last number, so the error of a fraction grew: `range(0, 1, 0.1)` gave 11 numbers. It gives 10.
+- `range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a list that is longer than an array. Before, `range(0, Infinity)` did not stop. A `step` of 0 throws a `RangeError`, with the same text.
+- `nCopies` throws a `RangeError` when `n` is not a safe integer of 0 or more. Before, `nCopies(2.5, value)` gave 3 copies, `nCopies(NaN, value)` gave an empty list, and `nCopies(Infinity, value)` did not stop.
+
 ### Removed
 
 - The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.
+- `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
 
 ## 0.9.6
 

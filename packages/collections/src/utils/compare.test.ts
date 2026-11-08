@@ -30,7 +30,21 @@ const dates = fc.oneof(fc.constant(Number.NaN), fc.integer({ min: -2, max: 2 }),
 const strings = fc.oneof(fc.constantFrom("é", "é", "A", "a", ""), fc.string({ maxLength: 3 }));
 const nullish = fc.constantFrom(null, undefined);
 
-/** The values of one type, and `null` and `undefined`: the domain where `defaultCompare` is an order. */
+/** Two symbols with one text, a registered symbol with the same text, and a well-known symbol. */
+const symbols = fc.constantFrom(Symbol("s"), Symbol("s"), Symbol.for("s"), Symbol.iterator);
+
+/** The values of each type: primitives, dates, symbols, functions, boxed values, and objects with and with no prototype. */
+const allTypes: fc.Arbitrary<unknown> = fc.oneof(
+  fc.anything({ withBigInt: true, withDate: true, withMap: true, withSet: true, withBoxedValues: true, withNullPrototype: true, withTypedArray: true }),
+  numbers,
+  dates,
+  strings,
+  symbols,
+  fc.func(fc.integer()),
+  fc.constantFrom(1, "1", 9, 10, "10z", 1n, true, [1], { a: 1 }, { a: 1 }),
+);
+
+/** The values of one type, and `null` and `undefined`. */
 const oneTypeAndNullish = <T>(values: fc.Arbitrary<T>): fc.Arbitrary<T | null | undefined> => fc.oneof(values, nullish);
 
 const cases: readonly { readonly name: string; readonly compare: Compare<any>; readonly values: fc.Arbitrary<unknown> }[] = [
@@ -43,6 +57,7 @@ const cases: readonly { readonly name: string; readonly compare: Compare<any>; r
   { name: "defaultCompare on dates", compare: defaultCompare, values: oneTypeAndNullish(dates) },
   { name: "defaultCompare on strings", compare: defaultCompare, values: oneTypeAndNullish(strings) },
   { name: "defaultCompare on booleans", compare: defaultCompare, values: oneTypeAndNullish(fc.boolean()) },
+  { name: "defaultCompare on values of all types (C39)", compare: defaultCompare, values: allTypes },
   { name: "reversed(numberCompare)", compare: reversed(numberCompare), values: numbers },
   { name: "nullsFirst(numberCompare)", compare: nullsFirst(numberCompare), values: oneTypeAndNullish(numbers) },
   { name: "nullsLast(dateCompare)", compare: nullsLast(dateCompare), values: oneTypeAndNullish(dates) },
@@ -81,6 +96,32 @@ describe.each(cases)("$name is an order", ({ compare, values }) => {
         if (compare(a, b) <= 0 && compare(b, c) <= 0) expect(compare(a, c) <= 0).toBe(true);
       }),
     );
+  });
+});
+
+describe("defaultCompare across types (C39)", () => {
+  it("orders by type first: null, undefined, booleans, numbers, bigints, strings, dates, symbols, objects", () => {
+    const date = new Date(0);
+    const symbol = Symbol("s");
+    const object = { a: 1 };
+    // Array.prototype.sort puts undefined last and does not give it to the comparator.
+    const values = [object, symbol, date, "a", 2n, 1, true, null];
+    expect([...values].sort(defaultCompare)).toEqual([null, true, 1, 2n, "a", date, symbol, object]);
+    expect(defaultCompare(null, undefined)).toBe(-1);
+    expect(defaultCompare(undefined, false)).toBe(-1);
+  });
+
+  it("gives a transitive order for the values of the old defect", () => {
+    expect([9, "10z", 10].sort(defaultCompare)).toEqual([9, 10, "10z"]);
+    expect(defaultCompare(1, "1")).toBe(-1);
+  });
+
+  it("holds two different objects with one text as two keys", () => {
+    const set = treeSet<object>();
+    set.add({ a: 1 });
+    set.add({ a: 1 });
+    set.add(Object.create(null));
+    expect(set.size).toBe(3);
   });
 });
 

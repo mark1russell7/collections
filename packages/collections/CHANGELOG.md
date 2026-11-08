@@ -10,6 +10,10 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
 - `defaultCompare` gives -1 or 1 for `1` and `"1"`, and for two different objects with the same text. Before, it gave 0, so a `treeSet` held one of the two. Two objects with the same text keep the order of their first comparison.
 - `defaultCompare` compares bigints by value. An object with no prototype compares by its tag, because `String` refuses it.
 
+### Removed
+
+- `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

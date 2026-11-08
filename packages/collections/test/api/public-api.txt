@@ -285,7 +285,6 @@ readonlyQueue: build/index.d.ts#readonlyQueue
 reduce: build/index.d.ts#reduce
 reducing: build/index.d.ts#reducing
 reducingWith: build/index.d.ts#reducingWith
-reentrantSynchronized: build/index.d.ts#reentrantSynchronized
 removalSource: build/index.d.ts#removalSource
 removals: build/index.d.ts#removals
 removalsOf: build/index.d.ts#removalsOf
@@ -2395,9 +2394,6 @@ export declare function reducing<T>(identity: T, reducer: (acc: T, element: T) =
 
 ### build/index.d.ts#reducingWith
 export declare function reducingWith<T, U>(identity: U, mapper: (element: T) => U, reducer: (acc: U, mapped: U) => U): Collector<T, U, U>;
-
-### build/index.d.ts#reentrantSynchronized
-export declare function reentrantSynchronized<C extends object>(): Middleware<C>;
 
 ### build/index.d.ts#removalSource
 export declare function removalSource<R>(next: object, below?: (removal: R) => void): RemovalSource<R>;

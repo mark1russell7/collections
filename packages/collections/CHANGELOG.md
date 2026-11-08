@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.0
+
+The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
+
+### Removed
+
+- `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

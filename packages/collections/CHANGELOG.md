@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.6
+
+The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.
+
+### Fixed
+
+- `numberCompare` gives 0 for two equal infinities. Before, it gave `NaN`, so a `treeMap` with this comparator held `Infinity` two times, `has` gave `false` and `get` threw. It gives -1, 0 or 1.
+- `dateCompare` and `defaultCompare` give 0 for two invalid dates, and an invalid date comes first. Before, they gave `NaN`.
+- `defaultCompare` puts `null` before `undefined`. Before, `defaultCompare(null, undefined)` and `defaultCompare(undefined, null)` both gave -1.
+- `compare.test.ts` holds the laws of each comparator with `fast-check`: a number for each pair, 0 for a value and itself, the opposite sign for a swap, and transitivity.
+
 ## 0.9.4
 
 A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a new export raises PATCH.

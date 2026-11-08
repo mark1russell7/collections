@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@mark1russell7/collections?color=2346c4)](https://www.npmjs.com/package/@mark1russell7/collections)
 
-Collections for TypeScript with no dependencies: lists, maps, queues, a summary tree, async queues, lazy operations and dependency graphs.
+Collections for TypeScript: lists, maps, queues, a summary tree, async queues, lazy operations and dependency graphs.
 
 ```sh
 npm i @mark1russell7/collections

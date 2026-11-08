@@ -4,6 +4,12 @@
 
 The breaking changes of the API review ship in one version, with the drop end of each front insert of `boundedList` (C21). MINOR: before 1.0.0 a breaking change raises MINOR.
 
+### Added
+
+- `ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` take a clock (D5): the option `clock`, or the fourth argument of the `TTLCache` constructor. The type is `Clock` of `@mark1russell7/algebra/clock`.
+- The default clock reads `Date.now()`, as before, and its timers do not keep a Node.js process alive. A test gives `fakeClock()`, and the expiry times are then exact.
+- The package depends on `@mark1russell7/algebra` (`^0.8.3`) for the clock. Its entry `./clock` imports no other module.
+
 ### Changed
 
 - `defaultCompare` orders values by type first (C39): `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values. Before, it compared the text of two values of different types. That order was not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. A sort of values of mixed types gives a different order.

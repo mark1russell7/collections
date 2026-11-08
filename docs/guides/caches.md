@@ -199,6 +199,34 @@ assert.deepEqual(deleted, ["beta (expire)"]);
 flags.dispose();
 ```
 
+## A clock for tests
+
+`ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` take the option `clock`. A test gives `fakeClock()` of `@mark1russell7/algebra/clock`. The test then sets the time, and the expiry times are exact.
+
+```ts
+import assert from "node:assert/strict";
+import { fakeClock } from "@mark1russell7/algebra/clock";
+import { compose, hashMap, ttlMap } from "@mark1russell7/collections";
+
+const clock = fakeClock();
+const expired: string[] = [];
+const sessions = compose(
+  ttlMap<string, string>({ ttl: 100, checkInterval: 10, clock, onExpire: ({ key }) => expired.push(key) }),
+)(hashMap<string, string>());
+
+sessions.set("ann", "s-1");
+await clock.advance(99);
+assert.equal(sessions.get("ann"), "s-1");
+
+// The background check at 100 removes the entry, with no access
+await clock.advance(1);
+assert.deepEqual(expired, ["ann"]);
+sessions.dispose();
+assert.equal(clock.pending, 0);
+```
+
+The default clock reads `Date.now()`. A monotonic clock, for example `realClock` of `@mark1russell7/algebra/clock`, keeps the order of expiry also when the wall clock goes back.
+
 ## LRU and TTL together
 
 In `compose(lruMap, ttlMap)`, an entry leaves at its expiry or at an eviction. An expiry is not an eviction, so `onEvict` does not occur for it.

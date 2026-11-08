@@ -4,8 +4,8 @@ A collection finds, removes and sorts its elements with three kinds of function.
 
 | Type | Shape | Options that take it |
 | --- | --- | --- |
-| `Eq<T>` | `(a, b) => boolean` | `eq` of the lists, the deques, `hashSet` and `linkedHashMap`. `keyEq` and `valueEq` of `hashMap` |
-| `Hash<T>` | `(value) => number` | `keyHash` of `hashMap`. `hash` of `hashSet` and `linkedHashMap` |
+| `Eq<T>` | `(a, b) => boolean` | `eq` of the lists, the deques, `hashMap`, `hashSet` and `linkedHashMap`. `valueEq` of `hashMap` and `linkedHashMap` |
+| `Hash<T>` | `(value) => number` | `hash` of `hashMap`, `hashSet` and `linkedHashMap` |
 | `Compare<T>` | `(a, b) => number` | `compare` of `treeMap`, `treeSet` and `priorityQueue`. The argument of `sort` |
 
 ## The rules of the three functions
@@ -62,7 +62,7 @@ import { deepEq, defaultHash, hashMap } from "@mark1russell7/collections";
 assert.equal(defaultHash({ a: 1, b: [2] }), defaultHash({ b: [2], a: 1 }));
 
 type Cell = { row: number; column: number };
-const cells = hashMap<Cell, string>({ keyEq: deepEq });
+const cells = hashMap<Cell, string>({ eq: deepEq });
 cells.set({ row: 1, column: 2 }, "x");
 assert.equal(cells.get({ row: 1, column: 2 }), "x");
 assert.equal(cells.size, 1);

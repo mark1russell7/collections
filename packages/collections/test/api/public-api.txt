@@ -1130,6 +1130,8 @@ export declare class HashMap<K, V> implements MapLike<K, V> {
 export interface HashMapOptions<K, V> {
   initialCapacity?: number;
   loadFactor?: number;
+  eq?: Eq<K>;
+  hash?: Hash<K>;
   keyEq?: Eq<K>;
   keyHash?: Hash<K>;
   valueEq?: Eq<V>;

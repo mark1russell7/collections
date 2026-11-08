@@ -4,6 +4,10 @@
 
 The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
 
+### Deprecated
+
+- The options `keyEq` and `keyHash` of `hashMap` (D2). Use `eq` and `hash`, the names that `linkedHashMap` and `hashSet` take. When both are given, `eq` and `hash` win. Version 0.11.0 removes the old names. The member `keyEq` of each map does not change.
+
 ### Removed
 
 - `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.

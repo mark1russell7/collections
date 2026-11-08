@@ -365,7 +365,7 @@ const colliding = { hash: (k: number) => Math.abs(k) % 2, eq: (a: number, b: num
 
 for (const [name, base, ordered] of [
   ["HashMap", () => hashMap<number, string>(), false],
-  ["HashMap (colliding hash)", () => hashMap<number, string>({ keyHash: colliding.hash, keyEq: colliding.eq, initialCapacity: 2 }), false],
+  ["HashMap (colliding hash)", () => hashMap<number, string>({ hash: colliding.hash, eq: colliding.eq, initialCapacity: 2 }), false],
   ["LinkedHashMap", () => linkedHashMap<number, string>(), true],
   ["TreeMap", () => treeMap<number, string>(), false],
 ] as const) {

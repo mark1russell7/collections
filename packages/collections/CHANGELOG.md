@@ -11,6 +11,17 @@ The comparators keep the laws of an order for each pair (C38). PATCH: a fix with
 - `defaultCompare` puts `null` before `undefined`. Before, `defaultCompare(null, undefined)` and `defaultCompare(undefined, null)` both gave -1.
 - `compare.test.ts` examines the laws of each comparator with `fast-check`. Each pair gives a number, and a value and itself give 0. A swap gives the opposite sign, and the order is transitive.
 
+## 0.9.5
+
+`AsyncQueue` examines its capacity, and each of its errors has one text (C36). PATCH: a fix with no change to the public API. Each capacity that it refuses gave a wrong result before.
+
+### Fixed
+
+- `asyncQueue` and `new AsyncQueue` throw a `RangeError` for a capacity that is not a whole number of 0 or more, or `Infinity`. Before, a capacity of -1 gave a `remainingCapacity` of -1, and 1.5 gave 0.5. With `NaN`, `isFull` was false, but each `put` waited with no end.
+- A put on a closed queue gives `Queue is closed`, also when `close` rejects a waiting put. Before, a waiting put got `Queue closed`.
+- A take, a peek or a `waitTake` on a closed and empty queue gives `Queue is closed and empty`, also when `close` rejects a waiting call. Before, a waiting call got `Queue closed and empty`.
+- The channels of `channels.ts` use `AsyncQueue`, so `channel(-1)` also throws a `RangeError`.
+
 ## 0.9.4
 
 A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a new export raises PATCH.

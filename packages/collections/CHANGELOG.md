@@ -17,6 +17,27 @@ The evented layers give an event for each element of a bulk change, so a replay 
 - The event `remove` of `QueueEvents` (`{ value }`) and of `DequeEvents` (`{ value, index }`).
 - The replay law of `src/contracts/removals.test.ts` has the bulk methods as steps, and a new law for `eventedMap` over `hashMap`, `lruMap` and `boundedMap` with each policy.
 
+## 0.9.7
+
+`readWriteLock` lets `for of` and the iterators work (C32). PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A loop with `for of` over a view of `readWriteLock` works. Before, the lock made `Symbol.iterator` async, so the loop threw `is not iterable`. A method with a symbol key stays synchronous.
+- `keys`, `values`, `entries` and `descendingIterator` give a promise of a copy. The lock reads the copy, so a write after the read does not change it. Before, the iteration started after the lock released the read.
+- `descendingIterator` is a read. Before, it took the lock of a write.
+
+## 0.9.6
+
+The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.
+
+### Fixed
+
+- `numberCompare` gives 0 for two equal infinities. Before, it gave `NaN`, so a `treeMap` with this comparator held `Infinity` two times, `has` gave `false` and `get` threw. It gives -1, 0 or 1.
+- `dateCompare` and `defaultCompare` give 0 for two invalid dates, and an invalid date comes first. Before, they gave `NaN`.
+- `defaultCompare` puts `null` before `undefined`. Before, `defaultCompare(null, undefined)` and `defaultCompare(undefined, null)` both gave -1.
+- `compare.test.ts` examines the laws of each comparator with `fast-check`. Each pair gives a number, and a value and itself give 0. A swap gives the opposite sign, and the order is transitive.
+
 ## 0.9.5
 
 `AsyncQueue` examines its capacity, and each of its errors has one text (C36). PATCH: a fix with no change to the public API. Each capacity that it refuses gave a wrong result before.

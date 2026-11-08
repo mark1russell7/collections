@@ -277,7 +277,11 @@ export function readWriteLock<C extends object>(): Middleware<C> {
       "forEach",
       "getOrDefault",
       "getOrUndefined",
+      "descendingIterator",
     ]);
+
+    // The reads that give an iterator. The lock copies the elements before it releases the read (C32).
+    const ITERATOR_READS = new Set(["keys", "values", "entries", "descendingIterator"]);
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -287,15 +291,28 @@ export function readWriteLock<C extends object>(): Middleware<C> {
           return value;
         }
 
-        const isReadMethod = typeof prop === "string" && READ_METHODS.has(prop);
+        // A method with a symbol key, for example Symbol.iterator, stays synchronous, so `for of` works (C32).
+        // The loop reads at once with no lock, as a plain method of synchronized().
+        if (typeof prop === "symbol") {
+          return function (this: unknown, ...args: unknown[]) {
+            return (value as Function).apply(target, args);
+          };
+        }
+
+        const isReadMethod = READ_METHODS.has(prop);
+        const isIteratorRead = ITERATOR_READS.has(prop);
 
         return async function (this: any, ...args: any[]) {
           if (isReadMethod) {
             // Acquire read lock
             await acquireRead();
             try {
-              const result = (value as Function).apply(target, args);
-              return result instanceof Promise ? await result : result;
+              const raw = (value as Function).apply(target, args);
+              const result = raw instanceof Promise ? await raw : raw;
+              // Before C32, the iteration started after the release of the read, so a write could change the elements.
+              return isIteratorRead && result != null && typeof result[Symbol.iterator] === "function"
+                ? Array.from(result as Iterable<unknown>)[Symbol.iterator]()
+                : result;
             } finally {
               releaseRead();
             }

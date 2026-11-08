@@ -22,12 +22,19 @@
 
 import type { AsyncQueue as IAsyncQueue } from "../interfaces/queue.js";
 
+/** The text of the error of a put, a new one or a waiting one, on a closed queue. */
+const CLOSED = "Queue is closed";
+
+/** The text of the error of a take, a peek or a wait on a queue that is closed and empty. */
+const CLOSED_AND_EMPTY = "Queue is closed and empty";
+
 /**
  * Options for making an AsyncQueue.
  */
 export interface AsyncQueueOptions {
   /**
-   * Maximum capacity. Infinity for unbounded queue.
+   * The maximum number of elements: a whole number of 0 or more, or `Infinity` for no bound.
+   * Any other value gives a `RangeError`.
    * @default Infinity
    */
   capacity?: number;
@@ -80,7 +87,12 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   private readonly defaultTimeout?: number;
 
   constructor(options: AsyncQueueOptions = {}) {
-    this.capacity = options.capacity ?? Infinity;
+    const capacity = options.capacity ?? Infinity;
+    // A capacity of -1, 1.5 or NaN gave a wrong remainingCapacity, or each put waited with no end.
+    if (capacity !== Infinity && !(Number.isInteger(capacity) && capacity >= 0)) {
+      throw new RangeError(`The capacity must be a whole number of 0 or more, or Infinity: ${String(capacity)}`);
+    }
+    this.capacity = capacity;
     if (options.timeout !== undefined) {
       this.defaultTimeout = options.timeout;
     }
@@ -124,7 +136,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
    */
   async put(element: T, timeout?: number): Promise<void> {
     if (this._isClosed) {
-      throw new Error("Queue is closed");
+      throw new Error(CLOSED);
     }
     if (this.tryPutNow(element)) {
       return;
@@ -166,7 +178,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
 
     // If closed and empty, throw
     if (this._isClosed) {
-      throw new Error("Queue is closed and empty");
+      throw new Error(CLOSED_AND_EMPTY);
     }
 
     // Wait for an element
@@ -203,7 +215,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
       return () => false;
     }
     if (this._isClosed) {
-      onClosed(new Error("Queue is closed and empty"));
+      onClosed(new Error(CLOSED_AND_EMPTY));
       return () => false;
     }
     const taker: Resolver<T> = { resolve: onElement, reject: onClosed };
@@ -306,7 +318,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
     }
 
     if (this._isClosed) {
-      throw new Error("Queue is closed and empty");
+      throw new Error(CLOSED_AND_EMPTY);
     }
 
     // Wait for the next element without a take. (Before, peek took the element and put it back
@@ -349,7 +361,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
     // Reject all waiting putters
     for (const putter of this.putters) {
       this.clearTimeout(putter);
-      putter.reject(new Error("Queue closed"));
+      putter.reject(new Error(CLOSED));
     }
     this.putters = [];
 
@@ -357,12 +369,12 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
     if (this.buffer.length === 0) {
       for (const taker of this.takers) {
         this.clearTimeout(taker);
-        taker.reject(new Error("Queue closed and empty"));
+        taker.reject(new Error(CLOSED_AND_EMPTY));
       }
       this.takers = [];
       for (const peeker of this.peekers) {
         this.clearTimeout(peeker);
-        peeker.reject(new Error("Queue closed and empty"));
+        peeker.reject(new Error(CLOSED_AND_EMPTY));
       }
       this.peekers = [];
     }
@@ -470,6 +482,8 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
 
 /**
  * Factory function to make an AsyncQueue.
+ *
+ * @throws RangeError if the capacity is not a whole number of 0 or more, or `Infinity`
  *
  * @example
  * const queue = asyncQueue<number>({ capacity: 100 })

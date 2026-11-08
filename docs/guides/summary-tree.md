@@ -280,6 +280,29 @@ assert.deepEqual(Tree.toArray(tree), ["abc", "def", "g"]);
 assert.equal(Tree.summary(tree), 7);
 ```
 
+## The height of a tree
+
+`height` gives the number of levels of the tree. An empty tree has the height 0. The tree stays balanced: its height is at most 1.45 log2(size + 2).
+
+```ts
+import assert from "node:assert/strict";
+import * as Tree from "@mark1russell7/collections/summary-tree";
+
+const count: Tree.SummarySpec<number, number> = {
+  monoid: { empty: 0, combine: (a, b) => a + b },
+  measure: () => 1,
+};
+
+let tree = Tree.of(count);
+assert.equal(Tree.height(tree), 0);
+
+// Each append adds a leaf at the right end
+for (let i = 0; i < 1000; i++) tree = Tree.append(tree, i);
+assert.equal(Tree.size(tree), 1000);
+assert.ok(Tree.height(tree) >= Math.log2(1000 + 1));
+assert.ok(Tree.height(tree) <= 1.45 * Math.log2(1000 + 2));
+```
+
 ## The class SummaryTree
 
 The root entry gives the class `SummaryTree` and the function `summaryTree`. Each method uses the function of the same name. The field `record` is the plain record, and `SummaryTree.fromRecord` wraps a record.

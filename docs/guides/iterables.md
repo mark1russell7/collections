@@ -215,6 +215,34 @@ const stats = collect([3, 0, 9], summarizingNumber((value: number) => value));
 assert.deepEqual(stats, { count: 3, sum: 12, min: 0, max: 9, average: 4 });
 ```
 
+## Minimum, maximum and a reduce in a collector
+
+`minBy` and `maxBy` take a comparator. An empty iterable gives `undefined`. When two elements are equal, the first element stays.
+
+`reducing` starts at an identity and adds each element with a function. `reducingWith` maps each element first. `flatMapping` gives each value of a mapped iterable to the next collector.
+
+```ts
+import assert from "node:assert/strict";
+import { collect, counting, flatMapping, maxBy, minBy, reducing, reducingWith } from "@mark1russell7/collections";
+
+type Order = { readonly id: string; readonly items: readonly string[]; readonly total: number };
+const orders: Order[] = [
+  { id: "a", items: ["tea", "bun"], total: 7 },
+  { id: "b", items: ["cake"], total: 12 },
+  { id: "c", items: ["tea"], total: 7 },
+];
+const byTotal = (x: Order, y: Order) => x.total - y.total;
+
+// "a" and "c" have the same total: the first one stays
+assert.equal(collect(orders, minBy(byTotal))?.id, "a");
+assert.equal(collect(orders, maxBy(byTotal))?.id, "b");
+assert.equal(collect([] as Order[], minBy(byTotal)), undefined);
+
+assert.equal(collect([1, 2, 3, 4], reducing(1, (product: number, n: number) => product * n)), 24);
+assert.equal(collect(orders, reducingWith(0, (order: Order) => order.total, (sum, total) => sum + total)), 26);
+assert.equal(collect(orders, flatMapping((order: Order) => order.items, counting<string>())), 4);
+```
+
 ## The names of the root
 
 The lazy functions and the collectors both have a `toArray`, a `toSet` and a `toMap`. The root gives each one a name:

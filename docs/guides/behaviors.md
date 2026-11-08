@@ -52,7 +52,7 @@ To give a value that does not change, copy it first: `compose(readonly())(arrayL
 
 ## Readonly: a sublist and a submap are readonly too
 
-A method that gives a view gives a readonly result. Examples are `subList`, `subMap` and `descendingMap`.
+A method that gives a part of the collection gives a readonly result. Examples are `subList`, `subMap` and `descendingMap`.
 
 ```ts
 import assert from "node:assert/strict";

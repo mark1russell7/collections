@@ -8,8 +8,8 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 
 | Verdict | What it means | Names |
 |---|---|---|
-| keep | The name stays as it is. | 209 |
-| change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 58 |
+| keep | The name stays as it is. | 244 |
+| change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 23 |
 | remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. Version 0.10.0 removes them (D3, C28). | 71 |
 | move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |
 | ask | The map had no home for the area. The strategist named the homes on 2026-11-07 (S1 and S2). | 0 |
@@ -39,7 +39,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `ReadonlyCollection`, `Collection`, `Readonly`, `RandomAccess`, `Stack`, `Entry`, `ReadonlyMapLike`, `MapLike`, `SortedMap`, `NavigableMap`, `ReadonlySet`, `Set`, `SortedSet`, `NavigableSet`, `ReadonlyQueue`, `Queue`, `Deque`, `IPriorityQueue`, `IAsyncQueue` | keep | An implementation or a behavior of the package uses each interface. |
-| `ReadonlyList`, `List` | change | The doc of `subList` told a view, but the code gives a copy (C13). Decision D1 picks one. |
+| `ReadonlyList`, `List` | keep | The doc of `subList` told a view, but the code gave a copy (C13). D1 keeps the copy, and the list test examines it. |
 | `Vector`, `CircularList`, `MultiMap`, `BiMap`, `WeakMapLike`, `BlockingQueue`, `TransferQueue`, `DelayQueue` | remove | No class implements these interfaces. An interface with no implementation tells a feature that the package does not have. |
 | `IsReadonly`, `ElementOf` | remove | No file uses these types. |
 
@@ -99,7 +99,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 
 | Names | Verdict | Reason |
 |---|---|---|
-| `map`, `filter`, `flatMap`, `flatten`, `take`, `skip`, `takeWhile`, `skipWhile`, `concat`, `zip`, `enumerate`, `chunk`, `window`, `partition`, `reduce`, `scan`, `sort`, `reverse`, `distinct`, `distinctConsecutive`, `tap`, `some`, `every`, `none`, `find`, `count`, `min`, `max`, `sum`, `toArray`, `toSet`, `iterToMap`, `pipe` | change | The language has helpers on each iterator for `map`, `filter`, `take`, `flatMap`, `reduce`, `some`, `every`, `find` and `toArray`. Decision D6 keeps or removes the copies. |
+| `map`, `filter`, `flatMap`, `flatten`, `take`, `skip`, `takeWhile`, `skipWhile`, `concat`, `zip`, `enumerate`, `chunk`, `window`, `partition`, `reduce`, `scan`, `sort`, `reverse`, `distinct`, `distinctConsecutive`, `tap`, `some`, `every`, `none`, `find`, `count`, `min`, `max`, `sum`, `toArray`, `toSet`, `iterToMap`, `pipe` | keep | The language has helpers on each iterator for `map`, `filter`, `take`, `flatMap`, `reduce`, `some`, `every`, `find` and `toArray`. These functions take each iterable, so D6 keeps them. |
 | `average`, `averagingNumber`, `summarizingNumber` | change | A mean is statistics. These functions call `@mark1russell7/rigor-statistics` after the move of `SummaryStatistics`. |
 | `SummaryStatistics` | move | Its home is `@mark1russell7/rigor-statistics`, the home of counts, means and spreads. |
 | `collect`, `Collector`, `groupingBy`, `groupingByWith`, `partitioningBy`, `counting`, `summingNumber`, `minBy`, `maxBy`, `joining`, `mapping`, `filtering`, `flatMapping`, `reducing`, `reducingWith`, `teeing`, `first`, `last` | keep | The tests of the collectors examine them. |
@@ -169,12 +169,12 @@ Version 0.9.3 adds the entry `./summary-tree` and two types of the root entry.
 
 Each decision changes the API. Before 1.0, a change of the API raises the MINOR version.
 
-- **D1. `subList`: a copy or a view.** The code gives a copy, and since C13 the doc tells a copy. A view follows the changes of its list, as in Java. A copy is simpler and safe. The recommendation is a copy.
+- **D1. `subList`: a copy or a view.** The code gives a copy, and since C13 the doc tells a copy. A view follows the changes of its list, as in Java. A copy is simpler and safe. The recommendation is a copy. Version 0.10.0 keeps the copy, and the list test of each list examines it.
 - **D2. One set of option names.** `hashMap` takes `keyEq` and `keyHash`. `linkedHashMap` and `hashSet` take `eq` and `hash`. The recommendation is `eq` and `hash` for each one, with the old names for one MINOR version. Version 0.10.0 does this. The old names have `@deprecated`, and `eq` and `hash` win when both are given.
 - **D3. The 70 removals.** Remove the names with the verdict "remove" in one MINOR version. `@procedures/collections` then removes the same names when it updates. The review first had 75. The guide to write a layer then used five tools of the middleware, so they stay. Version 0.10.0 removes the 70 names. C28 removes `reentrantSynchronized`, the 71st name with the verdict "remove". The code of `KEY_DIGITS` stays inside `rank.ts`.
 - **D4. One name for each function.** Remove the aliases `unmodifiableList`, `unmodifiableMap`, `unmodifiableCollection`, `mutableListOf` and `mutableMapOf`. Three functions make a list from an iterable: `toList`, `collectToList` and `toArray`. Keep one of them. Version 0.10.0 removes the five aliases and `toList`, the second name of `arrayList`. `collectToList` is a collector, and `toArray` gives an array, so both stay.
 - **D5. A clock for the TTL behaviors.** `TTLCache` takes a clock as an option. The default is the clock of the system, so the change is backward compatible.
-- **D6. The iterable functions.** The iterator helpers of the language work on an iterator, but not on each iterable. The recommendation is to keep the functions, and to tell in the doc when to use the language helpers.
+- **D6. The iterable functions.** The iterator helpers of the language work on an iterator, but not on each iterable. The recommendation is to keep the functions, and to tell in the doc when to use the language helpers. Version 0.10.0 keeps the functions. The iterables guide tells when to use the language helpers.
 
 ## The answers of the strategist
 

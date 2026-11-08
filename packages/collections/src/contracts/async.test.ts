@@ -115,6 +115,47 @@ describe("AsyncQueue", () => {
   });
 });
 
+describe("AsyncQueue: the capacity and the error texts (C36)", () => {
+  it("accepts a whole number of 0 or more, and Infinity", () => {
+    for (const capacity of [0, 1, 7, Infinity]) {
+      expect(asyncQueue<number>({ capacity }).remainingCapacity).toBe(capacity);
+    }
+    expect(asyncQueue<number>().remainingCapacity).toBe(Infinity);
+  });
+
+  it("throws a RangeError for any other capacity", () => {
+    for (const capacity of [-1, -Infinity, 1.5, Number.NaN]) {
+      expect(() => asyncQueue<number>({ capacity })).toThrow(RangeError);
+    }
+    expect(() => unbuffered<number>()).not.toThrow();
+  });
+
+  it("gives one text to a put on a closed queue, new or waiting", async () => {
+    const queue = asyncQueue<string>({ capacity: 1 });
+    await queue.put("a");
+    const waiting = queue.put("b");
+    queue.close();
+    await expect(waiting).rejects.toThrow(/^Queue is closed$/);
+    await expect(queue.put("c")).rejects.toThrow(/^Queue is closed$/);
+  });
+
+  it("gives one text to a take, a peek and a wait on a closed, empty queue, new or waiting", async () => {
+    const queue = asyncQueue<string>();
+    const take = queue.take();
+    const peek = queue.peek();
+    const waits: Error[] = [];
+    queue.waitTake(() => undefined, (error) => waits.push(error));
+    queue.close();
+    const text = /^Queue is closed and empty$/;
+    await expect(take).rejects.toThrow(text);
+    await expect(peek).rejects.toThrow(text);
+    await expect(queue.take()).rejects.toThrow(text);
+    await expect(queue.peek()).rejects.toThrow(text);
+    queue.waitTake(() => undefined, (error) => waits.push(error));
+    expect(waits.map((error) => error.message)).toEqual(["Queue is closed and empty", "Queue is closed and empty"]);
+  });
+});
+
 describe("Channel", () => {
   it("an unbuffered channel makes send wait for a receiver (L17)", async () => {
     const ch = unbuffered<string>();

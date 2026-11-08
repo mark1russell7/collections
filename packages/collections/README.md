@@ -110,6 +110,7 @@ Each guide has examples, and a test runs each example:
 - [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
 - [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
 - [Events and caches](https://github.com/mark1russell7/collections/blob/main/docs/guides/caches.md): `eventedMap`, `eventedList`, `lruMap`, `ttlMap` and their stacks
+- [Bounded collections](https://github.com/mark1russell7/collections/blob/main/docs/guides/bounded.md): `boundedList`, `boundedQueue`, `boundedDeque`, `boundedMap` and the overflow policies
 - [Write a layer](https://github.com/mark1russell7/collections/blob/main/docs/guides/writing-layers.md): `delegate`, `enhanceMethod`, `interceptMethods`, `blockMethods` and the removal channel
 - [Iterables and collectors](https://github.com/mark1russell7/collections/blob/main/docs/guides/iterables.md): lazy functions, reducers, collectors and the names of the root
 - [Factories](https://github.com/mark1russell7/collections/blob/main/docs/guides/factories.md): `listOf`, `mapOf`, `range`, `toMap`, `groupBy` and the empty and readonly collections

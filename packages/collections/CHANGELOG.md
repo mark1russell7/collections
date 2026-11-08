@@ -2,7 +2,7 @@
 
 ## 0.10.0
 
-The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
+The breaking changes of the API review ship in one version, with the drop end of each front insert of `boundedList` (C21). MINOR: before 1.0.0 a breaking change raises MINOR.
 
 ### Changed
 
@@ -14,6 +14,7 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
 - `nCopies` throws a `RangeError` when `n` is not a safe integer of 0 or more. Before, `nCopies(2.5, value)` gave 3 copies, `nCopies(NaN, value)` gave an empty list, and `nCopies(Infinity, value)` did not stop.
 - Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
 - `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
+- `boundedList` with `drop-oldest`: `insert(0, x)` and `insertAll(0, xs)` into a full list drop the last element, as `unshift(x)` does. Before, they dropped the first element. Each other index drops the first element, as before.
 
 ### Deprecated
 
@@ -35,6 +36,16 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
   - `mutableListOf` and `mutableMapOf`: use `listOf` and `mapOf`;
   - `toList` of an iterable: use `arrayList(iterable)`. The collector `collectToList` stays.
 - `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
+
+### Fixed
+
+- `boundedList`: `insert` and `insertAll` at an index that the base refuses dropped an element before the base threw. Now the base throws first, and the list does not change.
+- `boundedList`, `boundedQueue` and `boundedDeque` bound each add method of their base (C42). Before, 23 add methods went past the capacity:
+  - `addFirst`, `addLast`, `offer`, `offerFirst`, `offerLast` and `enqueue` of a `linkedList` under `boundedList`;
+  - `push`, `addFirst`, `addLast`, `offerFirst` and `offerLast` of an `arrayDeque` or a `linkedList` under `boundedQueue`, and `unshift`, `insert` and `insertAll` of a `linkedList`;
+  - `insert` and `insertAll` of a `linkedList` under `boundedDeque`.
+- Each element of `addAll` of a bounded list goes through `add` of the top layer, as for a queue and a deque. So `eventedList` above `boundedList` gives an `add` event for each element of `addAll`. Before, it gave no event.
+- `eventedDeque` gives an `addLast` event for `enqueue`. Before, it gave the event only when the base called `addLast` through the layer.
 
 ## 0.9.6
 
@@ -96,6 +107,7 @@ The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH:
 
 - The 13 names of `async/channels.ts`: `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Import each one from `@mark1russell7/service/channel`. The next MINOR version removes them from collections.
 - Collections does not re-export the channels of service, and it does not depend on service. Service depends on collections for `asyncQueue`.
+
 ## 0.9.0
 
 A layer above a removing layer now sees its removals (C23). The tests of the removal channel found six more faults. This version corrects them. MINOR: new exports, and before 1.0.0 a change of behavior raises MINOR. An evented layer above a layer that refuses an element no longer emits an event for it.

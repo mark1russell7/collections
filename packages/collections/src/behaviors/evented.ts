@@ -343,12 +343,13 @@ export function eventedDeque<T>(): Middleware<
 
         if (typeof value === "function") {
           switch (prop) {
-            // push of a deque adds at the end (see Deque.push). A layer below can refuse the element.
+            // push and enqueue of a deque add at the end (see Deque.push). A layer below can refuse the element (C42).
             case "addFirst":
             case "offerFirst":
             case "addLast":
             case "offerLast":
             case "offer":
+            case "enqueue":
             case "add":
             case "push":
               return function (element: T): any {

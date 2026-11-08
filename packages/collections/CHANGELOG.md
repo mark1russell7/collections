@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.0
+
+The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
+
+### Changed
+
+- Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
+- `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

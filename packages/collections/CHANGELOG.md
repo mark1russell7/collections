@@ -25,6 +25,7 @@ The breaking changes of the API review ship in one version, with the drop end of
 ### Deprecated
 
 - The options `keyEq` and `keyHash` of `hashMap` (D2). Use `eq` and `hash`, the names that `linkedHashMap` and `hashSet` take. When both are given, `eq` and `hash` win. Version 0.11.0 removes the old names. The member `keyEq` of each map does not change.
+- `dropIndex` and `Point` of `order` (C12). Their home is `@mark1russell7/layout-contract` (0.6.2 or later), because a hit test on the screen is geometry. Its `dropIndex` gives the same index. Version 0.11.0 removes them.
 
 ### Removed
 

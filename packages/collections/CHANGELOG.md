@@ -12,6 +12,8 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
 - `range` gives `start + i * step` at index `i` (C40). Before, it added `step` to the last number, so the error of a fraction grew: `range(0, 1, 0.1)` gave 11 numbers. It gives 10.
 - `range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a list that is longer than an array. Before, `range(0, Infinity)` did not stop. A `step` of 0 throws a `RangeError`, with the same text.
 - `nCopies` throws a `RangeError` when `n` is not a safe integer of 0 or more. Before, `nCopies(2.5, value)` gave 3 copies, `nCopies(NaN, value)` gave an empty list, and `nCopies(Infinity, value)` did not stop.
+- Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
+- `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
 
 ### Removed
 

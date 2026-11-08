@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.9
+
+The emitters of `core/events.ts` and the listeners of the storage get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.
+
+### Fixed
+
+- After `off(event)` of `Emitter` or `AsyncEmitter`, an unsubscribe from before the `off` removed the new listeners of the event. In this version, the unsubscribe removes only its own listener.
+
+### Added
+
+- A model test of `Emitter`: each sequence of `on`, `once`, unsubscribe, `off` and `emit` agrees with a model of the subscriptions.
+- Tests of `AsyncEmitter`, `EventBatcher`, `forwardEvent`, `onWhen`, `createEmitter`, `StorageListeners` and `reportListenerError`.
+
 ## 0.9.8
 
 The evented layers give an event for each element of a bulk change, so a replay of the events gives the contents (C24). PATCH: a fix, and new event keys that keep the old events.

@@ -29,6 +29,7 @@ import {
   toMap,
   toSet,
 } from "../fx/collectors.js";
+import { average } from "../fx/iter.js";
 
 const numbers = fc.array(fc.integer({ min: -50, max: 50 }), { maxLength: 40 });
 
@@ -51,6 +52,21 @@ describe("collectors", () => {
   it("summarizingNumber keeps a minimum or maximum of 0 (L16)", () => {
     expect(collect([0, 5, 3], summarizingNumber((x: number) => x))).toEqual({ count: 3, sum: 8, min: 0, max: 5, average: 8 / 3 });
     expect(collect([-4, 0], summarizingNumber((x: number) => x))).toMatchObject({ min: -4, max: 0 });
+  });
+
+  // C12: the mean collectors fold with the running summary of rigor-statistics, its home.
+  it("the mean collectors and average give the mean of the list, and refuse a NaN", () => {
+    fc.assert(
+      fc.property(numbers, (xs) => {
+        const mean = xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : undefined;
+        expect(average(xs)).toBe(mean);
+        expect(collect(xs, summarizingNumber((x: number) => x)).average).toBe(mean ?? 0);
+      }),
+    );
+    expect(collect([], summarizingNumber((x: number) => x))).toEqual({ count: 0, sum: 0, min: Infinity, max: -Infinity, average: 0 });
+    expect(() => collect([1, Number.NaN], averagingNumber((x: number) => x))).toThrow(RangeError);
+    expect(() => collect([Number.NaN], summarizingNumber((x: number) => x))).toThrow(RangeError);
+    expect(() => average([Number.NaN])).toThrow(RangeError);
   });
 
   it("the container collectors collect every element", () => {

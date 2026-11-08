@@ -1617,10 +1617,7 @@ export declare function asyncQueue<T>(options?: AsyncQueueOptions): AsyncQueue<T
 export declare function average(iterable: Iterable<number>): number | undefined;
 
 ### build/index.d.ts#averagingNumber
-export declare function averagingNumber<T>(mapper: (element: T) => number): Collector<T, {
-  sum: number;
-  count: number;
-}, number>;
+export declare function averagingNumber<T>(mapper: (element: T) => number): Collector<T, RunningSummary, number>;
 
 ### build/index.d.ts#blockMethods
 export declare const blockMethods: <C extends object>(target: C, mutatingMethods: Set<string | symbol>, errorMessage?: string) => C;
@@ -2017,7 +2014,7 @@ export declare const stringCompareIgnoreCase: Compare<string>;
 export declare function sum(iterable: Iterable<number>): number;
 
 ### build/index.d.ts#summarizingNumber
-export declare function summarizingNumber<T>(mapper: (element: T) => number): Collector<T, Partial<SummaryStatistics>, SummaryStatistics>;
+export declare function summarizingNumber<T>(mapper: (element: T) => number): Collector<T, RunningSummary, SummaryStatistics>;
 
 ### build/index.d.ts#summaryTree
 export declare function summaryTree<Leaf, Summary>(spec: SummarySpec<Leaf, Summary>, leaves?: Iterable<Leaf>): SummaryTree<Leaf, Summary>;

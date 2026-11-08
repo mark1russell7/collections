@@ -974,6 +974,10 @@ export interface DequeEvents<T> {
     value: T;
     reason?: RemovalReason;
   };
+  remove: {
+    value: T;
+    index: number;
+  };
   clear: {};
 }
 
@@ -1545,6 +1549,9 @@ export interface QueueEvents<T> {
   dequeue: {
     value: T;
     reason?: RemovalReason;
+  };
+  remove: {
+    value: T;
   };
   clear: {};
 }

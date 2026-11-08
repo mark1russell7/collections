@@ -20,7 +20,10 @@ import { hashMap } from "../impl/hash-map.js";
 import { boundedList, boundedQueue, boundedDeque, boundedMap } from "../behaviors/bounded.js";
 import { lruMap } from "../behaviors/lru.js";
 import { ttlMap, ttlCollection } from "../behaviors/ttl.js";
-import { eventedList, eventedQueue, eventedDeque, eventedMap } from "../behaviors/evented.js";
+import { evented, eventedList, eventedQueue, eventedDeque, eventedMap } from "../behaviors/evented.js";
+import { treeSet } from "../impl/tree-set.js";
+import { treeMap } from "../impl/tree-map.js";
+import type { Collection } from "../interfaces/collection.js";
 import { safeMap } from "../behaviors/safe.js";
 import { readonlyMap } from "../behaviors/readonly.js";
 import { synchronized, reentrantSynchronized, readWriteLock } from "../behaviors/synchronized.js";
@@ -322,6 +325,7 @@ describe("the cost of lruMap over ttlMap", () => {
 const POLICIES: OverflowPolicy[] = ["drop-oldest", "drop-newest", "reject", "throw", "grow"];
 const CAPACITY = 3;
 const value = fc.integer({ min: 0, max: 5 });
+const values = fc.array(value, { maxLength: 4 });
 
 /** This function makes a step that calls the layer. A throw (the policy "throw" or an empty collection) is a refusal. */
 function attempt<S>(label: string, run: (sut: S) => void): Step<{ sut: S; replay: unknown[] }, null> {
@@ -376,6 +380,17 @@ describe("an evented layer above a bounded layer gives events whose replay is th
     fc.nat(9).map((i) => attempt<EventedList>(`removeAt(${i})`, (l) => void l.removeAt(i % Math.max(1, l.size)))),
     value.map((v) => attempt<EventedList>(`remove(${v})`, (l) => void l.remove(v))),
     fc.constant(attempt<EventedList>("clear()", (l) => l.clear())),
+    // The bulk methods (C24)
+    values.map((vs) => attempt<EventedList>(`addAll(${vs})`, (l) => void l.addAll(vs))),
+    fc.tuple(fc.nat(9), values).map(([i, vs]) => attempt<EventedList>(`insertAll(${i}, ${vs})`, (l) => void l.insertAll(at(i, l.size), vs))),
+    values.map((vs) => attempt<EventedList>(`removeAll(${vs})`, (l) => void l.removeAll(vs))),
+    values.map((vs) => attempt<EventedList>(`retainAll(${vs})`, (l) => void l.retainAll(vs))),
+    fc.tuple(fc.nat(9), fc.nat(9)).map(([a, b]) =>
+      attempt<EventedList>(`removeRange(${a}, ${b})`, (l) => {
+        const from = at(a, l.size);
+        l.removeRange(from, from + (b % (l.size - from + 1)));
+      }),
+    ),
   );
   it.each(POLICIES)("eventedList over boundedList (%s)", (policy) => {
     replayLaw<EventedList>(
@@ -401,6 +416,12 @@ describe("an evented layer above a bounded layer gives events whose replay is th
     fc.constant(attempt<EventedQueue>("poll()", (q) => void (q.size > 0 && q.poll()))),
     fc.constant(attempt<EventedQueue>("dequeue()", (q) => void (q.size > 0 && q.dequeue()))),
     fc.constant(attempt<EventedQueue>("clear()", (q) => q.clear())),
+    // The bulk methods and the other removals (C24)
+    fc.constant(attempt<EventedQueue>("pollOrUndefined()", (q) => void q.pollOrUndefined())),
+    values.map((vs) => attempt<EventedQueue>(`addAll(${vs})`, (q) => void q.addAll(vs))),
+    value.map((v) => attempt<EventedQueue>(`remove(${v})`, (q) => void q.remove(v))),
+    values.map((vs) => attempt<EventedQueue>(`removeAll(${vs})`, (q) => void q.removeAll(vs))),
+    values.map((vs) => attempt<EventedQueue>(`retainAll(${vs})`, (q) => void q.retainAll(vs))),
   );
   it.each(POLICIES)("eventedQueue over boundedQueue (%s)", (policy) => {
     replayLaw<EventedQueue>(
@@ -408,6 +429,11 @@ describe("an evented layer above a bounded layer gives events whose replay is th
       (sut, replay) => {
         sut.on("enqueue", ({ value: v }) => void replay.push(v));
         sut.on("dequeue", ({ value: v }) => expect(replay.shift()).toBe(v));
+        sut.on("remove", ({ value: v }) => {
+          const i = replay.indexOf(v);
+          expect(i).toBeGreaterThanOrEqual(0);
+          replay.splice(i, 1);
+        });
         sut.on("clear", () => void replay.splice(0));
       },
       queueSteps,
@@ -423,6 +449,12 @@ describe("an evented layer above a bounded layer gives events whose replay is th
       fc.constant(attempt<EventedDeque>(`${name}()`, (d) => void (d.size > 0 && (d[name] as () => unknown)()))),
     ),
     fc.constant(attempt<EventedDeque>("clear()", (d) => d.clear())),
+    // The bulk methods and the other removals (C24)
+    fc.constant(attempt<EventedDeque>("pollOrUndefined()", (d) => void d.pollOrUndefined())),
+    values.map((vs) => attempt<EventedDeque>(`addAll(${vs})`, (d) => void d.addAll(vs))),
+    value.map((v) => attempt<EventedDeque>(`remove(${v})`, (d) => void d.remove(v))),
+    values.map((vs) => attempt<EventedDeque>(`removeAll(${vs})`, (d) => void d.removeAll(vs))),
+    values.map((vs) => attempt<EventedDeque>(`retainAll(${vs})`, (d) => void d.retainAll(vs))),
   );
   it.each(POLICIES)("eventedDeque over boundedDeque (%s)", (policy) => {
     replayLaw<EventedDeque>(
@@ -432,10 +464,125 @@ describe("an evented layer above a bounded layer gives events whose replay is th
         sut.on("addLast", ({ value: v }) => void replay.push(v));
         sut.on("removeFirst", ({ value: v }) => expect(replay.shift()).toBe(v));
         sut.on("removeLast", ({ value: v }) => expect(replay.pop()).toBe(v));
+        sut.on("remove", ({ value: v, index }) => {
+          expect(replay[index]).toBe(v);
+          replay.splice(index, 1);
+        });
         sut.on("clear", () => void replay.splice(0));
       },
       dequeSteps,
       policy === "grow",
     );
+  });
+});
+
+type EventedMapOf = MapLike<number, number> & { on(event: string, listener: (p: any) => void): () => void };
+type MapReplay = { sut: EventedMapOf; replay: Map<number, number> };
+
+describe("an evented map gives events whose replay is the contents, also for the composite methods (C24)", () => {
+  const key = fc.integer({ min: 0, max: 4 });
+  const tryMap = (label: string, run: (m: EventedMapOf) => void): Step<MapReplay, null> =>
+    step(label, ({ sut }) => {
+      try {
+        run(sut);
+      } catch {
+        // The layer refused the call: its events must show no change
+      }
+    });
+  const mapSteps: fc.Arbitrary<Step<MapReplay, null>> = fc.oneof(
+    fc.tuple(key, value).map(([k, v]) => tryMap(`set(${k}, ${v})`, (m) => void m.set(k, v))),
+    key.map((k) => tryMap(`delete(${k})`, (m) => void m.delete(k))),
+    fc.tuple(key, value).map(([k, v]) => tryMap(`setIfAbsent(${k}, ${v})`, (m) => void m.setIfAbsent(k, v))),
+    fc.tuple(key, value).map(([k, v]) => tryMap(`replace(${k}, ${v})`, (m) => void m.replace(k, v))),
+    fc.tuple(key, value).map(([k, v]) => tryMap(`computeIfAbsent(${k}, ${v})`, (m) => void m.computeIfAbsent(k, () => v))),
+    key.map((k) => tryMap(`computeIfPresent(${k})`, (m) => void m.computeIfPresent(k, (_, v) => (v > 2 ? undefined : v + 1)))),
+    key.map((k) => tryMap(`compute(${k})`, (m) => void m.compute(k, (_, v) => (v === undefined ? 0 : v > 2 ? undefined : v + 1)))),
+    fc.tuple(key, value).map(([k, v]) => tryMap(`merge(${k}, ${v})`, (m) => void m.merge(k, v, (a, b) => (a + b > 5 ? undefined : a + b)))),
+    fc.array(fc.tuple(key, value), { maxLength: 3 }).map((pairs) =>
+      tryMap(`putAll(${JSON.stringify(pairs)})`, (m) => m.putAll(pairs.map(([k, v]) => ({ key: k, value: v })))),
+    ),
+    fc.constant(tryMap("clear()", (m) => m.clear())),
+  );
+  const contents = (m: EventedMapOf): [number, number][] => [...m.entries()].map((e): [number, number] => [e.key, e.value]).sort((a, b) => a[0] - b[0]);
+  const law = (make: () => EventedMapOf, grow: boolean): void =>
+    runModel<MapReplay, null>({
+      create: () => {
+        const sut = make();
+        const replay = new Map<number, number>();
+        sut.on("set", ({ key: k, value: v }) => void replay.set(k, v));
+        sut.on("delete", ({ key: k, value: v }) => {
+          expect(replay.get(k)).toBe(v);
+          replay.delete(k);
+        });
+        sut.on("clear", () => replay.clear());
+        return { sut: { sut, replay }, model: null };
+      },
+      steps: mapSteps,
+      check: ({ sut, replay }) => {
+        expect([...replay.entries()].sort((a, b) => a[0] - b[0])).toEqual(contents(sut));
+        if (!grow) expect(sut.size).toBeLessThanOrEqual(CAPACITY);
+      },
+      maxSteps: 40,
+      numRuns: 60,
+    });
+
+  it("eventedMap over hashMap", () => {
+    law(() => eventedMap<number, number>()(hashMap<number, number>()) as unknown as EventedMapOf, true);
+  });
+  it("eventedMap over lruMap", () => {
+    law(() => compose(eventedMap<number, number>(), lruMap<number, number>({ capacity: CAPACITY }))(hashMap<number, number>()) as unknown as EventedMapOf, false);
+  });
+  it.each(POLICIES)("eventedMap over boundedMap (%s)", (policy) => {
+    law(
+      () => compose(eventedMap<number, number>(), boundedMap<number, number>({ capacity: CAPACITY, policy }))(hashMap<number, number>()) as unknown as EventedMapOf,
+      policy === "grow",
+    );
+  });
+});
+
+describe("the evented layers report each bulk change (C24)", () => {
+  it("evented over a set gives an event for each element of addAll, removeAll and retainAll", () => {
+    const set = evented<number>()(hashSet<number>()) as ReturnType<ReturnType<typeof evented<number>>>;
+    const log: string[] = [];
+    set.on("add", ({ value: v }) => void log.push(`+${v}`));
+    set.on("remove", ({ value: v }) => void log.push(`-${v}`));
+    expect(set.addAll([1, 2, 2, 3, 4])).toBe(true);
+    expect(set.removeAll([2, 9])).toBe(true);
+    expect(set.retainAll([1, 4])).toBe(true);
+    expect(log.slice(0, 4)).toEqual(["+1", "+2", "+3", "+4"]);
+    expect(log.slice(4).sort()).toEqual(["-2", "-3"]);
+    expect([...set].sort()).toEqual([1, 4]);
+  });
+
+  it("evented over a treeSet gives an event for pollFirst and pollLast", () => {
+    const set = evented<number>()(treeSet<number>([1, 2, 3]) as unknown as Collection<number>) as unknown as Collection<number> & {
+      on(event: "remove", listener: (p: { value: number }) => void): () => void;
+      pollFirst(): number | undefined;
+      pollLast(): number | undefined;
+    };
+    const removed: number[] = [];
+    set.on("remove", ({ value: v }) => void removed.push(v));
+    set.pollFirst();
+    set.pollLast();
+    expect(removed).toEqual([1, 3]);
+  });
+
+  it("eventedMap over a treeMap gives a delete for pollFirstEntry and pollLastEntry", () => {
+    const base = treeMap<number, string>();
+    base.set(1, "a");
+    base.set(2, "b");
+    base.set(3, "c");
+    const map = eventedMap<number, string>()(base) as unknown as EventedMapOf & {
+      pollFirstEntry(): unknown;
+      pollLastEntry(): unknown;
+    };
+    const deleted: unknown[] = [];
+    map.on("delete", (p) => void deleted.push(p));
+    map.pollFirstEntry();
+    map.pollLastEntry();
+    expect(deleted).toEqual([
+      { key: 1, value: "a" },
+      { key: 3, value: "c" },
+    ]);
   });
 });

@@ -34,11 +34,8 @@ export type {
   ReadonlyQueue,
   Queue,
   Deque,
-  BlockingQueue,
   PriorityQueue as IPriorityQueue,
   AsyncQueue as IAsyncQueue,
-  TransferQueue,
-  DelayQueue,
 } from "./interfaces/queue.js";
 
 // ============================================================================
@@ -216,4 +213,3 @@ export {
   toMap,
   groupBy,
 } from "./utils/factories.js";
-

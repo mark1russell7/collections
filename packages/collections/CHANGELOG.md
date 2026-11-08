@@ -19,6 +19,14 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
 
 - The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.
 - `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
+- The 70 names with the verdict "remove" of `docs/API-REVIEW.md` (D3). No file, test or doc of the repository used them:
+  - the interfaces with no class: `Vector`, `CircularList`, `MultiMap`, `BiMap`, `WeakMapLike`, `BlockingQueue`, `TransferQueue` and `DelayQueue`;
+  - the types `IsReadonly` and `ElementOf`, and the middleware types `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability` and `CollectionBuilder`;
+  - 12 traits, from `Sized` to `Disposable`. The `Disposable` of the language with `Symbol.dispose` is no longer hidden;
+  - 24 policy types and their default values, with `RetryPolicy` and `DEFAULT_RETRY_POLICY`. Retries have a home: `@mark1russell7/service`;
+  - `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` and `KEY_DIGITS`;
+  - 14 names of `utils/helpers.ts`, from `checkBounds` to `stringHashCode`. `toArray` stays.
+- `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
 
 ## 0.9.6
 

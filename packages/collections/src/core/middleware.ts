@@ -125,38 +125,6 @@ export interface BoundedCollection {
 }
 
 /**
- * Marker interface for collections that support safe (Option/Result) operations.
- */
-export interface SafeCollection {
-  /**
-   * Namespace for safe operations that return Option/Result instead of throwing.
-   */
-  readonly safe: unknown;
-}
-
-/**
- * This type gives the element type of a collection.
- */
-export type ElementType<C> = C extends {
-  [Symbol.iterator](): Iterator<infer T>;
-}
-  ? T
-  : C extends { get(index: number): infer T }
-  ? T
-  : C extends { peek(): infer T }
-  ? T
-  : never;
-
-/**
- * This type changes each method of a type so that it gives its async equivalent.
- */
-export type Asyncify<C> = {
-  [K in keyof C]: C[K] extends (...args: infer Args) => infer R
-    ? (...args: Args) => Promise<R>
-    : C[K];
-};
-
-/**
  * Helper to make a proxy that intercepts method calls.
  * Useful for implementing middleware that needs to wrap method invocations.
  *
@@ -233,50 +201,6 @@ export const delegate = <C extends object, T extends C>(
     },
   }) as C;
 };
-
-/**
- * Utility type to add optional capabilities to a collection type.
- */
-export type WithCapability<C, Cap> = C & Cap;
-
-/**
- * Builder pattern helper for fluent API construction.
- *
- * @example
- * class ListBuilder<T> {
- *   private middleware: Middleware<List<T>>[] = []
- *
- *   bounded(capacity: number) {
- *     this.middleware.push(boundedList({ capacity }))
- *     return this
- *   }
- *
- *   evented() {
- *     this.middleware.push(eventedList())
- *     return this
- *   }
- *
- *   build(): List<T> {
- *     return compose(...this.middleware)(arrayList<T>())
- *   }
- * }
- */
-export abstract class CollectionBuilder<C> {
-  protected middleware: Middleware<C>[] = [];
-
-  /**
-   * This method applies a custom middleware.
-   */
-  use(middleware: Middleware<C>): this {
-    this.middleware.push(middleware);
-    return this;
-  }
-
-  /**
-   * This method builds the final collection: it composes all middleware with the base.
-   */
-  abstract build(): C;
-}
 
 /**
  * Utility to make a middleware that only enhances specific methods.

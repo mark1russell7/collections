@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.11
+
+The entry `./graph` gets a search of the strongly connected components (C43). PATCH: a new feature before 1.0.0, with no change of the old names.
+
+### Added
+
+- `stronglyConnectedComponents(nodes, successors)` gives the components of a directed graph, the deepest component first.
+- `strongComponentsCompact(n, start, targets)` is the same search on a compact graph. It also gives the component of each node.
+- Both functions use the algorithm of Tarjan with their own stack, so a chain of 100000 nodes does not overflow.
+
 ## 0.9.10
 
 The helpers of `core/middleware.ts` get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.

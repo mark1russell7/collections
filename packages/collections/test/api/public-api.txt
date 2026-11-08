@@ -368,8 +368,11 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 
 ## ./graph (build/graph/index.d.ts): names
 
+type StrongComponents: build/graph/index.d.ts#StrongComponents
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
+strongComponentsCompact: build/graph/index.d.ts#strongComponentsCompact
+stronglyConnectedComponents: build/graph/index.d.ts#stronglyConnectedComponents
 
 ## ./layers (build/core/layers.d.ts): names
 
@@ -613,6 +616,12 @@ declare function summaryOf<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>
 ### build/functions.d.ts#toArray
 declare function toArray<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Leaf[];
 
+### build/graph/index.d.ts#StrongComponents
+interface StrongComponents {
+  readonly of: Int32Array;
+  readonly list: readonly (readonly number[])[];
+}
+
 ### build/graph/index.d.ts#WeightedEdge
 interface WeightedEdge {
   readonly a: number;
@@ -622,6 +631,12 @@ interface WeightedEdge {
 
 ### build/graph/index.d.ts#hubBreadthFirstOrder
 export declare function hubBreadthFirstOrder(n: number, edges?: readonly WeightedEdge[], compare?: (i: number, j: number) => number): number[];
+
+### build/graph/index.d.ts#strongComponentsCompact
+export declare function strongComponentsCompact(n: number, start: ArrayLike<number>, targets: ArrayLike<number>): StrongComponents;
+
+### build/graph/index.d.ts#stronglyConnectedComponents
+export declare function stronglyConnectedComponents<Id>(nodes: Iterable<Id>, successors: (node: Id) => Iterable<Id>): Id[][];
 
 ### build/index.d.ts#ArrayConvertible
 export interface ArrayConvertible<T> {

@@ -124,6 +124,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `hubBreadthFirstOrder`, `WeightedEdge` | keep | `@procedures/dag` re-exports them, and the graph guide tests the order. |
+| `stronglyConnectedComponents`, `strongComponentsCompact`, `StrongComponents` | keep | Version 0.9.11 adds them (C43). The search of the components of coeval moves to them. |
 
 ## The entry `./layers`
 

@@ -93,6 +93,7 @@ export * from "./behaviors/ttl.js";
 export * from "./async/async-queue.js";
 export * from "./async/channels.js";
 export * from "./async/settled.js";
+export * from "./async/semaphore.js";
 
 // ============================================================================
 // Functional Operations
@@ -135,6 +136,7 @@ export { ttlMap, ttlCache, TTLCache, ttlCollection } from "./behaviors/ttl.js";
 // Async/Concurrent
 export { asyncQueue, AsyncQueue } from "./async/async-queue.js";
 export { asSettled, type Settled } from "./async/settled.js";
+export { semaphore, type Semaphore } from "./async/semaphore.js";
 export {
   channel,
   Channel,

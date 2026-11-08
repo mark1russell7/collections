@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.4
+
+A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `semaphore(permits)` and the type `Semaphore`. At most `permits` tasks hold a permit. The waiting callers get the permits in the order that they came. A second call of one release does nothing. `run` gives the permit back when the task ends or throws.
+
 ## 0.9.3
 
 The summary tree is also a set of plain functions, so a bundler keeps only the functions that a program calls (C35). PATCH: before 1.0.0 a feature raises PATCH, and the class keeps its API.

@@ -254,4 +254,4 @@ assert.equal(list.size, 1);
 The examples of this guide found two defects. This guide does not show the functions until each defect has a fix:
 
 - `reentrantSynchronized` was not reentrant. A call from inside a locked method waited for the lock of the outer call, so the two calls did not end. Version 0.10.0 removes it.
-- The generic `safe()` gives the collection with no change, and adds no property `safe`. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.
+- Version 0.10.0 removes the generic `safe()`. It gave the collection with no change. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.

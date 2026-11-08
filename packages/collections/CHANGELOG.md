@@ -42,6 +42,7 @@ The breaking changes of the API review ship in one version, with the drop end of
   - `mutableListOf` and `mutableMapOf`: use `listOf` and `mapOf`;
   - `toList` of an iterable: use `arrayList(iterable)`. The collector `collectToList` stays.
 - `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
+- The generic `safe()` (C29). It gave the collection with no change and added no property `safe`, so no caller depended on its result. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.
 
 ### Fixed
 

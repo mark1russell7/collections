@@ -10,7 +10,7 @@ This guide shows three behaviors:
 | Safe | `safeList`, `safeQueue`, `safeDeque`, `safeMap` | a read of a missing element gives an `Optional` or a `Result`, not an error |
 | Locks | `synchronized`, `readWriteLock` | the async calls run in a fixed order |
 
-The guide [Events and caches](caches.md) shows `evented`, `lruMap` and `ttlMap`. A later guide shows `bounded`. An open pull request changes it.
+The guide [Events and caches](caches.md) shows `evented`, `lruMap` and `ttlMap`. The guide [Bounded collections](bounded.md) shows `bounded` and its policies.
 
 ## Readonly: a change throws an error
 

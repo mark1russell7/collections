@@ -8,7 +8,7 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 
 | Verdict | What it means | Names |
 |---|---|---|
-| keep | The name stays as it is. | 206 |
+| keep | The name stays as it is. | 209 |
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 57 |
 | remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. | 75 |
 | move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |

@@ -107,8 +107,6 @@ export function ttlMap<K, V>(
     };
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "dispose" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
@@ -254,8 +252,6 @@ export function ttlCollection<T>(
     };
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "dispose" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;

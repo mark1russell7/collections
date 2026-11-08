@@ -209,8 +209,6 @@ export function eventedList<T>(): Middleware<
     );
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "on" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         // Expose event subscription
         if (prop === "on") {
@@ -372,8 +370,6 @@ export function eventedQueue<T>(): Middleware<
     hear<ElementRemoval<T>>(next, ({ value, reason }) => emitter.emit("dequeue", { value, reason }));
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "on" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);
@@ -456,8 +452,6 @@ export function eventedDeque<T>(): Middleware<
     );
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "on" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);
@@ -572,8 +566,6 @@ export function eventedMap<K, V>(): Middleware<
     const heard = hear<MapRemoval<K, V>>(next, ({ key, value, reason }) => emitter.emit("delete", { key, value, reason }));
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "on" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);
@@ -651,8 +643,6 @@ export function evented<T>(): Middleware<
     hear<ElementRemoval<T>>(next, ({ value, reason }) => emitter.emit("remove", { value, reason }));
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "on" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === "on") {
           return emitter.on.bind(emitter);

@@ -123,8 +123,6 @@ export function boundedList<T>(
     const shifted = (index: number): number => (policy === "drop-oldest" ? Math.max(0, index - 1) : index);
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "capacity" || prop === "isFull" || prop === "remainingCapacity" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         // Capacity property
         if (prop === removals) return source.channel;
@@ -292,8 +290,6 @@ export function boundedQueue<T>(
     };
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "capacity" || prop === "isFull" || prop === "remainingCapacity" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;
@@ -376,8 +372,6 @@ export function boundedDeque<T>(
     };
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "capacity" || prop === "isFull" || prop === "remainingCapacity" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;
@@ -477,8 +471,6 @@ export function boundedMap<K, V>(
     };
 
     return new Proxy(next, {
-      // The key that this layer adds is in the collection, so hasCapability and the operator in find it
-      has: (target, prop) => prop === "capacity" || prop === "isFull" || prop === "remainingCapacity" || Reflect.has(target, prop),
       get(target, prop, receiver) {
         if (prop === removals) return source.channel;
         if (prop === "capacity") return capacity;

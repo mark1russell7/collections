@@ -149,7 +149,7 @@ export function groupingBy<T, K>(
 }
 
 /**
- * Groups and transforms with a downstream collector.
+ * This function groups the elements and transforms each group with a downstream collector.
  *
  * @example
  * const countByAge = collect(

@@ -1,5 +1,5 @@
 /**
- * Readonly behavior - Makes immutable views of collections.
+ * Readonly behavior: this module makes immutable views of collections.
  *
  * This module wraps collections to prevent modifications by throwing errors
  * on any mutation try. Mirrors Java's Collections.unmodifiable*() methods.

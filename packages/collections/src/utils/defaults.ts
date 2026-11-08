@@ -338,7 +338,7 @@ export const hashNumber = (num: number): number => {
 };
 
 /**
- * Combine multiple hash values.
+ * This function combines hash values into one hash.
  * Useful for hashing objects with multiple fields.
  *
  * @example
@@ -355,7 +355,7 @@ export const combineHashes = (...hashes: number[]): number => {
 };
 
 /**
- * Make a hash function that hashes by a specific property.
+ * This function makes a hash function that hashes by a property.
  *
  * @example
  * const userHash = hashBy<User>((u) => u.id)

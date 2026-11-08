@@ -1,5 +1,5 @@
 /**
- * List interfaces that mirror Java's List interface.
+ * This module has the list interfaces, which mirror the List interface of Java.
  *
  * Lists are ordered collections that can hold duplicate elements
  * and give positional (indexed) access to elements.
@@ -153,7 +153,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   push(element: T): void;
 
   /**
-   * Removes and gives the last element in this list.
+   * This method removes the last element of this list and gives it.
    *
    * @returns The last element
    * @throws Error if list is empty
@@ -161,7 +161,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   pop(): T;
 
   /**
-   * Removes and gives the first element in this list.
+   * This method removes the first element of this list and gives it.
    *
    * @returns The first element
    * @throws Error if list is empty
@@ -209,7 +209,7 @@ export interface Stack<T> extends Iterable<T> {
   push(element: T): void;
 
   /**
-   * Removes and gives the top element.
+   * This method removes the top element and gives it.
    *
    * @throws Error if stack is empty
    */

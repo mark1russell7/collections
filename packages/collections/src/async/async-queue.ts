@@ -152,7 +152,7 @@ export class AsyncQueue<T> implements IAsyncQueue<T> {
   }
 
   /**
-   * Removes and gives an element from the queue.
+   * This method removes an element from the queue and gives it.
    * If the queue is empty, waits until an element is available.
    *
    * @throws Error if queue is closed and empty

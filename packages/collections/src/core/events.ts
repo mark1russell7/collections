@@ -54,7 +54,7 @@ export class Emitter<E extends EventMap> {
   private listeners = new Map<keyof E, Set<Listener<any>>>();
 
   /**
-   * Subscribe to an event.
+   * This method subscribes a listener to an event.
    *
    * @param event The event name
    * @param listener The callback to invoke when event is emitted
@@ -79,7 +79,7 @@ export class Emitter<E extends EventMap> {
   }
 
   /**
-   * Subscribe to an event, but automatically unsubscribe after first emission.
+   * This method subscribes a listener to an event, and unsubscribes it after the first emission.
    *
    * @param event The event name
    * @param listener The callback to invoke once
@@ -96,7 +96,7 @@ export class Emitter<E extends EventMap> {
   }
 
   /**
-   * Emit an event to all registered listeners.
+   * This method emits an event to all registered listeners.
    *
    * @param event The event name
    * @param payload The event payload
@@ -121,7 +121,7 @@ export class Emitter<E extends EventMap> {
   }
 
   /**
-   * Remove all listeners for a specific event, or all events if no event specified.
+   * This method removes all listeners of an event, or of all events when the call gives no event.
    *
    * @param event Optional event name to clear listeners for
    */
@@ -134,7 +134,7 @@ export class Emitter<E extends EventMap> {
   }
 
   /**
-   * Get the number of listeners for a specific event.
+   * This method gives the number of listeners of an event.
    *
    * @param event The event name
    * @returns Number of registered listeners
@@ -144,21 +144,21 @@ export class Emitter<E extends EventMap> {
   }
 
   /**
-   * Get all event names that have at least one listener.
+   * This method gives the names of the events that have one or more listeners.
    */
   eventNames(): (keyof E)[] {
     return Array.from(this.listeners.keys());
   }
 
   /**
-   * Check if there are any listeners for a specific event.
+   * This method gives true when an event has one or more listeners.
    */
   hasListeners<K extends keyof E>(event: K): boolean {
     return this.listenerCount(event) > 0;
   }
 
   /**
-   * Remove all listeners and clean up resources.
+   * This method removes all listeners and releases the resources.
    */
   dispose(): void {
     this.listeners.clear();
@@ -166,7 +166,7 @@ export class Emitter<E extends EventMap> {
 }
 
 /**
- * Make an event emitter for a specific event map.
+ * This function makes an event emitter for an event map.
  *
  * This is a convenience factory function.
  *
@@ -205,7 +205,7 @@ export class EventBatcher<E extends EventMap, K extends keyof E> {
   }
 
   /**
-   * Add an event to the current batch.
+   * This method adds an event to the current batch.
    */
   queue(payload: E[K]): void {
     this.batch.push(payload);
@@ -216,7 +216,7 @@ export class EventBatcher<E extends EventMap, K extends keyof E> {
   }
 
   /**
-   * Immediately emit all batched events.
+   * This method emits all batched events at once.
    */
   flush(): void {
     if (this.timer !== null) {
@@ -232,7 +232,7 @@ export class EventBatcher<E extends EventMap, K extends keyof E> {
   }
 
   /**
-   * Clean up resources.
+   * This method sends the events of the batch and releases the resources.
    */
   dispose(): void {
     this.flush();
@@ -272,7 +272,7 @@ export class AsyncEmitter<E extends EventMap> {
   }
 
   /**
-   * Emit an event and wait for all async listeners to complete.
+   * This method emits an event and waits until all async listeners complete.
    *
    * @param event The event name
    * @param payload The event payload
@@ -340,7 +340,7 @@ export const forwardEvent = <
 };
 
 /**
- * Make a filtered event subscription that only fires when predicate is true.
+ * This function makes a filtered event subscription that fires only when the predicate is true.
  *
  * @example
  * const emitter = new Emitter<{ change: { value: number } }>()

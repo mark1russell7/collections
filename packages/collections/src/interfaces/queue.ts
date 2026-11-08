@@ -15,7 +15,7 @@ import type { Compare } from "../core/traits.js";
  */
 export interface ReadonlyQueue<T> extends ReadonlyCollection<T> {
   /**
-   * Retrieves, but does not remove, the head of this queue.
+   * This method gives the head of this queue, and does not remove it.
    *
    * @returns The head element
    * @throws Error if queue is empty
@@ -47,7 +47,7 @@ export interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
   offer(element: T): boolean;
 
   /**
-   * Retrieves and removes the head of this queue.
+   * This method removes the head of this queue and gives it.
    *
    * @returns The head element
    * @throws Error if queue is empty
@@ -55,7 +55,7 @@ export interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
   poll(): T;
 
   /**
-   * Retrieves and removes the head of this queue, or gives undefined if empty.
+   * This method removes the head of this queue and gives it, or gives undefined when the queue is empty.
    */
   pollOrUndefined(): T | undefined;
 
@@ -66,7 +66,7 @@ export interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
   enqueue(element: T): boolean;
 
   /**
-   * Alias for poll(). Removes and gives element from front of queue.
+   * This method is an alias for poll(). It removes the element at the front of the queue and gives it.
    * This method is here for consistency with standard queue terminology.
    */
   dequeue(): T;
@@ -96,14 +96,14 @@ export interface Deque<T> extends Queue<T> {
   offerFirst(element: T): boolean;
 
   /**
-   * Retrieves and removes the first element.
+   * This method removes the first element and gives it.
    *
    * @throws Error if deque is empty
    */
   removeFirst(): T;
 
   /**
-   * Retrieves and removes the first element, or undefined if empty.
+   * This method removes the first element and gives it, or gives undefined when the deque is empty.
    */
   pollFirst(): T | undefined;
 
@@ -135,14 +135,14 @@ export interface Deque<T> extends Queue<T> {
   offerLast(element: T): boolean;
 
   /**
-   * Retrieves and removes the last element.
+   * This method removes the last element and gives it.
    *
    * @throws Error if deque is empty
    */
   removeLast(): T;
 
   /**
-   * Retrieves and removes the last element, or undefined if empty.
+   * This method removes the last element and gives it, or gives undefined when the deque is empty.
    */
   pollLast(): T | undefined;
 
@@ -197,7 +197,7 @@ export interface BlockingQueue<T> extends Queue<T> {
   put(element: T, timeoutMs?: number): Promise<void>;
 
   /**
-   * Retrieves and removes the head, waiting if necessary until an element is available.
+   * This method removes the head and gives it. It waits until an element is available.
    *
    * @param timeoutMs Optional timeout in milliseconds
    * @returns Promise that resolves to the head element
@@ -258,7 +258,7 @@ export interface AsyncQueue<T> extends AsyncIterable<T> {
   put(element: T): Promise<void>;
 
   /**
-   * Removes and gives next element.
+   * This method removes the next element and gives it.
    * Waits for an element if queue is empty.
    */
   take(): Promise<T>;

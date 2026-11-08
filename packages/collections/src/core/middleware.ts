@@ -90,13 +90,13 @@ export const hasCapability = <C extends Collection<any>, K extends keyof any>(
  */
 export interface Evented<E extends Record<string, any>> {
   /**
-   * Subscribe to an event.
+   * This method subscribes a listener to an event.
    * @returns Unsubscribe function
    */
   on<K extends keyof E>(event: K, handler: (payload: E[K]) => void): () => void;
 
   /**
-   * Emit an event (internal use by middleware).
+   * This method emits an event. Only the middleware calls it.
    * @internal
    */
   emit?<K extends keyof E>(event: K, payload: E[K]): void;
@@ -135,7 +135,7 @@ export interface SafeCollection {
 }
 
 /**
- * Type helper to extract the element type from a collection.
+ * This type gives the element type of a collection.
  */
 export type ElementType<C> = C extends {
   [Symbol.iterator](): Iterator<infer T>;
@@ -148,7 +148,7 @@ export type ElementType<C> = C extends {
   : never;
 
 /**
- * Type helper to make all methods of a type return their async equivalents.
+ * This type changes each method of a type so that it gives its async equivalent.
  */
 export type Asyncify<C> = {
   [K in keyof C]: C[K] extends (...args: infer Args) => infer R
@@ -265,7 +265,7 @@ export abstract class CollectionBuilder<C> {
   protected middleware: Middleware<C>[] = [];
 
   /**
-   * Apply a custom middleware.
+   * This method applies a custom middleware.
    */
   use(middleware: Middleware<C>): this {
     this.middleware.push(middleware);
@@ -273,7 +273,7 @@ export abstract class CollectionBuilder<C> {
   }
 
   /**
-   * Build the final collection by composing all middleware with the base.
+   * This method builds the final collection: it composes all middleware with the base.
    */
   abstract build(): C;
 }

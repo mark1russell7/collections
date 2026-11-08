@@ -1,5 +1,5 @@
 /**
- * Evented behavior - Emits typed events on collection mutations.
+ * Evented behavior: this module emits typed events on collection mutations.
  *
  * This module wraps collections to emit events whenever elements are added, removed,
  * or the collection is cleared. This module enables reactive programming patterns.

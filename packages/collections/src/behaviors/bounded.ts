@@ -1,5 +1,5 @@
 /**
- * Bounded behavior - Enforces capacity limits on collections.
+ * Bounded behavior: this module enforces capacity limits on collections.
  *
  * This module wraps collections to prevent them from exceeding a maximum size.
  * This module gives various overflow policies to handle full collections.

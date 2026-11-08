@@ -12,6 +12,58 @@
 
 - `boundedList`: `insert` and `insertAll` at an index that the base refuses dropped an element before the base threw. Now the base throws first, and the list does not change.
 
+## 0.9.6
+
+The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.
+
+### Fixed
+
+- `numberCompare` gives 0 for two equal infinities. Before, it gave `NaN`, so a `treeMap` with this comparator held `Infinity` two times, `has` gave `false` and `get` threw. It gives -1, 0 or 1.
+- `dateCompare` and `defaultCompare` give 0 for two invalid dates, and an invalid date comes first. Before, they gave `NaN`.
+- `defaultCompare` puts `null` before `undefined`. Before, `defaultCompare(null, undefined)` and `defaultCompare(undefined, null)` both gave -1.
+- `compare.test.ts` examines the laws of each comparator with `fast-check`. Each pair gives a number, and a value and itself give 0. A swap gives the opposite sign, and the order is transitive.
+
+## 0.9.5
+
+`AsyncQueue` examines its capacity, and each of its errors has one text (C36). PATCH: a fix with no change to the public API. Each capacity that it refuses gave a wrong result before.
+
+### Fixed
+
+- `asyncQueue` and `new AsyncQueue` throw a `RangeError` for a capacity that is not a whole number of 0 or more, or `Infinity`. Before, a capacity of -1 gave a `remainingCapacity` of -1, and 1.5 gave 0.5. With `NaN`, `isFull` was false, but each `put` waited with no end.
+- A put on a closed queue gives `Queue is closed`, also when `close` rejects a waiting put. Before, a waiting put got `Queue closed`.
+- A take, a peek or a `waitTake` on a closed and empty queue gives `Queue is closed and empty`, also when `close` rejects a waiting call. Before, a waiting call got `Queue closed and empty`.
+- The channels of `channels.ts` use `AsyncQueue`, so `channel(-1)` also throws a `RangeError`.
+
+## 0.9.4
+
+A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `semaphore(permits)` and the type `Semaphore`. At most `permits` tasks hold a permit. The waiting callers get the permits in the order that they came. A second call of one release does nothing. `run` gives the permit back when the task ends or throws.
+
+## 0.9.3
+
+The summary tree is also a set of plain functions, so a bundler keeps only the functions that a program calls (C35). PATCH: before 1.0.0 a feature raises PATCH, and the class keeps its API.
+
+### Added
+
+- The entry `@mark1russell7/collections/summary-tree` gives the summary tree as plain functions over a plain record `{ spec, root }`: `of`, `at`, `locate`, `search`, `set`, `splice`, `insert`, `remove`, `slice`, `concat`, `split`, `splitAt` and the others. The rope of typeset (the functions `of`, `at`, `locate`, `set`, `splice`, `slice`, `concat` and `insert`) weighs 1842 gzip bytes in a bundle. With the class, it weighs 2551.
+- `SummaryTree` wraps the same functions. Its new field `record` and its new function `fromRecord` move a tree between the two forms without a copy.
+- The types `SummaryTreeRecord` and `SummaryNode`.
+- `bundle-weight.test.ts` bundles a small program of each entry with esbuild. A case fails when its gzip bytes pass the measured weight plus 10 percent. An import of each entry that uses nothing adds no byte.
+
+## 0.9.2
+
+The s20 audit found four faults of the set operations and of `readonly`. This version corrects them. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `HashSet`: `clone`, `union`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` keep the custom hash of the set. Before, the inner sets used `defaultHash`, so they did not find an equal element.
+- `HashSet`: `intersection`, `symmetricDifference` and `retainAll` read the other iterable one time. Before, `intersection` of a generator gave an empty set.
+- `TreeSet`: `retainAll`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` compare with the comparator of the set. Before, they used a native `Set`, which compares with `===`.
+- `readonly`: a view of an `lruCache` blocks `deleteWhere`. Before, `deleteWhere` emptied the cache through the view.
+
 ## 0.9.1
 
 The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.

@@ -54,7 +54,16 @@ export * from "./impl/tree-set.js";
 export * from "./impl/linked-list.js";
 export * from "./impl/hash-set.js";
 export * from "./impl/priority-queue.js";
-export { SummaryTree, summaryTree, type SummaryLocation, type SummaryMonoid, type SummarySearch, type SummarySpec } from "./impl/summary-tree.js";
+export {
+  SummaryTree,
+  summaryTree,
+  type SummaryLocation,
+  type SummaryMonoid,
+  type SummaryNode,
+  type SummarySearch,
+  type SummarySpec,
+  type SummaryTreeRecord,
+} from "./impl/summary-tree.js";
 
 // ============================================================================
 // Behaviors
@@ -84,6 +93,7 @@ export * from "./behaviors/ttl.js";
 export * from "./async/async-queue.js";
 export * from "./async/channels.js";
 export * from "./async/settled.js";
+export * from "./async/semaphore.js";
 
 // ============================================================================
 // Functional Operations
@@ -126,6 +136,7 @@ export { ttlMap, ttlCache, TTLCache, ttlCollection } from "./behaviors/ttl.js";
 // Async/Concurrent
 export { asyncQueue, AsyncQueue } from "./async/async-queue.js";
 export { asSettled, type Settled } from "./async/settled.js";
+export { semaphore, type Semaphore } from "./async/semaphore.js";
 export {
   channel,
   Channel,

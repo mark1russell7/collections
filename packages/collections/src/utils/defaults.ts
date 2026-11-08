@@ -338,7 +338,7 @@ export const hashNumber = (num: number): number => {
 };
 
 /**
- * Combine multiple hash values.
+ * This function combines hash values into one hash.
  * Useful for hashing objects with multiple fields.
  *
  * @example
@@ -355,7 +355,7 @@ export const combineHashes = (...hashes: number[]): number => {
 };
 
 /**
- * Make a hash function that hashes by a specific property.
+ * This function makes a hash function that hashes by a property.
  *
  * @example
  * const userHash = hashBy<User>((u) => u.id)
@@ -368,25 +368,29 @@ export const hashBy = <T>(accessor: (value: T) => any): Hash<T> => {
 // Default Comparison
 // ============================================================================
 
+/** This function gives the place of `null` and `undefined` in the order of `defaultCompare`: `null`, then `undefined`, then each other value. */
+const nullishRank = (value: unknown): number => (value === null ? 0 : value === undefined ? 1 : 2);
+
 /**
- * Natural ordering comparison for primitives.
- * Numbers, strings, booleans, dates are compared naturally.
+ * This comparator gives the natural order of primitives.
+ * - `null` comes first, then `undefined`, then each other value.
+ * - Numbers and dates compare as `numberCompare` and `dateCompare` compare them.
+ * - Strings compare by `localeCompare`, and `false` comes before `true`.
+ * - Two values of different types compare by their text, with `String`.
  */
 export const defaultCompare: Compare<any> = (a, b) => {
   if (a === b) return 0;
-  if (a === null || a === undefined) return -1;
-  if (b === null || b === undefined) return 1;
+  const nullish = nullishRank(a) - nullishRank(b);
+  if (nullish !== 0) return nullish;
 
   // Handle dates
   if (a instanceof Date && b instanceof Date) {
-    return a.getTime() - b.getTime();
+    return dateCompare(a, b);
   }
 
   // Handle numbers
   if (typeof a === "number" && typeof b === "number") {
-    if (Number.isNaN(a)) return Number.isNaN(b) ? 0 : -1;
-    if (Number.isNaN(b)) return 1;
-    return a - b;
+    return numberCompare(a, b);
   }
 
   // Handle strings
@@ -404,12 +408,14 @@ export const defaultCompare: Compare<any> = (a, b) => {
 };
 
 /**
- * Numeric comparison (for numbers).
+ * This comparator gives the order of numbers by value. It gives -1, 0 or 1.
+ * - `NaN` comes first, and two `NaN` values give 0.
+ * - Two equal infinities give 0, and 0 equals -0.
  */
 export const numberCompare: Compare<number> = (a, b) => {
   if (Number.isNaN(a)) return Number.isNaN(b) ? 0 : -1;
   if (Number.isNaN(b)) return 1;
-  return a - b;
+  return a < b ? -1 : a > b ? 1 : 0;
 };
 
 /**
@@ -424,10 +430,10 @@ export const stringCompareIgnoreCase: Compare<string> = (a, b) =>
   a.toLowerCase().localeCompare(b.toLowerCase());
 
 /**
- * Date comparison.
+ * This comparator gives the order of dates by time, with `numberCompare`. An invalid date has the time `NaN`, so it comes
+ * first, and two invalid dates give 0.
  */
-export const dateCompare: Compare<Date> = (a, b) =>
-  a.getTime() - b.getTime();
+export const dateCompare: Compare<Date> = (a, b) => numberCompare(a.getTime(), b.getTime());
 
 /**
  * Boolean comparison (false < true).

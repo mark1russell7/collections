@@ -92,7 +92,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | Names | Verdict | Reason |
 |---|---|---|
 | `asyncQueue`, `AsyncQueue`, `AsyncQueueOptions`, `asSettled`, `Settled` | keep | The async contracts test them. |
-| `channel`, `Channel`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `workerPool`, `buffered`, `unbuffered`, `SelectCase` | move | Channels, `select` and a worker pool are tools of concurrency. Their home is `@mark1russell7/service` (S2). There, `ticker` and `timeout` use its clock, so one fake clock tests each tool. |
+| `channel`, `Channel`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `workerPool`, `buffered`, `unbuffered`, `SelectCase` | move | Channels, `select` and a worker pool are tools of concurrency. Their home is `@mark1russell7/service` (S2). There, `ticker` and `timeout` use its clock, so one fake clock tests each tool. Version 0.10.0 removes them from collections (C26). |
 
 ### The iterables and the collectors
 

@@ -15,6 +15,7 @@ The breaking changes of the API review ship in one version. MINOR: before 1.0.0 
 
 ### Removed
 
+- The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.
 - `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
 
 ## 0.9.6

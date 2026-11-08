@@ -417,6 +417,73 @@ function checkMap({ sut, calls }: MS, m: MM, ordered: boolean): void {
   expect(calls.overflows).toBe(m.overflows);
 }
 
+// Each add method of one element, its call with the element 9, and the end that drop-oldest takes for it (C42)
+const ADDS: readonly (readonly [string, (c: any) => unknown, "first" | "last", "boolean" | "void"])[] = [
+  ["add", (c) => c.add(9), "first", "boolean"],
+  ["push", (c) => c.push(9), "first", "void"],
+  ["addLast", (c) => c.addLast(9), "first", "void"],
+  ["offer", (c) => c.offer(9), "first", "boolean"],
+  ["offerLast", (c) => c.offerLast(9), "first", "boolean"],
+  ["enqueue", (c) => c.enqueue(9), "first", "boolean"],
+  ["unshift", (c) => c.unshift(9), "last", "void"],
+  ["addFirst", (c) => c.addFirst(9), "last", "void"],
+  ["offerFirst", (c) => c.offerFirst(9), "last", "boolean"],
+  ["insert(0)", (c) => c.insert(0, 9), "last", "void"],
+  ["insert(1)", (c) => c.insert(1, 9), "first", "void"],
+  ["addAll", (c) => c.addAll([9]), "first", "boolean"],
+  ["insertAll(0)", (c) => c.insertAll(0, [9]), "last", "boolean"],
+  ["insertAll(1)", (c) => c.insertAll(1, [9]), "first", "boolean"],
+];
+
+const LAYERS = [
+  ["boundedList", "List", (o: { capacity: number; policy: Policy }) => boundedList<number>(o)],
+  ["boundedQueue", "Queue", (o: { capacity: number; policy: Policy }) => boundedQueue<number>(o)],
+  ["boundedDeque", "Deque", (o: { capacity: number; policy: Policy }) => boundedDeque<number>(o)],
+] as const;
+
+const BASES = [
+  ["ArrayList", () => arrayList<number>()],
+  ["LinkedList", () => linkedList<number>()],
+  ["ArrayDeque", () => arrayDeque<number>()],
+] as const;
+
+describe("each add method of each bounded layer and base (C42)", () => {
+  for (const [layer, kind, make] of LAYERS) {
+    for (const [baseName, base] of BASES) {
+      // A queue or a deque layer needs a base with poll, and a list layer needs a base with get
+      if (layer === "boundedList" && baseName === "ArrayDeque") continue;
+      if (layer !== "boundedList" && baseName === "ArrayList") continue;
+      for (const policy of POLICIES) {
+        it(`${layer} over ${baseName} with the policy ${policy}`, () => {
+          for (const [method, add, end, gives] of ADDS) {
+            const sut = (make({ capacity: 3, policy }) as (b: any) => any)(base());
+            if (typeof sut[method.replace(/\(.*$/, "")] !== "function") continue;
+            for (const value of [0, 1, 2]) sut.add(value);
+            const drops: [number, string][] = [];
+            removalsOf<ElementRemoval<number>>(sut)?.on(({ value, end: from }) => drops.push([value, String(from)]));
+            const where = `${layer}(${baseName}).${method}`;
+            if (policy === "throw") {
+              expect(() => add(sut), where).toThrow(`${kind} is full (capacity: 3)`);
+              expect(sut.toArray(), where).toEqual([0, 1, 2]);
+            } else if (policy === "grow") {
+              add(sut);
+              expect(sut.size, where).toBe(4);
+            } else if (policy === "drop-oldest") {
+              add(sut);
+              expect(sut.size, where).toBe(3);
+              expect(drops, where).toEqual([[end === "first" ? 0 : 2, end]]);
+              expect(sut.toArray(), where).toContain(9);
+            } else {
+              expect(add(sut), where).toBe(gives === "boolean" ? false : undefined);
+              expect(sut.toArray(), where).toEqual([0, 1, 2]);
+            }
+          }
+        });
+      }
+    }
+  }
+});
+
 // Every key in one of two buckets: the delete of the oldest key goes through keyEq on a chain
 const colliding = { hash: (k: number) => Math.abs(k) % 2, eq: (a: number, b: number) => a === b };
 

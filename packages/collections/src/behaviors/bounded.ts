@@ -62,186 +62,76 @@ export interface BoundedCollection {
 /**
  * This function makes a bounded List middleware.
  *
- * Intercepts add operations to enforce capacity limits.
+ * The layer bounds each add method of the base, also the deque and queue methods of a linked list (C42).
  * This function supports multiple overflow policies.
  */
 export function boundedList<T>(
   options: BoundedOptions<T>
 ): Middleware<List<T>, List<T> & BoundedCollection> {
-  const { policy = "throw", onOverflow } = options;
-  const capacity = checkCapacity(options.capacity, "boundedList");
+  return boundedElements<List<T>, T>("List", checkCapacity(options.capacity, "boundedList"), options);
+}
 
-  return (next: List<T>): List<T> & BoundedCollection => {
-    const source = removalSource<ElementRemoval<T>>(next);
-    // An unshift puts the element at the front, so drop-oldest drops the last element for it
-    const handleOverflow = (element: T, dropFrom: "first" | "last" = "first"): void => {
-      // Call overflow handler if provided
-      if (onOverflow) {
-        const context: OverflowContext<T> = {
-          newElement: element,
-          currentSize: next.size,
-          capacity,
-          timestamp: Date.now(),
-        };
-        onOverflow(context);
-      }
+/**
+ * This function makes a bounded Queue middleware.
+ *
+ * The layer bounds each add method of the base, also `push`, `addFirst` and `addLast` of a deque (C42).
+ */
+export function boundedQueue<T>(
+  options: BoundedOptions<T>
+): Middleware<Queue<T>, Queue<T> & BoundedCollection> {
+  return boundedElements<Queue<T>, T>("Queue", checkCapacity(options.capacity, "boundedQueue"), options);
+}
 
-      // Apply policy
-      switch (policy) {
-        case "throw":
-          throw new Error(`List is full (capacity: ${capacity})`);
+/**
+ * This function makes a bounded Deque middleware.
+ *
+ * The layer bounds each add method of the base, also `insert` and `insertAll` of a linked list (C42).
+ */
+export function boundedDeque<T>(
+  options: BoundedOptions<T>
+): Middleware<Deque<T>, Deque<T> & BoundedCollection> {
+  return boundedElements<Deque<T>, T>("Deque", checkCapacity(options.capacity, "boundedDeque"), options);
+}
 
-        case "drop-oldest":
-          // Remove one element: the first, or the last for an unshift
-          if (!next.isEmpty) {
-            const value = dropFrom === "last" ? next.pop() : next.shift();
-            source.emit({ value, end: dropFrom, reason: "drop" });
-          }
-          break;
+/** An end of a sequence. The policy `drop-oldest` removes the element at this end. */
+type End = "first" | "last";
 
-        case "drop-newest":
-          // Don't add the new element (do nothing)
-          return;
+/**
+ * This table gives each add method of one element, and the end that `drop-oldest` takes for it.
+ * A front add drops the last element. Each other add drops the first element (C21).
+ */
+const addEnds: Readonly<Record<string, End>> = {
+  add: "first",
+  push: "first",
+  addLast: "first",
+  offer: "first",
+  offerLast: "first",
+  enqueue: "first",
+  unshift: "last",
+  addFirst: "last",
+  offerFirst: "last",
+};
 
-        case "reject":
-          // Silently reject (return false for add operations)
-          return;
+/** These add methods give a boolean, so they give false for an element that the layer refuses. */
+const givesBoolean: ReadonlySet<string> = new Set(["add", "offer", "offerLast", "offerFirst", "enqueue"]);
 
-        case "grow":
-          // Allow growth (do nothing, element will be added)
-          return;
+/** The remove methods of a sequence that `dropAt` uses. Each base has some of them. */
+interface Ends<T> {
+  removeFirst?(): T;
+  removeLast?(): T;
+  shift?(): T | undefined;
+  pop?(): T | undefined;
+  poll?(): T | undefined;
+}
 
-        case "block":
-          throw new Error("Block policy not supported for sync collections");
-
-        default:
-          throw new Error(`Unknown overflow policy: ${policy}`);
-      }
-    };
-
-    // After drop-oldest removed the first element, an index of the caller is one place lower
-    const shifted = (index: number): number => (policy === "drop-oldest" ? Math.max(0, index - 1) : index);
-    // A front insert drops the last element, as unshift does. Each other insert drops the first element, as push does.
-    const dropEnd = (index: number): "first" | "last" => (index === 0 ? "last" : "first");
-    // An index that the base refuses goes to the base before a drop, so the base throws and no element goes
-    const inRange = (index: unknown): boolean =>
-      Number.isInteger(index) && (index as number) >= 0 && (index as number) <= next.size;
-
-    return new Proxy(next, {
-      get(target, prop, receiver) {
-        // Capacity property
-        if (prop === removals) return source.channel;
-        if (prop === "capacity") {
-          return capacity;
-        }
-
-        // isFull property
-        if (prop === "isFull") {
-          return target.size >= capacity;
-        }
-
-        // remainingCapacity property
-        if (prop === "remainingCapacity") {
-          return Math.max(0, capacity - target.size);
-        }
-
-        const value = Reflect.get(target, prop, receiver);
-
-        // Intercept methods that add elements
-        if (typeof value === "function") {
-          switch (prop) {
-            case "add":
-              return function (element: T): boolean {
-                if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element);
-                  if (policy === "reject" || policy === "drop-newest") {
-                    return false;
-                  }
-                }
-                return (value as Function).call(target, element);
-              };
-
-            case "push":
-              return function (element: T): void {
-                if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element);
-                  if (policy === "reject" || policy === "drop-newest") {
-                    return;
-                  }
-                }
-                (value as Function).call(target, element);
-              };
-
-            case "unshift":
-              return function (element: T): void {
-                if (target.size >= capacity && policy !== "grow") {
-                  // One element goes: the last one (before, the first and the last went: audit pass 2)
-                  handleOverflow(element, "last");
-                  if (policy === "reject" || policy === "drop-newest") {
-                    return;
-                  }
-                }
-                (value as Function).call(target, element);
-              };
-
-            case "insert":
-              return function (index: number, element: T): void {
-                let at = index;
-                if (inRange(index) && target.size >= capacity && policy !== "grow") {
-                  const end = dropEnd(index);
-                  handleOverflow(element, end);
-                  if (policy === "reject" || policy === "drop-newest") {
-                    return;
-                  }
-                  if (end === "first") at = shifted(at);
-                }
-                (value as Function).call(target, at, element);
-              };
-
-            case "addAll":
-            case "insertAll":
-              return function (...args: any[]): boolean {
-                const elements = args[args.length - 1] as Iterable<T>;
-                const elementsArray = Array.from(elements);
-
-                // Check if adding all elements would exceed capacity
-                const inserting = prop === "insertAll";
-                if ((!inserting || inRange(args[0])) && target.size + elementsArray.length > capacity && policy !== "grow") {
-                  // Add elements one by one with overflow handling. An insert keeps the order of
-                  // the elements, at an index that follows each drop. The index of the call gives
-                  // the drop end of each element: an insertAll at 0 is a front insert.
-                  let added = false;
-                  let at = args[0] as number;
-                  const end = inserting ? dropEnd(at) : "first";
-                  for (const element of elementsArray) {
-                    if (target.size >= capacity) {
-                      handleOverflow(element, end);
-                      if (policy === "reject" || policy === "drop-newest") {
-                        break;
-                      }
-                      // A drop from the last end can take an element of this call: then the index is the size
-                      at = end === "first" ? shifted(at) : Math.min(at, target.size);
-                    }
-                    if (prop === "addAll") {
-                      target.add(element);
-                    } else {
-                      target.insert(at, element);
-                      at++;
-                    }
-                    added = true;
-                  }
-                  return added;
-                }
-
-                return (value as Function).apply(target, args);
-              };
-          }
-        }
-
-        return value;
-      },
-    }) as List<T> & BoundedCollection;
-  };
+/**
+ * This function removes the element at one end of a base and gives it.
+ * A deque has `removeFirst` and `removeLast`, a list has `shift` and `pop`, and a queue has `poll`.
+ */
+function dropAt<T>(base: Ends<T>, end: End): T {
+  if (end === "last") return (base.removeLast ? base.removeLast() : base.pop?.()) as T;
+  if (base.removeFirst) return base.removeFirst();
+  return (base.shift ? base.shift() : base.poll?.()) as T;
 }
 
 /**
@@ -250,7 +140,7 @@ export function boundedList<T>(
  */
 function addEach<T>(elements: Iterable<T>, add: (element: T) => boolean): boolean {
   let added = false;
-  for (const element of Array.from(elements)) {
+  for (const element of elements) {
     if (!add(element)) break;
     added = true;
   }
@@ -258,17 +148,19 @@ function addEach<T>(elements: Iterable<T>, add: (element: T) => boolean): boolea
 }
 
 /**
- * This function makes a bounded Queue middleware.
+ * This function makes the bounded layer of a list, a queue or a deque.
+ * The layer bounds each method of `addEnds`, and `insert`, `insertAll` and `addAll`, that the base has.
  */
-export function boundedQueue<T>(
+function boundedElements<C extends Collection<T>, T>(
+  kind: "List" | "Queue" | "Deque",
+  capacity: number,
   options: BoundedOptions<T>
-): Middleware<Queue<T>, Queue<T> & BoundedCollection> {
+): Middleware<C, C & BoundedCollection> {
   const { policy = "throw", onOverflow } = options;
-  const capacity = checkCapacity(options.capacity, "boundedQueue");
 
-  return (next: Queue<T>): Queue<T> & BoundedCollection => {
+  return (next: C): C & BoundedCollection => {
     const source = removalSource<ElementRemoval<T>>(next);
-    const handleOverflow = (element: T): void => {
+    const handleOverflow = (element: T, dropFrom: End): void => {
       if (onOverflow) {
         const context: OverflowContext<T> = {
           newElement: element,
@@ -281,97 +173,15 @@ export function boundedQueue<T>(
 
       switch (policy) {
         case "throw":
-          throw new Error(`Queue is full (capacity: ${capacity})`);
+          throw new Error(`${kind} is full (capacity: ${capacity})`);
         case "drop-oldest":
           if (!next.isEmpty) {
-            source.emit({ value: next.poll() as T, end: "first", reason: "drop" });
-          }
-          break;
-        case "drop-newest":
-        case "reject":
-          return;
-        case "grow":
-          return;
-        case "block":
-          throw new Error("Block policy not supported for sync collections");
-        default:
-          throw new Error(`Unknown overflow policy: ${policy}`);
-      }
-    };
-
-    return new Proxy(next, {
-      get(target, prop, receiver) {
-        if (prop === removals) return source.channel;
-        if (prop === "capacity") return capacity;
-        if (prop === "isFull") return target.size >= capacity;
-        if (prop === "remainingCapacity") return Math.max(0, capacity - target.size);
-
-        const value = Reflect.get(target, prop, receiver);
-
-        if (typeof value === "function") {
-          switch (prop) {
-            case "offer":
-            case "enqueue":
-            case "add":
-              return function (element: T): boolean {
-                if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element);
-                  if (policy === "reject" || policy === "drop-newest") {
-                    return false;
-                  }
-                }
-                return (value as Function).call(target, element);
-              };
-
-            // The base addAll goes past the bound, so each element goes through add of this proxy (C10)
-            case "addAll":
-              return function (elements: Iterable<T>): boolean {
-                return addEach(elements, (element) => (receiver as Queue<T>).add(element));
-              };
-          }
-        }
-
-        return value;
-      },
-    }) as Queue<T> & BoundedCollection;
-  };
-}
-
-/**
- * This function makes a bounded Deque middleware.
- */
-export function boundedDeque<T>(
-  options: BoundedOptions<T>
-): Middleware<Deque<T>, Deque<T> & BoundedCollection> {
-  const { policy = "throw", onOverflow } = options;
-  const capacity = checkCapacity(options.capacity, "boundedDeque");
-
-  return (next: Deque<T>): Deque<T> & BoundedCollection => {
-    const source = removalSource<ElementRemoval<T>>(next);
-    // An insert at the front drops the last element, as unshift of boundedList does (C10)
-    const handleOverflow = (element: T, dropFrom: "first" | "last"): void => {
-      if (onOverflow) {
-        const context: OverflowContext<T> = {
-          newElement: element,
-          currentSize: next.size,
-          capacity,
-          timestamp: Date.now(),
-        };
-        onOverflow(context);
-      }
-
-      switch (policy) {
-        case "throw":
-          throw new Error(`Deque is full (capacity: ${capacity})`);
-        case "drop-oldest":
-          if (!next.isEmpty) {
-            const value = dropFrom === "last" ? next.removeLast() : next.removeFirst();
+            const value = dropAt(next as unknown as Ends<T>, dropFrom);
             source.emit({ value, end: dropFrom, reason: "drop" });
           }
           break;
         case "drop-newest":
         case "reject":
-          return;
         case "grow":
           return;
         case "block":
@@ -380,6 +190,17 @@ export function boundedDeque<T>(
           throw new Error(`Unknown overflow policy: ${policy}`);
       }
     };
+    // These policies keep the new element out of a full collection
+    const refuses = policy === "reject" || policy === "drop-newest";
+    const full = (): boolean => next.size >= capacity && policy !== "grow";
+
+    // After drop-oldest removed the first element, an index of the caller is one place lower
+    const shifted = (index: number): number => (policy === "drop-oldest" ? Math.max(0, index - 1) : index);
+    // A front insert drops the last element, as unshift does. Each other insert drops the first element, as push does.
+    const dropEnd = (index: number): End => (index === 0 ? "last" : "first");
+    // An index that the base refuses goes to the base before a drop, so the base throws and no element goes
+    const inRange = (index: unknown): boolean =>
+      Number.isInteger(index) && (index as number) >= 0 && (index as number) <= next.size;
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -389,37 +210,67 @@ export function boundedDeque<T>(
         if (prop === "remainingCapacity") return Math.max(0, capacity - target.size);
 
         const value = Reflect.get(target, prop, receiver);
+        if (typeof value !== "function" || typeof prop !== "string") return value;
 
-        if (typeof value === "function") {
-          switch (prop) {
-            case "addFirst":
-            case "addLast":
-            case "offerFirst":
-            case "offerLast":
-            case "push":
-            case "offer":
-            case "add":
-              return function (element: T): any {
-                if (target.size >= capacity && policy !== "grow") {
-                  handleOverflow(element, prop === "addFirst" || prop === "offerFirst" ? "last" : "first");
-                  if (policy === "reject" || policy === "drop-newest") {
-                    return prop.startsWith("offer") || prop === "add" ? false : undefined;
-                  }
+        const end = Object.hasOwn(addEnds, prop) ? addEnds[prop] : undefined;
+        if (end !== undefined) {
+          return function (element: T): unknown {
+            if (full()) {
+              handleOverflow(element, end);
+              if (refuses) return givesBoolean.has(prop) ? false : undefined;
+            }
+            return (value as Function).call(target, element);
+          };
+        }
+
+        switch (prop) {
+          case "insert":
+            return function (index: number, element: T): void {
+              let at = index;
+              if (inRange(index) && full()) {
+                const dropFrom = dropEnd(index);
+                handleOverflow(element, dropFrom);
+                if (refuses) return;
+                if (dropFrom === "first") at = shifted(at);
+              }
+              (value as Function).call(target, at, element);
+            };
+
+          case "addAll":
+          case "insertAll":
+            return function (...args: any[]): boolean {
+              const elementsArray = Array.from(args[args.length - 1] as Iterable<T>);
+              const inserting = prop === "insertAll";
+              // Each element of addAll goes through add of the top proxy, so a layer above sees each add (C10)
+              if (!inserting) return addEach(elementsArray, (element) => (receiver as { add(element: T): unknown }).add(element) !== false);
+              if (!inRange(args[0]) || next.size + elementsArray.length <= capacity || policy === "grow") {
+                return (value as Function).call(target, ...args.slice(0, -1), elementsArray);
+              }
+              // Insert elements one by one with overflow handling. An insert keeps the order of
+              // the elements, at an index that follows each drop. The index of the call gives
+              // the drop end of each element: an insertAll at 0 is a front insert.
+              const base = target as unknown as { insert(index: number, element: T): void };
+              let added = false;
+              let at = args[0] as number;
+              const dropFrom = dropEnd(at);
+              for (const element of elementsArray) {
+                if (target.size >= capacity) {
+                  handleOverflow(element, dropFrom);
+                  if (refuses) break;
+                  // A drop from the last end can take an element of this call: then the index is the size
+                  at = dropFrom === "first" ? shifted(at) : Math.min(at, target.size);
                 }
-                return (value as Function).call(target, element);
-              };
-
-            // The base addAll goes past the bound, so each element goes through add of this proxy (C10)
-            case "addAll":
-              return function (elements: Iterable<T>): boolean {
-                return addEach(elements, (element) => (receiver as Deque<T>).add(element));
-              };
-          }
+                base.insert(at, element);
+                at++;
+                added = true;
+              }
+              return added;
+            };
         }
 
         return value;
       },
-    }) as Deque<T> & BoundedCollection;
+    }) as C & BoundedCollection;
   };
 }
 

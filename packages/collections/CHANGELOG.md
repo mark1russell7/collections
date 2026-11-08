@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.8
+
+The evented layers give an event for each element of a bulk change, so a replay of the events gives the contents (C24). PATCH: a fix, and new event keys that keep the old events.
+
+### Fixed
+
+- `eventedList` gave no event for `addAll`, `insertAll`, `removeAll`, `retainAll` and `removeRange`. With this version, each element gives an `add` or a `remove` event. The index of a `remove` is the place of the element at the time of the event.
+- `eventedQueue`, `eventedDeque` and `evented` gave no event for `addAll`, `removeAll` and `retainAll`. `remove` of a queue or a deque and `pollOrUndefined` also gave no event.
+- `eventedMap` gave no event for `setIfAbsent`, `replace`, `computeIfAbsent`, `computeIfPresent`, `compute`, `merge` and `putAll` on a base that writes its storage directly. In this version, these methods use the `set` and `delete` of the layer.
+- `evented` gives `remove` for `pollFirst` and `pollLast` of a sorted set. `eventedMap` gives `delete` for `pollFirstEntry` and `pollLastEntry`.
+- The layer adds the elements of `addAll` and `insertAll` one at a time. Thus a `bounded` layer below drops or refuses each element with the rules of a single add.
+
+### Added
+
+- The event `remove` of `QueueEvents` (`{ value }`) and of `DequeEvents` (`{ value, index }`).
+- The replay law of `src/contracts/removals.test.ts` has the bulk methods as steps, and a new law for `eventedMap` over `hashMap`, `lruMap` and `boundedMap` with each policy.
+
 ## 0.9.4
 
 A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a new export raises PATCH.

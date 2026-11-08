@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.10.0
+
+The breaking changes of the API review ship in one version. MINOR: before 1.0.0 a breaking change raises MINOR.
+
+### Removed
+
+- The 70 names with the verdict "remove" of `docs/API-REVIEW.md` (D3). No file, test or doc of the repository used them:
+  - the interfaces with no class: `Vector`, `CircularList`, `MultiMap`, `BiMap`, `WeakMapLike`, `BlockingQueue`, `TransferQueue` and `DelayQueue`;
+  - the types `IsReadonly` and `ElementOf`, and the middleware types `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability` and `CollectionBuilder`;
+  - 12 traits, from `Sized` to `Disposable`. The `Disposable` of the language with `Symbol.dispose` is no longer hidden;
+  - 24 policy types and their default values, with `RetryPolicy` and `DEFAULT_RETRY_POLICY`. Retries have a home: `@mark1russell7/service`;
+  - `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` and `KEY_DIGITS`;
+  - 14 names of `utils/helpers.ts`, from `checkBounds` to `stringHashCode`. `toArray` stays.
+- `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

@@ -1,5 +1,60 @@
 # Changelog
 
+## 0.10.0
+
+The breaking changes of the API review ship in one version, with the drop end of each front insert of `boundedList` (C21). MINOR: before 1.0.0 a breaking change raises MINOR.
+
+### Added
+
+- `ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` take a clock (D5): the option `clock`, or the fourth argument of the `TTLCache` constructor. The type is `Clock` of `@mark1russell7/algebra/clock`.
+- The default clock reads `Date.now()`, as before, and its timers do not keep a Node.js process alive. A test gives `fakeClock()`, and the expiry times are then exact.
+- The package depends on `@mark1russell7/algebra` (`^0.8.3`) for the clock. Its entry `./clock` imports no other module.
+
+### Changed
+
+- `defaultCompare` orders values by type first (C39): `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values. Before, it compared the text of two values of different types. That order was not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. A sort of values of mixed types gives a different order.
+- `defaultCompare` gives -1 or 1 for `1` and `"1"`, and for two different objects with the same text. Before, it gave 0, so a `treeSet` held one of the two. Two objects with the same text keep the order of their first comparison.
+- `defaultCompare` compares bigints by value. An object with no prototype compares by its tag, because `String` refuses it.
+- `range` gives `start + i * step` at index `i` (C40). Before, it added `step` to the last number, so the error of a fraction grew: `range(0, 1, 0.1)` gave 11 numbers. It gives 10.
+- `range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a list that is longer than an array. Before, `range(0, Infinity)` did not stop. A `step` of 0 throws a `RangeError`, with the same text.
+- `nCopies` throws a `RangeError` when `n` is not a safe integer of 0 or more. Before, `nCopies(2.5, value)` gave 3 copies, `nCopies(NaN, value)` gave an empty list, and `nCopies(Infinity, value)` did not stop.
+- Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
+- `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
+- `boundedList` with `drop-oldest`: `insert(0, x)` and `insertAll(0, xs)` into a full list drop the last element, as `unshift(x)` does. Before, they dropped the first element. Each other index drops the first element, as before.
+
+### Deprecated
+
+- The options `keyEq` and `keyHash` of `hashMap` (D2). Use `eq` and `hash`, the names that `linkedHashMap` and `hashSet` take. When both are given, `eq` and `hash` win. Version 0.11.0 removes the old names. The member `keyEq` of each map does not change.
+- `dropIndex` and `Point` of `order` (C12). Their home is `@mark1russell7/layout-contract` (0.6.2 or later), because a hit test on the screen is geometry. Its `dropIndex` gives the same index. Version 0.11.0 removes them.
+
+### Removed
+
+- The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.
+- `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
+- The 70 names with the verdict "remove" of `docs/API-REVIEW.md` (D3). No file, test or doc of the repository used them:
+  - the interfaces with no class: `Vector`, `CircularList`, `MultiMap`, `BiMap`, `WeakMapLike`, `BlockingQueue`, `TransferQueue` and `DelayQueue`;
+  - the types `IsReadonly` and `ElementOf`, and the middleware types `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability` and `CollectionBuilder`;
+  - 12 traits, from `Sized` to `Disposable`. The `Disposable` of the language with `Symbol.dispose` is no longer hidden;
+  - 24 policy types and their default values, with `RetryPolicy` and `DEFAULT_RETRY_POLICY`. Retries have a home: `@mark1russell7/service`;
+  - `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` and `KEY_DIGITS`;
+  - 14 names of `utils/helpers.ts`, from `checkBounds` to `stringHashCode`. `toArray` stays.
+- The second names of one function (D4). Use the first name:
+  - `unmodifiableList`, `unmodifiableMap` and `unmodifiableCollection`: use `readonlyList`, `readonlyMap` and `readonlyCollection`;
+  - `mutableListOf` and `mutableMapOf`: use `listOf` and `mapOf`;
+  - `toList` of an iterable: use `arrayList(iterable)`. The collector `collectToList` stays.
+- `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
+- The generic `safe()` (C29). It gave the collection with no change and added no property `safe`, so no caller depended on its result. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.
+
+### Fixed
+
+- `boundedList`: `insert` and `insertAll` at an index that the base refuses dropped an element before the base threw. Now the base throws first, and the list does not change.
+- `boundedList`, `boundedQueue` and `boundedDeque` bound each add method of their base (C42). Before, 23 add methods went past the capacity:
+  - `addFirst`, `addLast`, `offer`, `offerFirst`, `offerLast` and `enqueue` of a `linkedList` under `boundedList`;
+  - `push`, `addFirst`, `addLast`, `offerFirst` and `offerLast` of an `arrayDeque` or a `linkedList` under `boundedQueue`, and `unshift`, `insert` and `insertAll` of a `linkedList`;
+  - `insert` and `insertAll` of a `linkedList` under `boundedDeque`.
+- Each element of `addAll` of a bounded list goes through `add` of the top layer, as for a queue and a deque. So `eventedList` above `boundedList` gives an `add` event for each element of `addAll`. Before, it gave no event.
+- `eventedDeque` gives an `addLast` event for `enqueue`. Before, it gave the event only when the base called `addLast` through the layer.
+
 ## 0.9.11
 
 The entry `./graph` gets a search of the strongly connected components (C43). PATCH: a new feature before 1.0.0, with no change of the old names.
@@ -122,6 +177,7 @@ The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH:
 
 - The 13 names of `async/channels.ts`: `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Import each one from `@mark1russell7/service/channel`. The next MINOR version removes them from collections.
 - Collections does not re-export the channels of service, and it does not depend on service. Service depends on collections for `asyncQueue`.
+
 ## 0.9.0
 
 A layer above a removing layer now sees its removals (C23). The tests of the removal channel found six more faults. This version corrects them. MINOR: new exports, and before 1.0.0 a change of behavior raises MINOR. An evented layer above a layer that refuses an element no longer emits an event for it.

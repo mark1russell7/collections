@@ -26,7 +26,7 @@ import { treeMap } from "../impl/tree-map.js";
 import type { Collection } from "../interfaces/collection.js";
 import { safeMap } from "../behaviors/safe.js";
 import { readonlyMap } from "../behaviors/readonly.js";
-import { synchronized, reentrantSynchronized, readWriteLock } from "../behaviors/synchronized.js";
+import { synchronized, readWriteLock } from "../behaviors/synchronized.js";
 import type { List } from "../interfaces/list.js";
 import type { Queue, Deque } from "../interfaces/queue.js";
 import type { MapLike } from "../interfaces/map.js";
@@ -140,7 +140,6 @@ describe("a layer that does not remove forwards the channel below it", () => {
     ["safeMap", (m) => safeMap<string, number>()(m)],
     ["readonlyMap", (m) => readonlyMap<string, number>()(m)],
     ["synchronized", (m) => synchronized<MapLike<string, number>>()(m)],
-    ["reentrantSynchronized", (m) => reentrantSynchronized<MapLike<string, number>>()(m)],
     ["readWriteLock", (m) => readWriteLock<MapLike<string, number>>()(m)],
     ["eventedMap", (m) => eventedMap<string, number>()(m)],
   ];

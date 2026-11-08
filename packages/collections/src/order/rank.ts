@@ -16,7 +16,7 @@
  */
 
 /** The digits of a key, in ascending order of their code units. */
-export const KEY_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const KEY_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 const ZERO = KEY_DIGITS[0]!;
 const LAST = KEY_DIGITS[KEY_DIGITS.length - 1]!;
@@ -241,7 +241,11 @@ export function compareKeys(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-/** A point, for example the center of an item on the screen. */
+/**
+ * A point, for example the center of an item on the screen.
+ *
+ * @deprecated Use `Point` of `@mark1russell7/layout-contract` (0.6.2 or later). Version 0.11.0 removes it.
+ */
 export interface Point {
   readonly x: number;
   readonly y: number;
@@ -260,6 +264,9 @@ export interface Point {
  * const index = dropIndex(pointer, others.map(centerOf));
  * const key = keyBetween(keys[index - 1], keys[index]);
  * ```
+ *
+ * @deprecated Use `dropIndex` of `@mark1russell7/layout-contract` (0.6.2 or later). It gives the same index. Version
+ * 0.11.0 removes it.
  */
 export function dropIndex(point: Point, centers: readonly Point[], rowTolerance = 24): number {
   for (let i = 0; i < centers.length; i++) {

@@ -14,6 +14,8 @@
  * ) // [6, 8]
  */
 
+import { runningMean, runningOf } from "@mark1russell7/rigor-statistics";
+
 // ============================================================================
 // Mapping and transformation
 // ============================================================================
@@ -466,18 +468,12 @@ export function sum(iterable: Iterable<number>): number {
 }
 
 /**
- * This function gives the average of elements.
+ * This function gives the mean of the numbers, or `undefined` for no number. It folds with `runningOf` of
+ * `@mark1russell7/rigor-statistics`, so a NaN throws a `RangeError`.
  */
 export function average(iterable: Iterable<number>): number | undefined {
-  let total = 0;
-  let count = 0;
-
-  for (const value of iterable) {
-    total += value;
-    count++;
-  }
-
-  return count === 0 ? undefined : total / count;
+  const s = runningOf(iterable);
+  return s.n === 0 ? undefined : runningMean(s);
 }
 
 // ============================================================================

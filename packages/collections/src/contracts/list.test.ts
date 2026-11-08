@@ -125,10 +125,15 @@ for (const [name, create] of [
       runModel<S, M>({ create: () => ({ sut: create(), model: [] }), steps, check });
     });
 
-    it("subList is a view of a range", () => {
+    it("subList gives a copy of a range, not a view (D1)", () => {
       const list = create();
       list.addAll([0, 1, 2, 3, 4, 5]);
-      expect(list.subList(1, 4).toArray()).toEqual([1, 2, 3]);
+      const part = list.subList(1, 4);
+      expect(part.toArray()).toEqual([1, 2, 3]);
+      part.set(0, 9);
+      list.set(2, 8);
+      expect(list.toArray()).toEqual([0, 1, 8, 3, 4, 5]);
+      expect(part.toArray()).toEqual([9, 2, 3]);
       expect(() => list.subList(4, 1)).toThrow(RangeError);
     });
   });

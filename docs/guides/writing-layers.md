@@ -113,7 +113,7 @@ Some layers remove elements by themselves. The bounded layers drop an element, a
 
 ```ts
 import assert from "node:assert/strict";
-import { eventedMap, hashMap, removals, removalSource, type MapLike, type MapRemoval, type Middleware } from "@mark1russell7/collections";
+import { eventedMap, hasCapability, hashMap, removals, removalSource, type MapLike, type MapRemoval, type Middleware } from "@mark1russell7/collections";
 
 type Prunable<K, V> = MapLike<K, V> & { prune(drop: (value: V, key: K) => boolean): number };
 
@@ -130,6 +130,7 @@ const prunable = <K, V>(): Middleware<MapLike<K, V>, Prunable<K, V>> => (next) =
     return count;
   };
   return new Proxy(next, {
+    has: (target, prop) => prop === removals || prop === "prune" || Reflect.has(target, prop),
     get(target, prop, receiver) {
       if (prop === removals) return source.channel;
       if (prop === "prune") return prune;
@@ -150,6 +151,7 @@ assert.equal(stock.prune((count) => count === 0), 2);
 
 assert.deepEqual(log.sort(), ["bun (drop)", "tea (drop)"]);
 assert.equal(shelf.size, 1);
+assert.ok("prune" in shelf && hasCapability(shelf, "prune"));
 ```
 
 `eventedMap` gets the removals of `prune` from the channel. Thus its `delete` event has the reason `"drop"`. A layer that does not remove needs no channel of its own. A proxy gives each unknown key of its target, so it forwards the channel below. A class that wraps a collection, not a proxy, must give the key `removals` of the collection below.
@@ -201,13 +203,14 @@ The default handler is `reportListenerError`. It throws the error again in a mic
 ## The rules of a layer
 
 - A layer gives each member of the collection below that it does not change. A proxy does this with `Reflect.get`.
+- A proxy that adds a member in its `get` trap also gives it in a `has` trap. Then the operator `in` and `hasCapability` see the member.
 - The bulk methods of a base write its storage directly. A layer that changes `add` also changes `addAll`, and the same for each bulk method.
 - A layer that removes elements by itself gives a removal channel, and sends each removal after the change.
 - The four laws of the guide [Layers](layers.md) also apply to a layer of your own. The model tests of `src/contracts` examine them for the layers of the root.
 
-## Known defects
+## Defects that version 0.10.0 corrects
 
 The reading for this guide found two defects. Roadmap row C41 has them.
 
-- `hasCapability` uses the operator `in`. The evented layers give `on` from a proxy, and the proxy has no `has` trap. Thus `hasCapability(eventedList()(arrayList()), "on")` gives `false`, and the example of its doc comment fails. Examine `typeof collection.on === "function"` instead.
-- `eventedMap` gives its `set` event after the `set` of the layer below. A layer below that removes the key of the same `set` sends its removal first. Thus a replay of the events gives `delete` and then `set`, and the replay has the key, but the map does not. The layers of the root do not remove the key that they set.
+- `hasCapability` used the operator `in`. The evented layers gave `on` from a proxy, and the proxy had no `has` trap. Thus `hasCapability(eventedList()(arrayList()), "on")` gave `false`. Version 0.10.0 gives each layer of the root a `has` trap, and `hasCapability` also reads the member through the layer.
+- `eventedMap` gave its `set` event after the removals of the layer below. A layer below that removed the key of the same `set` thus sent its removal first. A replay of the events then kept the key, but the map did not have it. When the key is gone after the `set`, `eventedMap` gives the `set` event first.

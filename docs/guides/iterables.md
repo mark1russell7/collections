@@ -121,6 +121,29 @@ assert.equal(reduce(deposits, (balance, amount) => balance + amount, 0), 120);
 assert.deepEqual(toArray(scan(deposits, (balance, amount) => balance + amount, 0)), [0, 100, 70, 120]);
 ```
 
+## The iterator helpers of the language
+
+Node 22 and later have helpers on each iterator: `map`, `filter`, `take`, `drop`, `flatMap`, `reduce`, `toArray`, `some`, `every` and `find`. An array, a `Set` or a collection of this package is an iterable, not an iterator. `Iterator.from` gives an iterator of an iterable.
+
+- Use the language helpers for a chain on one iterator, for example the result of `entries()`.
+- Use the functions of this package for a value that can be any iterable.
+- The language has no `chunk`, `window`, `zip` or `scan`. Use the functions of this package for these steps.
+
+```ts
+import assert from "node:assert/strict";
+import { arrayList, chunk, toArray } from "@mark1russell7/collections";
+
+const list = arrayList([1, 2, 3, 4, 5]);
+
+const odd = Iterator.from(list)
+  .filter((value) => value % 2 === 1)
+  .map((value) => value * 10)
+  .toArray();
+assert.deepEqual(odd, [10, 30, 50]);
+
+assert.deepEqual(toArray(chunk(list, 2)), [[1, 2], [3, 4], [5]]);
+```
+
 ## The reducers
 
 A reducer reads the full iterable and gives one value. On an empty iterable, `min`, `max` and `average` give `undefined`, and `sum` gives `0`.
@@ -231,7 +254,7 @@ assert.equal(mean, 66.25);
 
 ## The statistics of a number
 
-`summarizingNumber` gives the count, the sum, the minimum, the maximum and the mean in one read.
+`summarizingNumber` gives the count, the sum, the minimum, the maximum and the mean in one read. It folds with the running summary of `@mark1russell7/rigor-statistics`. Thus a NaN throws a `RangeError`, and no NaN goes into a result. For the spread or the merge of two parts, use `runningOf`, `runningSd` and `mergeRunning` of that package.
 
 ```ts
 import assert from "node:assert/strict";

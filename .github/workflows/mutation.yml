@@ -60,7 +60,7 @@ jobs:
 
   mutation-ok:
     name: Mutation OK
-    if: always()
+    if: ${{ !cancelled() }}
     needs: [changes, mutation]
     runs-on: ubuntu-latest
     permissions: {}

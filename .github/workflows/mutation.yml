@@ -2,19 +2,16 @@
 # into 6 parts, and each part has its own runner. The lane has no gate yet: the first full runs give the baseline.
 # A pull request that changes the lane or the test config starts a dry run: the tests of each part under Stryker, with
 # no mutant. A person starts a full run on a branch with: gh workflow run mutation.yml --ref <branch>
+#
+# The workflow starts on each pull request, so the summary check "Mutation OK" is always there for the ruleset. The job
+# "changes" decides if the dry run starts (CI.md, "A gate with paths").
 name: Mutation
 
 on:
   schedule:
     # Each scheduled heavy run of the fleet has its own minute.
-    - cron: "37 4 * * 1"
+    - cron: "21 4 * * 1"
   pull_request:
-    paths:
-      - mutation.json
-      - mutation-disables.json
-      - .github/workflows/mutation.yml
-      - packages/collections/vitest.config.ts
-      - packages/collections/vitest.mutation.config.ts
   workflow_dispatch:
     inputs:
       dry-run:
@@ -37,7 +34,37 @@ env:
   STATED_REASON: one runner for each of the 6 parts of collections, at most 2 at one time
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@fe8b4a2e892daf3f973909a1830fde55be97ec57 # main
+        with:
+          paths: |
+            mutation.json
+            mutation-disables.json
+            .github/workflows/mutation.yml
+            packages/collections/vitest.config.ts
+            packages/collections/vitest.mutation.config.ts
+
   mutation:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
     uses: mark1russell7/template/.github/workflows/reusable-mutation.yml@fe8b4a2e892daf3f973909a1830fde55be97ec57 # main
     with:
       dry-run: ${{ github.event_name == 'pull_request' || inputs.dry-run == true }}
+
+  mutation-ok:
+    name: Mutation OK
+    if: always()
+    needs: [changes, mutation]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@fe8b4a2e892daf3f973909a1830fde55be97ec57 # main
+        with:
+          needs: ${{ toJSON(needs) }}

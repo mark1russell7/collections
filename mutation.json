@@ -4,6 +4,7 @@
       "dir": "packages/collections",
       "mutate": ["src/**/*.ts", "!src/**/*.test.ts", "!src/index.ts"],
       "vitestConfig": "vitest.mutation.config.ts",
+      "stryker": { "tsconfigFile": "tsconfig.no-stryker-rewrite.json" },
       "notRead": {
         "src/api-review.test.ts": "it reads docs/API-REVIEW.md at the repository root, which is not in the copy of Stryker",
         "src/contracts/docs.test.ts": "it reads the guides at the repository root, and its examples import the source outside the copy",

@@ -249,6 +249,22 @@ assert.equal(await read, 5);
 assert.equal(list.size, 1);
 ```
 
+A loop with `for of` reads the object at once, with no lock. The methods `keys`, `values`, `entries` and `descendingIterator` give a promise of a copy. The lock reads the copy, so a write after the read does not change it.
+
+```ts
+import assert from "node:assert/strict";
+import { arrayList, compose, hashMap, readWriteLock } from "@mark1russell7/collections";
+
+const list = compose(readWriteLock())(arrayList([1, 2, 3]));
+assert.deepEqual([...list], [1, 2, 3]);
+
+const map = compose(readWriteLock())(hashMap<string, number>());
+await map.set("a", 1);
+const keys = await map.keys();
+await map.set("b", 2);
+assert.deepEqual([...keys], ["a"]);
+```
+
 ## Known defects
 
 The examples of this guide found two defects. This guide does not show the functions until each defect has a fix:

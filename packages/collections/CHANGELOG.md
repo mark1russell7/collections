@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.7
+
+`readWriteLock` lets `for of` and the iterators work (C32). PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A loop with `for of` over a view of `readWriteLock` works. Before, the lock made `Symbol.iterator` async, so the loop threw `is not iterable`. A method with a symbol key stays synchronous.
+- `keys`, `values`, `entries` and `descendingIterator` give a promise of a copy. The lock reads the copy, so a write after the read does not change it. Before, the iteration started after the lock released the read.
+- `descendingIterator` is a read. Before, it took the lock of a write.
+
 ## 0.9.6
 
 The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.

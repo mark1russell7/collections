@@ -182,7 +182,7 @@ importers:
         specifier: ^2.0.0
         version: 2.1.1
       '@mark1russell7/rigor-mutation':
-        specifier: ^0.1.6
+        specifier: ^0.1.9
         version: 0.1.9
       '@mark1russell7/ste-lint':
         specifier: ^0.3.0

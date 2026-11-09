@@ -3,7 +3,7 @@
  *
  * `lruMap` over `ttlMap` (the stack of a cache):
  * - An entry expires `ttl` after its last `set`. An expired entry is not an eviction, and it frees a place.
- * - A `set` of a new key into a full map evicts the least recent live key. `get`, `has` and `set` are a use.
+ * - A `set` of a new key into a full map evicts the least recent live key. `get` and `set` are a use. `has` is not a use (C37).
  * - `onExpire` and `onEvict` occur one time for each removal, in their order.
  *
  * `eventedMap` at the bottom of a stack (next to the base):
@@ -100,12 +100,8 @@ const steps: fc.Arbitrary<Step<S, M>> = fc.oneof(
       use(m, k);
     }),
   ),
-  key.map((k) =>
-    op(`has(${k})`, ({ sut }, m) => {
-      expect(sut.has(k)).toBe(m.map.has(k));
-      use(m, k);
-    }),
-  ),
+  // has is not a use (C37)
+  key.map((k) => op(`has(${k})`, ({ sut }, m) => expect(sut.has(k)).toBe(m.map.has(k)))),
   key.map((k) => op(`getOrUndefined(${k})`, ({ sut }, m) => expect(sut.getOrUndefined(k)).toBe(m.map.get(k)?.value))),
   key.map((k) =>
     op(`delete(${k})`, ({ sut }, m) => {

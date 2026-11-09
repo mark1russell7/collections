@@ -106,7 +106,7 @@ The layer adds the elements of `addAll` and `insertAll` one at a time, with the 
 
 ## LRU: evict the entry with no use for the longest time
 
-`lruMap({ capacity })` keeps at most `capacity` entries. A new key in a full map evicts the least recently used entry. `get`, `has` and a `set` of a key that is in the map are a use.
+`lruMap({ capacity })` keeps at most `capacity` entries. A new key in a full map evicts the least recently used entry. `get` and a `set` of a key that is in the map are a use.
 
 ```ts
 import assert from "node:assert/strict";
@@ -127,7 +127,8 @@ pages.set("/blog", "<h1>Blog</h1>");
 assert.deepEqual(evicted, ["/about"]);
 assert.equal(pages.size, 2);
 
-// getOrUndefined is a peek: it is not a use, so "/home" stays the least recently used entry
+// has and getOrUndefined are a peek: they are not a use, so "/home" stays the least recently used entry
+assert.equal(pages.has("/home"), true);
 assert.equal(pages.getOrUndefined("/home"), "<h1>Home</h1>");
 pages.set("/shop", "<h1>Shop</h1>");
 assert.deepEqual(evicted, ["/about", "/home"]);
@@ -136,7 +137,7 @@ assert.deepEqual(evicted, ["/about", "/home"]);
 assert.throws(() => lruMap({ capacity: 0 }), RangeError);
 ```
 
-`delete` and the iteration are not a use. A `delete` is not an eviction, so `onEvict` does not occur.
+`delete` and the iteration are not a use. A `delete` is not an eviction, so `onEvict` does not occur. `has` is not a use of `lruMap` or of `LRUCache`.
 
 ## An eviction as an event
 
@@ -188,6 +189,8 @@ sessions.dispose();
 ```
 
 A background interval also removes the expired entries, each `checkInterval` milliseconds (1000 by default). Thus `onExpire` occurs also when nothing reads the map. The interval does not keep a Node.js process alive. `dispose` stops it.
+
+`ttl` and `checkInterval` are numbers of milliseconds greater than 0. A different value gives a `RangeError`. A `checkInterval` of `Infinity` starts no interval: each access still removes the expired entries. `ttlCollection`, `TTLCache` and `ttlCache` use the same rule.
 
 ```ts
 import assert from "node:assert/strict";
@@ -329,10 +332,10 @@ assert.ok((tokens.getTTL("ada") ?? 0) > 200);
 tokens.dispose();
 ```
 
-## Known differences
+## The same rules in the layers and the classes
 
-The reading for this guide found three differences between the layers and the classes. Item C37 of the roadmap removes them.
+The layers and the classes agree on these rules:
 
-- `has` of `lruMap` is a use, but `has` of `LRUCache` is not a use.
-- `ttlMap`, `ttlCollection` and `TTLCache` do not examine `ttl` and `checkInterval`. A `checkInterval` of 0 or `NaN` starts the interval each millisecond.
-- `touch` of `TTLCache` removes an expired entry with no `onExpire`. `get` gives `onExpire` for the same entry.
+- `has` is not a use of `lruMap` or of `LRUCache`.
+- `ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` refuse a `ttl` or a `checkInterval` that is not greater than 0. The `customTTL` of `set` and `touch` has the same rule.
+- An expired entry goes to `onExpire` one time, from `get`, `touch` or the background check.

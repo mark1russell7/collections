@@ -2,7 +2,7 @@
 
 ## 0.11.0
 
-`lruMap`, `ttlMap` and `ttlCollection` find each key with the equality of their base (C20). MINOR: a new getter, and before 1.0.0 a change of behavior raises MINOR.
+`lruMap`, `ttlMap` and `ttlCollection` find each key with the equality of their base (C20). The LRU and TTL layers and classes have the same rules (C37). MINOR: a new getter, and before 1.0.0 a change of behavior raises MINOR.
 
 ### Added
 
@@ -12,9 +12,12 @@
 
 - `lruMap` and `ttlMap` kept their keys in a JavaScript `Map`, so they did not agree with a base that has a custom `keyEq` or comparator. Two equal keys were two entries of the layer. Then the layer evicted or expired a key that was gone, or the entry of the other key. The layer finds a key as the base does.
 - `ttlCollection` did the same with the `eq` of its base. A `remove` with an equal element kept the old time, which later removed the element of a new `add`.
+- `touch` of `TTLCache` removed an expired entry with no `onExpire` (C37). It gives the entry to `onExpire`, as `get` does.
 
 ### Changed
 
+- `has` of `lruMap` is not a use, as with `has` of `LRUCache` (C37). Before, it moved the key to the most recent place. Use `get` for a use.
+- `ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` throw a `RangeError` when `ttl` or `checkInterval` is not a number greater than 0 (C37). The `customTTL` of `set` and `touch` of `TTLCache` has the same check. Before, a `checkInterval` of 0 or `NaN` started the check each millisecond, and a `ttl` of 0 or less ended each entry at its start. A `checkInterval` of `Infinity` starts no background check.
 - Over a `treeMap`, `lruMap` and `ttlMap` find a key in O(log n), with the comparator of the base. Over a map with a custom `keyEq` and no hash, they find a key in O(n). With the default `keyEq`, they use a JavaScript `Map`, as before.
 
 ## 0.10.0

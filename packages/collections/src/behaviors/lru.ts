@@ -69,6 +69,7 @@ interface TimedNode<K, V> extends LRUNode<K, V> {
  * This function maintains a doubly-linked list to track access order.
  * Most recently accessed items are at the head.
  * When capacity is exceeded, items at the tail are evicted.
+ * A `get` and a `set` are a use. A `has` is not a use, as with `LRUCache`.
  *
  * @throws RangeError when `options.capacity` is not a positive whole number.
  */
@@ -224,17 +225,6 @@ export function lruMap<K, V>(
                 return result;
               };
 
-            case "has":
-              return function (key: K): boolean {
-                const result = (value as Function).call(target, key);
-                const node = nodeMap.get(key);
-                if (node && result) {
-                  // Update access time
-                  moveToHead(node);
-                }
-                return result;
-              };
-
             case "set":
               return function (key: K, val: V): V | undefined {
                 const hadKey = target.has(key);
@@ -372,6 +362,7 @@ export class LRUCache<K, V> {
     }
   }
 
+  /** This method gives true when the cache has the key. It is not a use, so the order does not change. */
   has(key: K): boolean {
     return this.map.has(key);
   }

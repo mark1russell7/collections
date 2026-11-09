@@ -2,8 +2,8 @@
  * The laws of the LRU layer (C10): lruMap over each base map, against a model of the recency order.
  *
  * The laws:
- * - `get` of a present key, `has` of a present key and `set` are a use: the key becomes the most recent.
- * - `getOrUndefined`, `delete` and the iteration are not a use.
+ * - `get` of a present key and `set` are a use: the key becomes the most recent.
+ * - `has`, `getOrUndefined`, `delete` and the iteration are not a use, as with `LRUCache` (C37).
  * - A `set` of a new key into a full map evicts the least recent key first, and calls `onEvict` with it.
  * - The size is never over the capacity, and the entries are the entries of the model.
  */
@@ -63,8 +63,8 @@ const steps: fc.Arbitrary<Step<S, M>> = fc.oneof(
   ),
   key.map((k) =>
     step<S, M>(`has(${k})`, ({ sut }, m) => {
+      // A has is not a use (C37), so the order does not change
       expect(sut.has(k)).toBe(m.map.has(k));
-      use(m, k);
     }),
   ),
   key.map((k) => step<S, M>(`getOrUndefined(${k})`, ({ sut }, m) => expect(sut.getOrUndefined(k)).toBe(m.map.get(k)))),

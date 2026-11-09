@@ -1,9 +1,9 @@
 /**
- * Tests of the capacity check and of `LRUCache.deleteWhere`.
+ * Tests of the capacity check, of the duration check and of `LRUCache.deleteWhere`.
  */
 
 import fc from "fast-check";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   arrayDeque,
   arrayList,
@@ -15,6 +15,10 @@ import {
   LRUCache,
   lruCache,
   lruMap,
+  TTLCache,
+  ttlCache,
+  ttlCollection,
+  ttlMap,
 } from "./index.js";
 
 const BAD = [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER + 1];
@@ -66,6 +70,58 @@ describe("the capacity check", () => {
     cache.set("b", 2);
     expect([...cache.keys()]).toEqual(["b"]);
   });
+});
+
+/** The durations that are not a number greater than 0 (C37). A `checkInterval` of 0 or `NaN` started the check each millisecond. */
+const BAD_DURATIONS = [0, -1, -0.5, Number.NaN, Number.NEGATIVE_INFINITY, "10" as unknown as number];
+
+describe("the duration check (C37)", () => {
+  const disposers: Array<() => void> = [];
+  const keep = <T extends { dispose: () => void }>(value: T): T => (disposers.push(() => value.dispose()), value);
+  afterEach(() => {
+    for (const dispose of disposers.splice(0)) dispose();
+  });
+  const makers: ReadonlyArray<readonly [string, (duration: number) => unknown]> = [
+    ["ttlMap: ttl", (ttl) => keep(ttlMap<string, number>({ ttl })(hashMap<string, number>()))],
+    ["ttlMap: checkInterval", (checkInterval) => keep(ttlMap<string, number>({ ttl: 10, checkInterval })(hashMap<string, number>()))],
+    ["ttlCollection: ttl", (ttl) => keep(ttlCollection<number>({ ttl })(arrayList<number>()))],
+    ["ttlCollection: checkInterval", (checkInterval) => keep(ttlCollection<number>({ ttl: 10, checkInterval })(arrayList<number>()))],
+    ["TTLCache: ttl", (ttl) => keep(new TTLCache<string, number>(ttl))],
+    ["TTLCache: checkInterval", (checkInterval) => keep(new TTLCache<string, number>(10, checkInterval))],
+    ["ttlCache: ttl", (ttl) => keep(ttlCache<string, number>(ttl))],
+    ["ttlCache: checkInterval", (checkInterval) => keep(ttlCache<string, number>(10, { checkInterval }))],
+    ["TTLCache.set: customTTL", (customTTL) => keep(ttlCache<string, number>(10)).set("a", 1, customTTL)],
+    ["TTLCache.touch: customTTL", (customTTL) => {
+      const cache = keep(ttlCache<string, number>(10));
+      cache.set("a", 1);
+      return cache.touch("a", customTTL);
+    }],
+  ];
+
+  for (const [name, make] of makers) {
+    it(`${name} throws RangeError for a duration that is not a number greater than 0`, () => {
+      for (const duration of BAD_DURATIONS) {
+        expect(() => make(duration), String(duration)).toThrow(RangeError);
+      }
+      expect(() => make(0)).toThrow(/: the duration must be a number of milliseconds greater than 0, not 0$/);
+    });
+
+    it(`${name} accepts a fraction, a whole number and Infinity`, () => {
+      for (const duration of [0.5, 1, 1000, Number.POSITIVE_INFINITY]) {
+        expect(() => make(duration), String(duration)).not.toThrow();
+      }
+    });
+  }
+
+  it("a bad set or touch does not change the cache", () => {
+    const cache = keep(ttlCache<string, number>(10));
+    cache.set("a", 1);
+    expect(() => cache.set("a", 2, 0)).toThrow(RangeError);
+    expect(() => cache.touch("a", Number.NaN)).toThrow(RangeError);
+    expect(cache.get("a")).toBe(1);
+    expect(cache.getTTL("a")).toBeLessThanOrEqual(10);
+  });
+
 });
 
 describe("LRUCache.deleteWhere", () => {

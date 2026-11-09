@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { fakeClock } from "@mark1russell7/algebra/clock";
-import { arrayList, boundedList, boundedMap, compose, hashMap, lruMap, ttlCache, ttlMap, ttlCollection, TTLCache } from "./index.js";
+import { arrayList, boundedList, boundedMap, compose, hashMap, lruCache, lruMap, ttlCache, ttlMap, ttlCollection, TTLCache } from "./index.js";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -169,10 +169,10 @@ describe("the clock of the TTL behaviors (D5)", () => {
     map.dispose();
   });
 
-  it("an interval less than 1 ms checks each millisecond", async () => {
+  it("an interval between 0 and 1 ms checks each millisecond", async () => {
     const clock = fakeClock();
     const base = hashMap<string, number>();
-    const map = ttlMap<string, number>({ ttl: 5, checkInterval: 0, clock })(base);
+    const map = ttlMap<string, number>({ ttl: 5, checkInterval: 0.5, clock })(base);
 
     map.set("a", 1);
     await clock.advance(5);
@@ -221,6 +221,60 @@ describe("the clock of the TTL behaviors (D5)", () => {
     cache.dispose();
     direct.dispose();
     expect(clock.pending).toBe(0);
+  });
+
+  it("touch of an expired entry gives it to onExpire one time, as get does (C37)", async () => {
+    const clock = fakeClock();
+    const expired: Array<[string, number]> = [];
+    const cache = ttlCache<string, number>(10, { checkInterval: 1000, clock, onExpire: (key, value) => expired.push([key, value]) });
+
+    cache.set("a", 1);
+    cache.set("b", 2);
+    await clock.advance(10);
+    expect(cache.touch("a")).toBe(false);
+    expect(expired).toEqual([["a", 1]]);
+    expect(cache.touch("a")).toBe(false);
+    expect(cache.get("b")).toBeUndefined();
+    expect(expired).toEqual([["a", 1], ["b", 2]]);
+    cache.dispose();
+  });
+
+  it("an interval of Infinity starts no background check, and an access still removes an expired entry", async () => {
+    const clock = fakeClock();
+    const expired: string[] = [];
+    const base = hashMap<string, number>();
+    const map = ttlMap<string, number>({ ttl: 5, checkInterval: Number.POSITIVE_INFINITY, clock, onExpire: ({ key }) => expired.push(key) })(base);
+
+    map.set("a", 1);
+    await clock.advance(100);
+    expect(base.has("a")).toBe(true);
+    expect(expired).toEqual([]);
+    expect(map.has("a")).toBe(false);
+    expect(expired).toEqual(["a"]);
+    map.dispose();
+  });
+});
+
+describe("has is not a use of an LRU (C37)", () => {
+  it("lruMap evicts the oldest key, also after has() found it", () => {
+    const evicted: string[] = [];
+    const map = lruMap<string, number>({ capacity: 2, onEvict: ({ key }) => evicted.push(key) })(hashMap<string, number>());
+    map.set("a", 1);
+    map.set("b", 2);
+    expect(map.has("a")).toBe(true);
+    map.set("c", 3);
+    expect(evicted).toEqual(["a"]);
+  });
+
+  it("LRUCache does the same", () => {
+    const evicted: string[] = [];
+    const cache = lruCache<string, number>(2, (key) => evicted.push(key));
+    cache.set("a", 1);
+    cache.set("b", 2);
+    expect(cache.has("a")).toBe(true);
+    cache.set("c", 3);
+    expect(evicted).toEqual(["a"]);
+    expect([...cache.keys()]).toEqual(["c", "b"]);
   });
 });
 

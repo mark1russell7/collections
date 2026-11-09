@@ -838,7 +838,7 @@ export declare class HashMap<K, V> implements MapLike<K, V> {
   get size(): number;
   get isEmpty(): boolean;
   get keyEq(): Eq<K>;
-  get keyHash(): Hash<K>;
+  get hash(): Hash<K>;
   get valueEq(): Eq<V>;
   has(key: K): boolean;
   get(key: K): V;
@@ -969,7 +969,6 @@ export declare class LinkedHashMap<K, V> implements MapLike<K, V> {
   get keyEq(): Eq<K>;
   get valueEq(): Eq<V>;
   get hash(): Hash<K>;
-  get keyHash(): Hash<K>;
   has(key: K): boolean;
   containsKey(key: K): boolean;
   containsValue(value: V): boolean;
@@ -1314,7 +1313,7 @@ export interface ReadonlyMapLike<K, V> extends Iterable<Entry<K, V>> {
   entries(): Iterable<Entry<K, V>>;
   forEach(action: (value: V, key: K, map: this) => void): void;
   readonly keyEq: Eq<K>;
-  readonly keyHash?: Hash<K>;
+  readonly hash?: Hash<K>;
   readonly valueEq: Eq<V>;
 }
 

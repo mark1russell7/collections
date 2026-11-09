@@ -93,7 +93,7 @@ export interface ReadonlyMapLike<K, V> extends Iterable<Entry<K, V>> {
    * This value is the hash function used for keys, when the map is a hash map. It agrees with `keyEq`.
    * A layer with data for each key (`lruMap`, `ttlMap`) uses it to find a key as the map does.
    */
-  readonly keyHash?: Hash<K>;
+  readonly hash?: Hash<K>;
 
   /**
    * This value is the equality function used for values.

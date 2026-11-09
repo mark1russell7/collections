@@ -3,7 +3,7 @@
  * find a key as the base does.
  *
  * The bases:
- * - a `hashMap` with a `keyEq` and `keyHash` by `id`: two objects with the same `id` are one key;
+ * - a `hashMap` with an `eq` and a `hash` by `id`: two objects with the same `id` are one key;
  * - a `treeMap` with a comparator that ignores case: "a" and "A" are one key.
  *
  * The model keeps each key by its class (the `id`, or the lower case), so it agrees with the base.
@@ -39,10 +39,10 @@ const lower = (s: string): string => s.toLowerCase();
 const byCase = (a: string, b: string): number => (lower(a) < lower(b) ? -1 : lower(a) > lower(b) ? 1 : 0);
 
 const ids: Family<Id> = {
-  name: "hashMap with keyEq and keyHash by id",
+  name: "hashMap with eq and hash by id",
   key: fc.record({ id: fc.integer({ min: 0, max: 5 }), tag: fc.integer({ min: 0, max: 2 }) }),
   canon: (key) => String(key.id),
-  base: () => hashMap<Id, number>({ keyEq: (a, b) => a.id === b.id, keyHash: (key) => key.id }),
+  base: () => hashMap<Id, number>({ eq: (a, b) => a.id === b.id, hash: (key) => key.id }),
 };
 
 const letters: Family<string> = {

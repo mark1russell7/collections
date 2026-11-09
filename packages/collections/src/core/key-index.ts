@@ -34,10 +34,10 @@ export interface BaseEquality<K> {
   readonly comparator?: Compare<K> | undefined;
 }
 
-/** This function reads the equality of a map: `keyEq`, then `keyHash` or `hash`, and `comparator`. */
+/** This function reads the equality of a map: its `keyEq`, its `hash` and its `comparator`. */
 export function mapEquality<K, V>(map: MapLike<K, V>): BaseEquality<K> {
-  const fields = map as MapLike<K, V> & { hash?: Hash<K>; comparator?: Compare<K> };
-  return { eq: fields.keyEq, hash: fields.keyHash ?? fields.hash, comparator: fields.comparator };
+  const fields = map as MapLike<K, V> & { comparator?: Compare<K> };
+  return { eq: fields.keyEq, hash: fields.hash, comparator: fields.comparator };
 }
 
 /** This function reads the equality of a collection: `eq`, then `hash` and `comparator`. */
@@ -63,7 +63,7 @@ export function keyIndex<K, X>(base: BaseEquality<K>): KeyIndex<K, X> {
   const { eq, hash, comparator } = base;
   if (comparator !== undefined) return new LinkedIndex<K, X>(treeMap<K, Cell<K, X>>({ compare: comparator }));
   if (eq === undefined || eq === defaultEq) return new Map<K, X>();
-  return new LinkedIndex<K, X>(hashMap<K, Cell<K, X>>({ keyEq: eq, keyHash: hash ?? (() => 0) }));
+  return new LinkedIndex<K, X>(hashMap<K, Cell<K, X>>({ eq, hash: hash ?? (() => 0) }));
 }
 
 /** One entry of a linked index. A delete keeps its `next`, so an iteration that holds it can go on. */

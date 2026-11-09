@@ -140,7 +140,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 
 | Names | Verdict | Reason |
 |---|---|---|
-| `ContractViolation`, `deepEqual`, `holds`, `rejects`, `same`, `show` | move | These checks go to `@mark1russell7/rigor-testkit` (C25). `rejects` goes first (rigor#114). A later MINOR version removes `./testing`, after client moves. |
+| `ContractViolation`, `deepEqual`, `holds`, `rejects`, `same`, `show` | move | `node:assert` covers `holds`, `same` and `deepEqual`, and `@mark1russell7/rigor-testkit` 0.1.4 has `rejects` (C25). Version 0.11.0 marks them `@deprecated`, and 0.12.0 removes `./testing`. |
 
 ## The names of the removals (C23)
 

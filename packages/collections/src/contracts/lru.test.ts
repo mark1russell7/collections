@@ -15,7 +15,7 @@ import { linkedHashMap } from "../impl/linked-hash-map.js";
 import { treeMap } from "../impl/tree-map.js";
 import { lruMap } from "../behaviors/lru.js";
 import type { MapLike } from "../interfaces/map.js";
-import { runModel, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
 
 type S = { sut: MapLike<number, string> & { readonly isFull: boolean }; evicted: [number, string][] };
 /** The model: the entries, with the most recent key last, and the evictions in their order. */

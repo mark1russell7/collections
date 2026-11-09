@@ -9,7 +9,8 @@ import { hashSet } from "../impl/hash-set.js";
 import { treeSet } from "../impl/tree-set.js";
 import { linkedHashMap } from "../impl/linked-hash-map.js";
 import type { Set as SetLike, NavigableSet } from "../interfaces/set.js";
-import { runModel, smallInt, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
+import { smallInt } from "./arbitraries.js";
 
 type S = SetLike<number>;
 type M = Set<number>;

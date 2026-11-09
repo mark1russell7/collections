@@ -11,7 +11,8 @@ import { arrayDeque } from "../impl/array-deque.js";
 import { linkedList } from "../impl/linked-list.js";
 import { priorityQueue } from "../impl/priority-queue.js";
 import type { Deque, PriorityQueue } from "../interfaces/queue.js";
-import { runModel, smallInt, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
+import { smallInt } from "./arbitraries.js";
 
 type D = Deque<number>;
 type M = number[];

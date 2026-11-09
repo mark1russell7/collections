@@ -12,7 +12,8 @@ import { hashMap } from "../impl/hash-map.js";
 import { linkedHashMap } from "../impl/linked-hash-map.js";
 import { treeMap } from "../impl/tree-map.js";
 import type { MapLike } from "../interfaces/map.js";
-import { runModel, smallInt, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
+import { smallInt } from "./arbitraries.js";
 
 type S = MapLike<number, string>;
 type M = Map<number, string>;

@@ -11,7 +11,8 @@ import fc from "fast-check";
 import { arrayList } from "../impl/array-list.js";
 import { linkedList } from "../impl/linked-list.js";
 import type { List } from "../interfaces/list.js";
-import { runModel, smallInt, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
+import { smallInt } from "./arbitraries.js";
 
 type S = List<number>;
 type M = number[];

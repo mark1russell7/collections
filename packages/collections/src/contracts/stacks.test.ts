@@ -22,7 +22,7 @@ import { ttlMap } from "../behaviors/ttl.js";
 import { boundedMap } from "../behaviors/bounded.js";
 import { eventedMap } from "../behaviors/evented.js";
 import type { MapLike } from "../interfaces/map.js";
-import { runModel, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
 
 const TTL = 10;
 

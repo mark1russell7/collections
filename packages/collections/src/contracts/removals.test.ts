@@ -30,7 +30,7 @@ import { synchronized, readWriteLock } from "../behaviors/synchronized.js";
 import type { List } from "../interfaces/list.js";
 import type { Queue, Deque } from "../interfaces/queue.js";
 import type { MapLike } from "../interfaces/map.js";
-import { runModel, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
 
 const TTL = 10;
 

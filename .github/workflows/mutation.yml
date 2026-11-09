@@ -42,7 +42,7 @@ jobs:
       match: ${{ steps.changes.outputs.match }}
     steps:
       - id: changes
-        uses: mark1russell7/template/.github/actions/changes@c216644a252956d695bc2a785e80abccd98fa0d0 # main
+        uses: mark1russell7/template/.github/actions/changes@90b63f666ff1a840779ee3f94d07934d16076ae5 # main
         with:
           paths: |
             mutation.json
@@ -54,7 +54,7 @@ jobs:
   mutation:
     needs: changes
     if: needs.changes.outputs.match == 'true'
-    uses: mark1russell7/template/.github/workflows/reusable-mutation.yml@c216644a252956d695bc2a785e80abccd98fa0d0 # main
+    uses: mark1russell7/template/.github/workflows/reusable-mutation.yml@90b63f666ff1a840779ee3f94d07934d16076ae5 # main
     with:
       dry-run: ${{ github.event_name == 'pull_request' || inputs.dry-run == true }}
 
@@ -65,6 +65,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {}
     steps:
-      - uses: mark1russell7/template/.github/actions/gate-summary@c216644a252956d695bc2a785e80abccd98fa0d0 # main
+      - uses: mark1russell7/template/.github/actions/gate-summary@90b63f666ff1a840779ee3f94d07934d16076ae5 # main
         with:
           needs: ${{ toJSON(needs) }}

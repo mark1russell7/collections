@@ -17,6 +17,7 @@ import type { Middleware } from "../core/middleware.js";
 import type { Entry, MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
+import { elementEquality, keyIndex, mapEquality } from "../core/key-index.js";
 import type { Collection } from "../interfaces/collection.js";
 import { hasMembers } from "./members.js";
 import type { Cancel, Clock } from "@mark1russell7/algebra/clock";
@@ -95,8 +96,9 @@ export function ttlMap<K, V>(
   return (
     next: MapLike<K, V>
   ): MapLike<K, V> & { readonly dispose: () => void } => {
-    // The times of the live keys, in the order of expiry: a set deletes its key before it adds it again
-    const metadata = new Map<K, TTLEntry<V>>();
+    // The times of the live keys, in the order of expiry: a set deletes its key before it adds it again.
+    // The index finds a key with the equality of the base (C20).
+    const metadata = keyIndex<K, TTLEntry<V>>(mapEquality(next));
     // A removal below (for example an eviction of lruMap) ends the time of its key, so it never expires
     const source = removalSource<MapRemoval<K, V>>(next, ({ key }) => void metadata.delete(key));
 
@@ -224,7 +226,7 @@ export function ttlCollection<T>(
   return (
     next: Collection<T>
   ): Collection<T> & { readonly dispose: () => void } => {
-    const metadata = new Map<T, { expiresAt: number; createdAt: number }>();
+    const metadata = keyIndex<T, { expiresAt: number; createdAt: number }>(elementEquality(next));
     const source = removalSource<ElementRemoval<T>>(next, ({ value }) => void metadata.delete(value));
 
     const checkExpired = (): void => {

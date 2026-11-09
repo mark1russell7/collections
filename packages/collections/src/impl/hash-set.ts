@@ -99,6 +99,11 @@ export class HashSet<T> implements Set<T> {
     return this._eq;
   }
 
+  /** This value is the hash function of the elements. It agrees with `eq`. */
+  get hash(): Hash<T> {
+    return this._hash;
+  }
+
   // ========================================================================
   // Core set operations
   // ========================================================================

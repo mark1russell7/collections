@@ -5,7 +5,7 @@
  * Keys are unique within a map.
  */
 
-import type { Eq, Compare } from "../core/traits.js";
+import type { Eq, Compare, Hash } from "../core/traits.js";
 
 /**
  * Entry<K, V> - An immutable key-value pair from a map.
@@ -88,6 +88,12 @@ export interface ReadonlyMapLike<K, V> extends Iterable<Entry<K, V>> {
    * This value is the equality function used for keys.
    */
   readonly keyEq: Eq<K>;
+
+  /**
+   * This value is the hash function used for keys, when the map is a hash map. It agrees with `keyEq`.
+   * A layer with data for each key (`lruMap`, `ttlMap`) uses it to find a key as the map does.
+   */
+  readonly hash?: Hash<K>;
 
   /**
    * This value is the equality function used for values.

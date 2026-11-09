@@ -137,6 +137,11 @@ export class HashMap<K, V> implements MapLike<K, V> {
     return this._keyEq;
   }
 
+  /** This value is the hash function of the keys. It agrees with `keyEq`. */
+  get hash(): Hash<K> {
+    return this._keyHash;
+  }
+
   get valueEq(): Eq<V> {
     return this._valueEq;
   }

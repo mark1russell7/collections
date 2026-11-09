@@ -19,6 +19,7 @@ import type { Middleware } from "../core/middleware.js";
 import type { MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type MapRemoval } from "../core/removals.js";
+import { keyIndex, mapEquality } from "../core/key-index.js";
 import { hasMembers } from "./members.js";
 import type { Clock } from "@mark1russell7/algebra/clock";
 import { systemClock } from "../core/system-clock.js";
@@ -82,7 +83,8 @@ export function lruMap<K, V>(
     // Doubly-linked list for LRU tracking
     let head: TimedNode<K, V> | null = null;
     let tail: TimedNode<K, V> | null = null;
-    const nodeMap = new Map<K, TimedNode<K, V>>();
+    // The nodes, found with the equality of the base (C20)
+    const nodeMap = keyIndex<K, TimedNode<K, V>>(mapEquality(next));
 
     const moveToHead = (node: TimedNode<K, V>): void => {
       // Remove from current position

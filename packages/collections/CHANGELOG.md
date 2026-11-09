@@ -2,7 +2,7 @@
 
 ## 0.11.0
 
-`lruMap`, `ttlMap` and `ttlCollection` find each key with the equality of their base (C20). The LRU and TTL layers and classes have the same rules (C37). MINOR: a new getter, and before 1.0.0 a change of behavior raises MINOR.
+`lruMap`, `ttlMap` and `ttlCollection` find each key with the equality of their base (C20). The LRU and TTL layers and classes have the same rules (C37). The entry `./testing` is deprecated (C25). MINOR: a new getter, and before 1.0.0 a change of behavior raises MINOR.
 
 ### Added
 
@@ -13,6 +13,10 @@
 - `lruMap` and `ttlMap` kept their keys in a JavaScript `Map`, so they did not agree with a base that has a custom `keyEq` or comparator. Two equal keys were two entries of the layer. Then the layer evicted or expired a key that was gone, or the entry of the other key. The layer finds a key as the base does.
 - `ttlCollection` did the same with the `eq` of its base. A `remove` with an equal element kept the old time, which later removed the element of a new `add`.
 - `touch` of `TTLCache` removed an expired entry with no `onExpire` (C37). It gives the entry to `onExpire`, as `get` does.
+
+### Deprecated
+
+- The entry `./testing` and its names `holds`, `same`, `deepEqual`, `rejects`, `show` and `ContractViolation` (C25). Version 0.12.0 removes them. Use `assert.ok` and `assert.deepStrictEqual` of `node:assert`, and `rejects` of `@mark1russell7/rigor-testkit` 0.1.4. `assert.deepStrictEqual` also compares the prototypes, and `deepEqual` did not.
 
 ### Changed
 

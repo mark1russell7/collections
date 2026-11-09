@@ -119,7 +119,7 @@ Each guide has examples, and a test runs each example:
 
 ## Contract checks
 
-The entry `./testing` gives the small checks of a contract suite: `holds`, `same`, `rejects`, `deepEqual`, `show` and `ContractViolation`. These checks import no test framework.
+The entry `./testing` gives the small checks of a contract suite: `holds`, `same`, `rejects`, `deepEqual`, `show` and `ContractViolation`. These checks import no test framework. Each name is deprecated, and version 0.12.0 removes the entry. Use `node:assert` and `rejects` of `@mark1russell7/rigor-testkit`.
 
 ## Entries
 

@@ -3,12 +3,20 @@
  * entry of this package does not load one. A failed check throws `ContractViolation`.
  */
 
-/** The error of a failed check of the contract suite. */
+/**
+ * The error of a failed check of the contract suite.
+ *
+ * @deprecated Version 0.12.0 removes the entry `./testing` (C25). Use `AssertionError` of `node:assert`.
+ */
 export class ContractViolation extends Error {
   override readonly name = "ContractViolation";
 }
 
-/** This function gives the text of a value for a message: JSON, with a `Map` as its entries. */
+/**
+ * This function gives the text of a value for a message: JSON, with a `Map` as its entries.
+ *
+ * @deprecated Version 0.12.0 removes the entry `./testing` (C25). Use `inspect` of `node:util`.
+ */
 export function show(value: unknown): string {
   if (value === undefined) return "undefined";
   try {
@@ -36,6 +44,8 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
  * - 0 does not equal -0 here, and it does under `deepEq`.
  * - `{}` equals `Object.create(null)` here, and it does not under `deepEq`.
  * - A cyclic value exhausts the stack here, and it ends under `deepEq`.
+ *
+ * @deprecated Version 0.12.0 removes the entry `./testing` (C25). Use `isDeepStrictEqual` of `node:util`. It also compares the prototypes.
  */
 export function deepEqual(actual: unknown, expected: unknown): boolean {
   if (Object.is(actual, expected)) return true;
@@ -57,14 +67,22 @@ export function deepEqual(actual: unknown, expected: unknown): boolean {
   return false;
 }
 
-/** This function throws `ContractViolation` when the two values are not deeply equal. */
+/**
+ * This function throws `ContractViolation` when the two values are not deeply equal.
+ *
+ * @deprecated Version 0.12.0 removes the entry `./testing` (C25). Use `assert.deepStrictEqual` of `node:assert`. It also compares the prototypes.
+ */
 export function same(actual: unknown, expected: unknown, what: string): void {
   if (!deepEqual(actual, expected)) {
     throw new ContractViolation(`${what}: expected ${show(expected)}, got ${show(actual)}`);
   }
 }
 
-/** This function throws `ContractViolation` when the condition is false. */
+/**
+ * This function throws `ContractViolation` when the condition is false.
+ *
+ * @deprecated Version 0.12.0 removes the entry `./testing` (C25). Use `assert.ok` of `node:assert`.
+ */
 export function holds(condition: boolean, what: string): void {
   if (!condition) throw new ContractViolation(what);
 }
@@ -72,6 +90,8 @@ export function holds(condition: boolean, what: string): void {
 /**
  * This function starts an operation that must fail with a rejected promise, and gives the error.
  * A synchronous throw breaks the contract too: each method of a storage gives a promise.
+ *
+ * @deprecated Version 0.12.0 removes the entry `./testing` (C25). Use `rejects` of `@mark1russell7/rigor-testkit` 0.1.4.
  */
 export async function rejects(start: () => Promise<unknown>, what: string): Promise<unknown> {
   let promise: Promise<unknown>;

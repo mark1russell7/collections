@@ -22,11 +22,12 @@ import type { Collection } from "../interfaces/collection.js";
 import { hasMembers } from "./members.js";
 import type { Cancel, Clock } from "@mark1russell7/algebra/clock";
 import { systemClock } from "../core/system-clock.js";
+import { checkDuration } from "../core/capacity.js";
 
 /**
  * This function starts the background expiration checker on a clock, and gives the function that stops it.
  * The checker starts again before each check, so a check that throws does not stop it. An interval
- * less than 1 ms is 1 ms, as with `setInterval`.
+ * between 0 and 1 ms is 1 ms, as with `setInterval`. The options check that the interval is greater than 0.
  */
 function startExpirationTimer(clock: Clock, check: () => void, interval: number): Cancel {
   const every = Math.max(1, interval);
@@ -44,14 +45,14 @@ function startExpirationTimer(clock: Clock, check: () => void, interval: number)
  */
 export interface TTLOptions {
   /**
-   * Time-to-live in milliseconds.
-   * Elements expire after this duration.
+   * The time to live of an element, in milliseconds: a number greater than 0. `Infinity` keeps each element.
    */
   ttl: number;
 
   /**
-   * Interval for checking expired elements (in milliseconds).
-   * @default 1000 (check every second)
+   * The time between two background checks for expired elements, in milliseconds: a number greater than 0.
+   * `Infinity` starts no background check, and each access still removes the expired elements.
+   * @default 1000
    */
   checkInterval?: number;
 
@@ -87,11 +88,15 @@ interface TTLEntry<V> {
  *
  * The layer keeps the times in the order of expiry, so the removal before an access is amortized O(1).
  * This order needs a clock that does not go back. If the clock goes back, an entry can stay until the entries before it expire.
+ *
+ * @throws RangeError when `ttl` or `checkInterval` is not a number greater than 0.
  */
 export function ttlMap<K, V>(
   options: TTLOptions
 ): Middleware<MapLike<K, V>, MapLike<K, V> & { readonly dispose: () => void }> {
-  const { ttl, checkInterval = 1000, onExpire, clock = systemClock } = options;
+  const { onExpire, clock = systemClock } = options;
+  const ttl = checkDuration(options.ttl, "ttlMap: ttl");
+  const checkInterval = checkDuration(options.checkInterval ?? 1000, "ttlMap: checkInterval");
 
   return (
     next: MapLike<K, V>
@@ -215,13 +220,17 @@ export function ttlMap<K, V>(
  *
  * Note: This is less precise than TTL map because collections don't have keys.
  * Elements are tracked by reference, which can fail for primitive types.
+ *
+ * @throws RangeError when `ttl` or `checkInterval` is not a number greater than 0.
  */
 export function ttlCollection<T>(
   options: Omit<TTLOptions, "onExpire"> & {
     onExpire?: (info: { element: T; createdAt: number; expiredAt: number }) => void;
   }
 ): Middleware<Collection<T>, Collection<T> & { readonly dispose: () => void }> {
-  const { ttl, checkInterval = 1000, onExpire, clock = systemClock } = options;
+  const { onExpire, clock = systemClock } = options;
+  const ttl = checkDuration(options.ttl, "ttlCollection: ttl");
+  const checkInterval = checkDuration(options.checkInterval ?? 1000, "ttlCollection: checkInterval");
 
   return (
     next: Collection<T>
@@ -337,6 +346,7 @@ export class TTLCache<K, V> {
    * @param checkInterval - The time between two background checks, in milliseconds.
    * @param onExpire - The function that gets each expired entry.
    * @param clock - The clock of the times and of the background check. The default clock reads `Date.now()`.
+   * @throws RangeError when `ttl` or `checkInterval` is not a number greater than 0.
    */
   constructor(
     ttl: number,
@@ -344,8 +354,8 @@ export class TTLCache<K, V> {
     onExpire?: ((key: K, value: V) => void) | undefined,
     clock: Clock = systemClock
   ) {
-    this.ttl = ttl;
-    this.checkInterval = checkInterval;
+    this.ttl = checkDuration(ttl, "TTLCache: ttl");
+    this.checkInterval = checkDuration(checkInterval, "TTLCache: checkInterval");
     this.onExpire = onExpire;
     this.clock = clock;
     this.startExpirationCheck();
@@ -371,9 +381,15 @@ export class TTLCache<K, V> {
     return entry.value;
   }
 
+  /**
+   * This method sets the value of a key, with a new time to live.
+   *
+   * @param customTTL - The time to live of this entry, in milliseconds. The default is the `ttl` of the cache.
+   * @throws RangeError when `customTTL` is not a number greater than 0.
+   */
   set(key: K, value: V, customTTL?: number): void {
+    const ttlToUse = customTTL !== undefined ? checkDuration(customTTL, "TTLCache.set: customTTL") : this.ttl;
     const now = this.clock.now();
-    const ttlToUse = customTTL !== undefined ? customTTL : this.ttl;
 
     this.map.set(key, {
       value,
@@ -431,18 +447,23 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * This method updates the TTL of a key that is in the map.
+   * This method gives a live key a new time to live, and gives true. For an expired key, it removes the entry,
+   * gives it to `onExpire` as `get` does, and gives false.
+   *
+   * @param customTTL - The new time to live, in milliseconds. The default is the `ttl` of the cache.
+   * @throws RangeError when `customTTL` is not a number greater than 0.
    */
   touch(key: K, customTTL?: number): boolean {
+    const ttlToUse = customTTL !== undefined ? checkDuration(customTTL, "TTLCache.touch: customTTL") : this.ttl;
     const entry = this.map.get(key);
     if (!entry) return false;
 
     if (this.clock.now() >= entry.expiresAt) {
       this.map.delete(key);
+      this.onExpire?.(key, entry.value);
       return false;
     }
 
-    const ttlToUse = customTTL !== undefined ? customTTL : this.ttl;
     entry.expiresAt = this.clock.now() + ttlToUse;
     return true;
   }
@@ -480,7 +501,9 @@ export class TTLCache<K, V> {
 }
 
 /**
- * Factory function to make a TTL cache.
+ * This function makes a TTL cache.
+ *
+ * @throws RangeError when `ttl` or `options.checkInterval` is not a number greater than 0.
  */
 export function ttlCache<K, V>(
   ttl: number,

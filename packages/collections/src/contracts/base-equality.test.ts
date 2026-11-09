@@ -106,9 +106,8 @@ function lruSteps<K>(f: Family<K>): fc.Arbitrary<Step<LruSut<K>, LruModel>> {
     ),
     f.key.map((k) =>
       step<LruSut<K>, LruModel>(`has(${JSON.stringify(k)})`, ({ map }, m) => {
-        const c = f.canon(k);
-        if (m.values.has(c)) use(m, c);
-        expect(map.has(k)).toBe(m.values.has(c));
+        // A has is not a use (C37), so the order does not change
+        expect(map.has(k)).toBe(m.values.has(f.canon(k)));
       }),
     ),
     f.key.map((k) =>

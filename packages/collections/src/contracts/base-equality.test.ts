@@ -20,7 +20,7 @@ import { ttlMap, ttlCollection } from "../behaviors/ttl.js";
 import type { MapLike } from "../interfaces/map.js";
 import type { Collection } from "../interfaces/collection.js";
 import { keyIndex } from "../core/key-index.js";
-import { runModel, step, type Step } from "./model.js";
+import { runModel, step, type Step } from "@mark1russell7/rigor-testkit/model";
 
 interface Id {
   readonly id: number;

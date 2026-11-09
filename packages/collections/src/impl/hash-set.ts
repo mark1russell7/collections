@@ -34,7 +34,7 @@ export interface HashSetOptions<T> {
   initialCapacity?: number;
 
   /**
-   * Load factor threshold for resizing.
+   * This option is the load factor threshold for a resize.
    * @default 0.75
    */
   loadFactor?: number;
@@ -78,8 +78,8 @@ export class HashSet<T> implements Set<T> {
     this._map = new HashMap<T, symbol>({
       initialCapacity,
       loadFactor,
-      keyEq: eq,
-      keyHash: hash,
+      eq,
+      hash,
     });
   }
 
@@ -147,18 +147,11 @@ export class HashSet<T> implements Set<T> {
   }
 
   retainAll(other: Iterable<T>): boolean {
-    const toRetain = new globalThis.Set(other);
+    const toRetain = this.setOf(other);
     const toRemove: T[] = [];
 
     for (const element of this) {
-      let shouldRetain = false;
-      for (const retainElement of toRetain) {
-        if (this._eq(element, retainElement)) {
-          shouldRetain = true;
-          break;
-        }
-      }
-      if (!shouldRetain) {
+      if (!toRetain.contains(element)) {
         toRemove.push(element);
       }
     }
@@ -204,13 +197,12 @@ export class HashSet<T> implements Set<T> {
    * The new set contains only elements present in both sets.
    */
   intersection(other: Iterable<T>): HashSet<T> {
-    const result = new HashSet<T>({ eq: this._eq });
+    // The loop reads `other` one time, so a generator gives all of its elements
+    const others = this.setOf(other);
+    const result = this.empty();
     for (const element of this) {
-      for (const otherElement of other) {
-        if (this._eq(element, otherElement)) {
-          result.add(element);
-          break;
-        }
+      if (others.contains(element)) {
+        result.add(element);
       }
     }
     return result;
@@ -231,8 +223,10 @@ export class HashSet<T> implements Set<T> {
    * The new set contains elements in either set but not in both.
    */
   symmetricDifference(other: Iterable<T>): HashSet<T> {
-    const result = this.union(other);
-    const inter = this.intersection(other);
+    // The union and the intersection each read `other`, so read it one time first
+    const others = this.setOf(other);
+    const result = this.union(others);
+    const inter = this.intersection(others);
     result.removeAll(inter);
     return result;
   }
@@ -242,8 +236,7 @@ export class HashSet<T> implements Set<T> {
    * All elements in this set are also in the other set.
    */
   isSubsetOf(other: Iterable<T>): boolean {
-    const otherSet = new HashSet<T>({ eq: this._eq });
-    otherSet.addAll(other);
+    const otherSet = this.setOf(other);
 
     for (const element of this) {
       if (!otherSet.contains(element)) {
@@ -307,9 +300,22 @@ export class HashSet<T> implements Set<T> {
    * This method makes a shallow copy of this set.
    */
   clone(): HashSet<T> {
-    const clone = new HashSet<T>({ eq: this._eq });
-    clone.addAll(this);
-    return clone;
+    return this.setOf(this);
+  }
+
+  /**
+   * This method makes an empty set with the equality and the hash function of this set.
+   * Before, the inner sets kept only the equality, so they did not find an element with a custom hash.
+   */
+  private empty(): HashSet<T> {
+    return new HashSet<T>({ eq: this._eq, hash: this._hash });
+  }
+
+  /** This method makes a set of the elements, with the equality and the hash function of this set. */
+  private setOf(elements: Iterable<T>): HashSet<T> {
+    const set = this.empty();
+    set.addAll(elements);
+    return set;
   }
 
   /**

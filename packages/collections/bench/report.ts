@@ -4,17 +4,32 @@
  *
  * The field `bound` is the factor to defend: the high end of the 95 % interval of the ratio, times
  * the high end of the A/A band. `limitVerdict` of rigor-bench uses the same bound.
+ *
+ * The report also writes a gate line on the check of the run. The line tells a pooled verdict that is `slower` or
+ * `cannot decide`, and each case that a job skipped. The bench only reports, so the line is a warning.
  */
 
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { aaBand, caseIntervals, caseRatios, poolRecords, pooledVerdict, type PairedTime } from "@mark1russell7/rigor-bench";
+import {
+  aaBand,
+  caseIntervals,
+  caseRatios,
+  gateLine,
+  jobModels,
+  poolRecords,
+  pooledVerdict,
+  writeGateLine,
+  type CaseRead,
+  type JobEnv,
+  type PairedTime,
+} from "@mark1russell7/rigor-bench";
 import { median } from "@mark1russell7/rigor-statistics";
 
 interface JobFile {
   readonly job: string;
-  readonly env: unknown;
+  readonly env: JobEnv;
   readonly candidate: readonly PairedTime[];
   readonly aa: readonly PairedTime[];
 }
@@ -64,3 +79,17 @@ const report = {
   env: jobs.map(({ job, env }) => ({ job, env })),
 };
 writeFileSync(values.out, `${JSON.stringify(report, null, 2)}\n`);
+
+const reads: CaseRead[] = [
+  { case: "the pooled verdict", outcome: verdict.outcome },
+  ...verdict.dropped.map((id): CaseRead => ({ case: id, outcome: "cannot decide" })),
+];
+const skipped =
+  verdict.dropped.length === 0 ? "" : ` A job skipped ${verdict.dropped.length} cases, and the verdict uses no record of them.`;
+writeGateLine(
+  gateLine(reads, {
+    title: "collections bench",
+    reason: `${verdict.reason}${skipped}`,
+    models: jobModels(jobs.map(({ env }) => env), { cores: true }),
+  }),
+);

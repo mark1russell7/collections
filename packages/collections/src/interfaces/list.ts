@@ -1,5 +1,5 @@
 /**
- * List interfaces that mirror Java's List interface.
+ * This module has the list interfaces, which mirror the List interface of Java.
  *
  * Lists are ordered collections that can hold duplicate elements
  * and give positional (indexed) access to elements.
@@ -153,7 +153,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   push(element: T): void;
 
   /**
-   * Removes and gives the last element in this list.
+   * This method removes the last element of this list and gives it.
    *
    * @returns The last element
    * @throws Error if list is empty
@@ -161,7 +161,7 @@ export interface List<T> extends ReadonlyList<T>, Collection<T> {
   pop(): T;
 
   /**
-   * Removes and gives the first element in this list.
+   * This method removes the first element of this list and gives it.
    *
    * @returns The first element
    * @throws Error if list is empty
@@ -209,7 +209,7 @@ export interface Stack<T> extends Iterable<T> {
   push(element: T): void;
 
   /**
-   * Removes and gives the top element.
+   * This method removes the top element and gives it.
    *
    * @throws Error if stack is empty
    */
@@ -232,50 +232,4 @@ export interface Stack<T> extends Iterable<T> {
    * This method gives -1 if not found.
    */
   search(element: T): number;
-}
-
-/**
- * Vector<T> - Synchronized growable array.
- *
- * Like ArrayList but with synchronized access.
- * This interface is a legacy of Java. Use compose(synchronized())(arrayList()) instead.
- */
-export interface Vector<T> extends List<T> {
-  /**
-   * Current capacity of the underlying array.
-   */
-  readonly capacity: number;
-
-  /**
-   * Trims capacity to current size to minimize memory usage.
-   */
-  trimToSize(): void;
-
-  /**
-   * This method increases capacity to make sure that it can hold at least the specified number of elements.
-   */
-  ensureCapacity(minCapacity: number): void;
-}
-
-/**
- * CircularList<T> - List with circular/ring buffer behavior.
- *
- * When capacity is reached, oldest elements are overwritten.
- * Useful for fixed-size buffers like logs or history.
- */
-export interface CircularList<T> extends List<T> {
-  /**
-   * Maximum capacity of the circular list.
-   */
-  readonly capacity: number;
-
-  /**
-   * This value is true if the list has reached capacity.
-   */
-  readonly isFull: boolean;
-
-  /**
-   * Number of elements that have been overwritten.
-   */
-  readonly overwriteCount: number;
 }

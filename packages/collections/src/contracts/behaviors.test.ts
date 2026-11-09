@@ -10,6 +10,7 @@ import { hashMap } from "../impl/hash-map.js";
 import { treeMap } from "../impl/tree-map.js";
 import { arrayList } from "../impl/array-list.js";
 import { linkedHashMap } from "../impl/linked-hash-map.js";
+import { treeSet } from "../impl/tree-set.js";
 import { boundedList } from "../behaviors/bounded.js";
 import { safeDeque } from "../behaviors/safe.js";
 import { readonly } from "../behaviors/readonly.js";
@@ -104,6 +105,52 @@ describe("readWriteLock (L11)", () => {
     const second = await Promise.race([locked.set("a", 2).then(() => "written"), sleep(200).then(() => "starved")]);
     expect(second).toBe("written");
     expect(await locked.get("a")).toBe(2);
+  });
+});
+
+describe("readWriteLock and iteration (C32)", () => {
+  type Locked = {
+    set(key: string, value: number): Promise<number | undefined>;
+    keys(): Promise<Iterable<string>>;
+    values(): Promise<Iterable<number>>;
+    entries(): Promise<Iterable<unknown>>;
+  };
+
+  it("iterates the view with for of, as the collection below it", () => {
+    const map = hashMap<string, number>();
+    map.set("a", 1);
+    map.set("b", 2);
+    const lockedMap = readWriteLock<typeof map>()(map);
+    const list = arrayList([1, 2, 3]);
+    const lockedList = readWriteLock<typeof list>()(list);
+    expect([...lockedMap]).toEqual([...map]);
+    expect([...lockedList]).toEqual([1, 2, 3]);
+    const seen: number[] = [];
+    for (const value of lockedList) seen.push(value);
+    expect(seen).toEqual([1, 2, 3]);
+  });
+
+  it("gives a promise of a copy for keys, values and entries, read under the lock", async () => {
+    const map = hashMap<string, number>();
+    const locked = readWriteLock<typeof map>()(map) as unknown as Locked;
+    const write = locked.set("a", 1);
+    const keys = locked.keys();
+    expect(keys).toBeInstanceOf(Promise);
+    await write;
+    const read = await keys;
+    await locked.set("b", 2);
+    // The copy has the key of the write before it, and not the key of the write after it
+    expect([...read]).toEqual(["a"]);
+    expect([...(await locked.values())]).toEqual([...map.values()]);
+    expect([...(await locked.entries())]).toEqual([...map.entries()]);
+  });
+
+  it("gives an iterator for descendingIterator", async () => {
+    const set = treeSet<number>([1, 2, 3]);
+    const locked = readWriteLock<typeof set>()(set) as unknown as { descendingIterator(): Promise<Iterator<number>> };
+    const iterator = await locked.descendingIterator();
+    expect([iterator.next().value, iterator.next().value, iterator.next().value]).toEqual([3, 2, 1]);
+    expect(iterator.next().done).toBe(true);
   });
 });
 

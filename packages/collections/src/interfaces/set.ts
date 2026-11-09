@@ -1,5 +1,5 @@
 /**
- * Set interfaces that mirror Java's Set interface hierarchy.
+ * This module has the set interfaces, which mirror the Set interface hierarchy of Java.
  *
  * Sets are collections that contain no duplicate elements.
  * They give efficient membership testing.
@@ -137,12 +137,12 @@ export interface NavigableSet<T> extends SortedSet<T> {
   higher(element: T): T | undefined;
 
   /**
-   * Retrieves and removes the first (lowest) element, or gives undefined if empty.
+   * This method removes the first (lowest) element and gives it, or gives undefined when the set is empty.
    */
   pollFirst(): T | undefined;
 
   /**
-   * Retrieves and removes the last (highest) element, or gives undefined if empty.
+   * This method removes the last (highest) element and gives it, or gives undefined when the set is empty.
    */
   pollLast(): T | undefined;
 

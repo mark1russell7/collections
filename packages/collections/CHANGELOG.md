@@ -19,15 +19,181 @@
 
 ## 0.10.0
 
-`boundedList` has one drop end for each front insert (C21). MINOR: before 1.0.0 a change of behavior raises MINOR. On a full `drop-oldest` list, `insert(0, x)` now drops the last element.
+The breaking changes of the API review ship in one version, with the drop end of each front insert of `boundedList` (C21). MINOR: before 1.0.0 a breaking change raises MINOR.
+
+### Added
+
+- `ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` take a clock (D5): the option `clock`, or the fourth argument of the `TTLCache` constructor. The type is `Clock` of `@mark1russell7/algebra/clock`.
+- The default clock reads `Date.now()`, as before, and its timers do not keep a Node.js process alive. A test gives `fakeClock()`, and the expiry times are then exact.
+- The package depends on `@mark1russell7/algebra` (`^0.8.3`) for the clock. Its entry `./clock` imports no other module.
 
 ### Changed
 
+- `defaultCompare` orders values by type first (C39): `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values. Before, it compared the text of two values of different types. That order was not transitive: `9 < 10`, `10 < "10z"` and `"10z" < 9`. A sort of values of mixed types gives a different order.
+- `defaultCompare` gives -1 or 1 for `1` and `"1"`, and for two different objects with the same text. Before, it gave 0, so a `treeSet` held one of the two. Two objects with the same text keep the order of their first comparison.
+- `defaultCompare` compares bigints by value. An object with no prototype compares by its tag, because `String` refuses it.
+- `range` gives `start + i * step` at index `i` (C40). Before, it added `step` to the last number, so the error of a fraction grew: `range(0, 1, 0.1)` gave 11 numbers. It gives 10.
+- `range` throws a `RangeError` for a `start`, an `end` or a `step` that is not finite, and for a list that is longer than an array. Before, `range(0, Infinity)` did not stop. A `step` of 0 throws a `RangeError`, with the same text.
+- `nCopies` throws a `RangeError` when `n` is not a safe integer of 0 or more. Before, `nCopies(2.5, value)` gave 3 copies, `nCopies(NaN, value)` gave an empty list, and `nCopies(Infinity, value)` did not stop.
+- Each layer proxy that adds a member has a `has` trap (C41). The operator `in` sees `on`, `capacity`, `isFull`, `remainingCapacity`, `dispose` and the key `removals`. `hasCapability` also reads the member through the layer, so it gives `true` for `on` of an evented layer.
+- `eventedMap` gives its `set` event before a removal of the same key that the `set` caused (C41). A replay of the events then has the contents of the map. The removal of another key, for example an eviction, still comes before the `set` event.
 - `boundedList` with `drop-oldest`: `insert(0, x)` and `insertAll(0, xs)` into a full list drop the last element, as `unshift(x)` does. Before, they dropped the first element. Each other index drops the first element, as before.
+
+### Deprecated
+
+- The options `keyEq` and `keyHash` of `hashMap` (D2). Use `eq` and `hash`, the names that `linkedHashMap` and `hashSet` take. When both are given, `eq` and `hash` win. Version 0.11.0 removes the old names. The member `keyEq` of each map does not change.
+- `dropIndex` and `Point` of `order` (C12). Their home is `@mark1russell7/layout-contract` (0.6.2 or later), because a hit test on the screen is geometry. Its `dropIndex` gives the same index. Version 0.11.0 removes them.
+
+### Removed
+
+- The 13 names of `async/channels.ts` (C26): `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Version 0.9.1 deprecated them. Import each one from `@mark1russell7/service/channel` (service 0.6.6 or later). Service holds their tests.
+- `reentrantSynchronized` (C28). It was not reentrant: each use made a new `Symbol`, so the check for the holder of the lock did not match. A nested use waited for the outer lock, and the two uses did not end. Use `synchronized`, and do not nest locked uses.
+- The 70 names with the verdict "remove" of `docs/API-REVIEW.md` (D3). No file, test or doc of the repository used them:
+  - the interfaces with no class: `Vector`, `CircularList`, `MultiMap`, `BiMap`, `WeakMapLike`, `BlockingQueue`, `TransferQueue` and `DelayQueue`;
+  - the types `IsReadonly` and `ElementOf`, and the middleware types `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability` and `CollectionBuilder`;
+  - 12 traits, from `Sized` to `Disposable`. The `Disposable` of the language with `Symbol.dispose` is no longer hidden;
+  - 24 policy types and their default values, with `RetryPolicy` and `DEFAULT_RETRY_POLICY`. Retries have a home: `@mark1russell7/service`;
+  - `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` and `KEY_DIGITS`;
+  - 14 names of `utils/helpers.ts`, from `checkBounds` to `stringHashCode`. `toArray` stays.
+- The second names of one function (D4). Use the first name:
+  - `unmodifiableList`, `unmodifiableMap` and `unmodifiableCollection`: use `readonlyList`, `readonlyMap` and `readonlyCollection`;
+  - `mutableListOf` and `mutableMapOf`: use `listOf` and `mapOf`;
+  - `toList` of an iterable: use `arrayList(iterable)`. The collector `collectToList` stays.
+- `hasCapability`, `interceptMethods`, `blockMethods`, `delegate` and `enhanceMethod` stay. The guide to write a layer teaches them.
+- The generic `safe()` (C29). It gave the collection with no change and added no property `safe`, so no caller depended on its result. Use `safeList`, `safeQueue`, `safeDeque` or `safeMap`.
 
 ### Fixed
 
 - `boundedList`: `insert` and `insertAll` at an index that the base refuses dropped an element before the base threw. Now the base throws first, and the list does not change.
+- `boundedList`, `boundedQueue` and `boundedDeque` bound each add method of their base (C42). Before, 23 add methods went past the capacity:
+  - `addFirst`, `addLast`, `offer`, `offerFirst`, `offerLast` and `enqueue` of a `linkedList` under `boundedList`;
+  - `push`, `addFirst`, `addLast`, `offerFirst` and `offerLast` of an `arrayDeque` or a `linkedList` under `boundedQueue`, and `unshift`, `insert` and `insertAll` of a `linkedList`;
+  - `insert` and `insertAll` of a `linkedList` under `boundedDeque`.
+- Each element of `addAll` of a bounded list goes through `add` of the top layer, as for a queue and a deque. So `eventedList` above `boundedList` gives an `add` event for each element of `addAll`. Before, it gave no event.
+- `eventedDeque` gives an `addLast` event for `enqueue`. Before, it gave the event only when the base called `addLast` through the layer.
+
+## 0.9.11
+
+The entry `./graph` gets a search of the strongly connected components (C43). PATCH: a new feature before 1.0.0, with no change of the old names.
+
+### Added
+
+- `stronglyConnectedComponents(nodes, successors)` gives the components of a directed graph, the deepest component first.
+- `strongComponentsCompact(n, start, targets)` is the same search on a compact graph. It also gives the component of each node.
+- Both functions use the algorithm of Tarjan with their own stack, so a chain of 100000 nodes does not overflow.
+
+## 0.9.10
+
+The helpers of `core/middleware.ts` get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.
+
+### Fixed
+
+- `delegate` ran a getter of the target with the proxy as `this`, so the getter read the keys of the wrapper. A method of the target read the target. In this version, a getter also reads the target.
+
+### Added
+
+- Tests of `hasCapability`, `interceptMethods`, `blockMethods`, `delegate`, `enhanceMethod` and `CollectionBuilder`.
+
+## 0.9.9
+
+The emitters of `core/events.ts` and the listeners of the storage get tests (C10). The tests found one fault. PATCH: a fix with no change of the API.
+
+### Fixed
+
+- After `off(event)` of `Emitter` or `AsyncEmitter`, an unsubscribe from before the `off` removed the new listeners of the event. In this version, the unsubscribe removes only its own listener.
+
+### Added
+
+- A model test of `Emitter`: each sequence of `on`, `once`, unsubscribe, `off` and `emit` agrees with a model of the subscriptions.
+- Tests of `AsyncEmitter`, `EventBatcher`, `forwardEvent`, `onWhen`, `createEmitter`, `StorageListeners` and `reportListenerError`.
+
+## 0.9.8
+
+The evented layers give an event for each element of a bulk change, so a replay of the events gives the contents (C24). PATCH: a fix, and new event keys that keep the old events.
+
+### Fixed
+
+- `eventedList` gave no event for `addAll`, `insertAll`, `removeAll`, `retainAll` and `removeRange`. With this version, each element gives an `add` or a `remove` event. The index of a `remove` is the place of the element at the time of the event.
+- `eventedQueue`, `eventedDeque` and `evented` gave no event for `addAll`, `removeAll` and `retainAll`. `remove` of a queue or a deque and `pollOrUndefined` also gave no event.
+- `eventedMap` gave no event for `setIfAbsent`, `replace`, `computeIfAbsent`, `computeIfPresent`, `compute`, `merge` and `putAll` on a base that writes its storage directly. In this version, these methods use the `set` and `delete` of the layer.
+- `evented` gives `remove` for `pollFirst` and `pollLast` of a sorted set. `eventedMap` gives `delete` for `pollFirstEntry` and `pollLastEntry`.
+- The layer adds the elements of `addAll` and `insertAll` one at a time. Thus a `bounded` layer below drops or refuses each element with the rules of a single add.
+
+### Added
+
+- The event `remove` of `QueueEvents` (`{ value }`) and of `DequeEvents` (`{ value, index }`).
+- The replay law of `src/contracts/removals.test.ts` has the bulk methods as steps, and a new law for `eventedMap` over `hashMap`, `lruMap` and `boundedMap` with each policy.
+
+## 0.9.7
+
+`readWriteLock` lets `for of` and the iterators work (C32). PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A loop with `for of` over a view of `readWriteLock` works. Before, the lock made `Symbol.iterator` async, so the loop threw `is not iterable`. A method with a symbol key stays synchronous.
+- `keys`, `values`, `entries` and `descendingIterator` give a promise of a copy. The lock reads the copy, so a write after the read does not change it. Before, the iteration started after the lock released the read.
+- `descendingIterator` is a read. Before, it took the lock of a write.
+
+## 0.9.6
+
+The comparators keep the laws of an order for each pair (C38). PATCH: a fix with no change to the public API. Each pair that changes gave a wrong order before.
+
+### Fixed
+
+- `numberCompare` gives 0 for two equal infinities. Before, it gave `NaN`, so a `treeMap` with this comparator held `Infinity` two times, `has` gave `false` and `get` threw. It gives -1, 0 or 1.
+- `dateCompare` and `defaultCompare` give 0 for two invalid dates, and an invalid date comes first. Before, they gave `NaN`.
+- `defaultCompare` puts `null` before `undefined`. Before, `defaultCompare(null, undefined)` and `defaultCompare(undefined, null)` both gave -1.
+- `compare.test.ts` examines the laws of each comparator with `fast-check`. Each pair gives a number, and a value and itself give 0. A swap gives the opposite sign, and the order is transitive.
+
+## 0.9.5
+
+`AsyncQueue` examines its capacity, and each of its errors has one text (C36). PATCH: a fix with no change to the public API. Each capacity that it refuses gave a wrong result before.
+
+### Fixed
+
+- `asyncQueue` and `new AsyncQueue` throw a `RangeError` for a capacity that is not a whole number of 0 or more, or `Infinity`. Before, a capacity of -1 gave a `remainingCapacity` of -1, and 1.5 gave 0.5. With `NaN`, `isFull` was false, but each `put` waited with no end.
+- A put on a closed queue gives `Queue is closed`, also when `close` rejects a waiting put. Before, a waiting put got `Queue closed`.
+- A take, a peek or a `waitTake` on a closed and empty queue gives `Queue is closed and empty`, also when `close` rejects a waiting call. Before, a waiting call got `Queue closed and empty`.
+- The channels of `channels.ts` use `AsyncQueue`, so `channel(-1)` also throws a `RangeError`.
+
+## 0.9.4
+
+A new export bounds the tasks that run at the same time. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `semaphore(permits)` and the type `Semaphore`. At most `permits` tasks hold a permit. The waiting callers get the permits in the order that they came. A second call of one release does nothing. `run` gives the permit back when the task ends or throws.
+
+## 0.9.3
+
+The summary tree is also a set of plain functions, so a bundler keeps only the functions that a program calls (C35). PATCH: before 1.0.0 a feature raises PATCH, and the class keeps its API.
+
+### Added
+
+- The entry `@mark1russell7/collections/summary-tree` gives the summary tree as plain functions over a plain record `{ spec, root }`: `of`, `at`, `locate`, `search`, `set`, `splice`, `insert`, `remove`, `slice`, `concat`, `split`, `splitAt` and the others. The rope of typeset (the functions `of`, `at`, `locate`, `set`, `splice`, `slice`, `concat` and `insert`) weighs 1842 gzip bytes in a bundle. With the class, it weighs 2551.
+- `SummaryTree` wraps the same functions. Its new field `record` and its new function `fromRecord` move a tree between the two forms without a copy.
+- The types `SummaryTreeRecord` and `SummaryNode`.
+- `bundle-weight.test.ts` bundles a small program of each entry with esbuild. A case fails when its gzip bytes pass the measured weight plus 10 percent. An import of each entry that uses nothing adds no byte.
+
+## 0.9.2
+
+The s20 audit found four faults of the set operations and of `readonly`. This version corrects them. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `HashSet`: `clone`, `union`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` keep the custom hash of the set. Before, the inner sets used `defaultHash`, so they did not find an equal element.
+- `HashSet`: `intersection`, `symmetricDifference` and `retainAll` read the other iterable one time. Before, `intersection` of a generator gave an empty set.
+- `TreeSet`: `retainAll`, `intersection`, `difference`, `symmetricDifference` and `isSubsetOf` compare with the comparator of the set. Before, they used a native `Set`, which compares with `===`.
+- `readonly`: a view of an `lruCache` blocks `deleteWhere`. Before, `deleteWhere` emptied the cache through the view.
+
+## 0.9.1
+
+The channels moved to `@mark1russell7/service/channel`, in service 0.6.6. PATCH: before 1.0.0 a feature raises PATCH, and a deprecation changes no behavior.
+
+### Deprecated
+
+- The 13 names of `async/channels.ts`: `Channel`, `SelectCase`, `select`, `timeout`, `ticker`, `pipeline`, `fanOut`, `fanIn`, `merge`, `buffered`, `unbuffered`, `channel` and `workerPool`. Import each one from `@mark1russell7/service/channel`. The next MINOR version removes them from collections.
+- Collections does not re-export the channels of service, and it does not depend on service. Service depends on collections for `asyncQueue`.
 
 ## 0.9.0
 
@@ -68,6 +234,24 @@ Model tests of the bounded, LRU and TTL layers, and of stacks of layers, found s
 - `ttlMap`: a lazy removal in `get` or `has` did not start `onExpire`. Now `onExpire` occurs one time for each expired entry, in the order of expiry.
 - `ttlMap`: a new `set` of a key starts its time again and puts the key at the end of the order of expiry.
 - `lruMap`: a `set` of a new key into a full map read each entry with `has` of the base, so it cost O(capacity). Now it costs amortized O(1): the layer looks for stale entries only at twice the capacity.
+
+## 0.7.2
+
+`take` reads no element after the last element that it gives. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- `take(source, n)` read one more element of `source` than it gave, and `take(source, 0)` read one element. A source with side effects did one step too many. Now `take` stops after the n-th element.
+
+## 0.7.1
+
+A readonly view blocks each change of the structures of this package. PATCH: a fix with no change to the public API.
+
+### Fixed
+
+- A readonly view of `arrayDeque`, `priorityQueue` or `linkedList` did not block `pollOrUndefined`. The method removed an element of the base. It now throws the readonly error.
+- A readonly view did not block the internal changes of the structures, for example `unlinkNode` of `linkedList` and `heapify` of `priorityQueue`. TypeScript marks them private, but a call at run time reached them. The view now blocks them.
+- A new test puts each method of each structure in the reads or in the blocked names. A new method fails the test until one of the two lists has its name.
 
 ## 0.7.0
 

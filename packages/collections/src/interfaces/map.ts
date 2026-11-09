@@ -1,12 +1,11 @@
 /**
- * Map interfaces that mirror Java's Map interface hierarchy.
+ * This module has the map interfaces, which mirror the Map interface hierarchy of Java.
  *
  * A map holds key-value pairs and gives efficient lookup by key.
  * Keys are unique within a map.
  */
 
 import type { Eq, Compare, Hash } from "../core/traits.js";
-import type { ReadonlyCollection } from "./collection.js";
 
 /**
  * Entry<K, V> - An immutable key-value pair from a map.
@@ -294,12 +293,12 @@ export interface NavigableMap<K, V> extends SortedMap<K, V> {
   lastEntry(): Entry<K, V> | undefined;
 
   /**
-   * Removes and gives the first (lowest) entry, or undefined if empty.
+   * This method removes the first (lowest) entry and gives it, or gives undefined when the map is empty.
    */
   pollFirstEntry(): Entry<K, V> | undefined;
 
   /**
-   * Removes and gives the last (highest) entry, or undefined if empty.
+   * This method removes the last (highest) entry and gives it, or gives undefined when the map is empty.
    */
   pollLastEntry(): Entry<K, V> | undefined;
 
@@ -312,100 +311,4 @@ export interface NavigableMap<K, V> extends SortedMap<K, V> {
    * This method gives a reverse order iterable of the keys.
    */
   descendingKeys(): Iterable<K>;
-}
-
-/**
- * MultiMap<K, V> - Map that can hold multiple values per key.
- *
- * Not in standard Java Collections, but commonly used.
- */
-export interface MultiMap<K, V> {
-  readonly size: number;
-  readonly isEmpty: boolean;
-
-  /**
-   * This method gives true if the map contains at least one value for the key.
-   */
-  has(key: K): boolean;
-
-  /**
-   * This method gives all values associated with the key.
-   */
-  get(key: K): ReadonlyCollection<V>;
-
-  /**
-   * This method adds a value to the collection of values for the key.
-   */
-  put(key: K, value: V): boolean;
-
-  /**
-   * This method adds all values to the collection of values for the key.
-   */
-  putAll(key: K, values: Iterable<V>): boolean;
-
-  /**
-   * This method removes a single occurrence of value from the key's collection.
-   */
-  remove(key: K, value: V): boolean;
-
-  /**
-   * This method removes all values for the key.
-   */
-  removeAll(key: K): ReadonlyCollection<V>;
-
-  /**
-   * This method replaces all values for the key with the given values.
-   */
-  replaceAll(key: K, values: Iterable<V>): ReadonlyCollection<V>;
-
-  /**
-   * This method gives all keys that have at least one value.
-   */
-  keys(): Iterable<K>;
-
-  /**
-   * This method gives all entries (key with one of its values).
-   */
-  entries(): Iterable<Entry<K, V>>;
-
-  /**
-   * This method removes all mappings.
-   */
-  clear(): void;
-}
-
-/**
- * BiMap<K, V> - Bidirectional map (1:1 mapping).
- *
- * Both keys and values are unique.
- * With this type, lookup is by key or by value.
- */
-export interface BiMap<K, V> extends MapLike<K, V> {
-  /**
-   * This method gives the inverse view of this bimap (swaps keys and values).
-   */
-  inverse(): BiMap<V, K>;
-
-  /**
-   * This method gives the key mapped to the specified value, or undefined if none.
-   */
-  getKey(value: V): K | undefined;
-
-  /**
-   * This method forces the put by removing any existing entry with the same value.
-   */
-  forcePut(key: K, value: V): V | undefined;
-}
-
-/**
- * WeakMapLike<K extends object, V> - Map with weak key references.
- *
- * Mirrors JavaScript's WeakMap but with our interface conventions.
- * Keys must be objects and are held weakly (so garbage collection can remove them).
- */
-export interface WeakMapLike<K extends object, V> {
-  has(key: K): boolean;
-  get(key: K): V | undefined;
-  set(key: K, value: V): this;
-  delete(key: K): boolean;
 }

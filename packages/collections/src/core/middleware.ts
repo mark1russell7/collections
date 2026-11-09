@@ -68,8 +68,8 @@ export function compose<const L extends readonly Layer[]>(...layers: L & Chain<L
 }
 
 /**
- * Utility to check if a collection has a specific capability.
- * Useful for middleware that wants to conditionally enhance behavior.
+ * This function tells if a collection has a member. A layer proxy can add the member in its `get` trap
+ * only, so the function also reads the member through the layer (C41).
  *
  * @example
  * if (hasCapability(collection, 'on')) {
@@ -81,7 +81,7 @@ export const hasCapability = <C extends Collection<any>, K extends keyof any>(
   collection: C,
   capability: K
 ): collection is C & Record<K, unknown> => {
-  return capability in collection;
+  return capability in collection || Reflect.get(collection, capability) !== undefined;
 };
 
 /**
@@ -90,13 +90,13 @@ export const hasCapability = <C extends Collection<any>, K extends keyof any>(
  */
 export interface Evented<E extends Record<string, any>> {
   /**
-   * Subscribe to an event.
+   * This method subscribes a listener to an event.
    * @returns Unsubscribe function
    */
   on<K extends keyof E>(event: K, handler: (payload: E[K]) => void): () => void;
 
   /**
-   * Emit an event (internal use by middleware).
+   * This method emits an event. Only the middleware calls it.
    * @internal
    */
   emit?<K extends keyof E>(event: K, payload: E[K]): void;
@@ -123,38 +123,6 @@ export interface BoundedCollection {
   /** Remaining space */
   readonly remainingCapacity: number;
 }
-
-/**
- * Marker interface for collections that support safe (Option/Result) operations.
- */
-export interface SafeCollection {
-  /**
-   * Namespace for safe operations that return Option/Result instead of throwing.
-   */
-  readonly safe: unknown;
-}
-
-/**
- * Type helper to extract the element type from a collection.
- */
-export type ElementType<C> = C extends {
-  [Symbol.iterator](): Iterator<infer T>;
-}
-  ? T
-  : C extends { get(index: number): infer T }
-  ? T
-  : C extends { peek(): infer T }
-  ? T
-  : never;
-
-/**
- * Type helper to make all methods of a type return their async equivalents.
- */
-export type Asyncify<C> = {
-  [K in keyof C]: C[K] extends (...args: infer Args) => infer R
-    ? (...args: Args) => Promise<R>
-    : C[K];
-};
 
 /**
  * Helper to make a proxy that intercepts method calls.
@@ -223,8 +191,8 @@ export const delegate = <C extends object, T extends C>(
       if (prop in wrapper) {
         return Reflect.get(wrapper, prop, receiver);
       }
-      // Otherwise delegate to target
-      const value = Reflect.get(t, prop, receiver);
+      // Otherwise delegate to target. A getter runs on the target, as a method does.
+      const value = Reflect.get(t, prop, t);
       // Bind methods to maintain correct 'this' context
       if (typeof value === "function") {
         return value.bind(t);
@@ -233,50 +201,6 @@ export const delegate = <C extends object, T extends C>(
     },
   }) as C;
 };
-
-/**
- * Utility type to add optional capabilities to a collection type.
- */
-export type WithCapability<C, Cap> = C & Cap;
-
-/**
- * Builder pattern helper for fluent API construction.
- *
- * @example
- * class ListBuilder<T> {
- *   private middleware: Middleware<List<T>>[] = []
- *
- *   bounded(capacity: number) {
- *     this.middleware.push(boundedList({ capacity }))
- *     return this
- *   }
- *
- *   evented() {
- *     this.middleware.push(eventedList())
- *     return this
- *   }
- *
- *   build(): List<T> {
- *     return compose(...this.middleware)(arrayList<T>())
- *   }
- * }
- */
-export abstract class CollectionBuilder<C> {
-  protected middleware: Middleware<C>[] = [];
-
-  /**
-   * Apply a custom middleware.
-   */
-  use(middleware: Middleware<C>): this {
-    this.middleware.push(middleware);
-    return this;
-  }
-
-  /**
-   * Build the final collection by composing all middleware with the base.
-   */
-  abstract build(): C;
-}
 
 /**
  * Utility to make a middleware that only enhances specific methods.

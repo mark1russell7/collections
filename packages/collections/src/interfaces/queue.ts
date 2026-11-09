@@ -15,7 +15,7 @@ import type { Compare } from "../core/traits.js";
  */
 export interface ReadonlyQueue<T> extends ReadonlyCollection<T> {
   /**
-   * Retrieves, but does not remove, the head of this queue.
+   * This method gives the head of this queue, and does not remove it.
    *
    * @returns The head element
    * @throws Error if queue is empty
@@ -47,7 +47,7 @@ export interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
   offer(element: T): boolean;
 
   /**
-   * Retrieves and removes the head of this queue.
+   * This method removes the head of this queue and gives it.
    *
    * @returns The head element
    * @throws Error if queue is empty
@@ -55,7 +55,7 @@ export interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
   poll(): T;
 
   /**
-   * Retrieves and removes the head of this queue, or gives undefined if empty.
+   * This method removes the head of this queue and gives it, or gives undefined when the queue is empty.
    */
   pollOrUndefined(): T | undefined;
 
@@ -66,7 +66,7 @@ export interface Queue<T> extends ReadonlyQueue<T>, Collection<T> {
   enqueue(element: T): boolean;
 
   /**
-   * Alias for poll(). Removes and gives element from front of queue.
+   * This method is an alias for poll(). It removes the element at the front of the queue and gives it.
    * This method is here for consistency with standard queue terminology.
    */
   dequeue(): T;
@@ -96,14 +96,14 @@ export interface Deque<T> extends Queue<T> {
   offerFirst(element: T): boolean;
 
   /**
-   * Retrieves and removes the first element.
+   * This method removes the first element and gives it.
    *
    * @throws Error if deque is empty
    */
   removeFirst(): T;
 
   /**
-   * Retrieves and removes the first element, or undefined if empty.
+   * This method removes the first element and gives it, or gives undefined when the deque is empty.
    */
   pollFirst(): T | undefined;
 
@@ -135,14 +135,14 @@ export interface Deque<T> extends Queue<T> {
   offerLast(element: T): boolean;
 
   /**
-   * Retrieves and removes the last element.
+   * This method removes the last element and gives it.
    *
    * @throws Error if deque is empty
    */
   removeLast(): T;
 
   /**
-   * Retrieves and removes the last element, or undefined if empty.
+   * This method removes the last element and gives it, or gives undefined when the deque is empty.
    */
   pollLast(): T | undefined;
 
@@ -177,45 +177,6 @@ export interface Deque<T> extends Queue<T> {
    * @throws Error if deque is empty
    */
   pop(): T;
-}
-
-/**
- * BlockingQueue<T> - Queue that supports blocking operations.
- *
- * Mirrors java.util.concurrent.BlockingQueue.
- * Useful for producer-consumer patterns.
- */
-export interface BlockingQueue<T> extends Queue<T> {
-  /**
-   * This method inserts element, waiting if necessary for space to become available.
-   *
-   * @param element The element to add
-   * @param timeoutMs Optional timeout in milliseconds
-   * @returns Promise that resolves to true when element is added
-   * @throws Error if timeout expires
-   */
-  put(element: T, timeoutMs?: number): Promise<void>;
-
-  /**
-   * Retrieves and removes the head, waiting if necessary until an element is available.
-   *
-   * @param timeoutMs Optional timeout in milliseconds
-   * @returns Promise that resolves to the head element
-   * @throws Error if timeout expires
-   */
-  take(timeoutMs?: number): Promise<T>;
-
-  /**
-   * This value is the remaining capacity.
-   * This value is Infinity for unbounded queues.
-   */
-  readonly remainingCapacity: number;
-
-  /**
-   * This method removes all available elements and adds them to the given array.
-   * This method gives the number of elements transferred.
-   */
-  drainTo(target: T[], maxElements?: number): number;
 }
 
 /**
@@ -258,7 +219,7 @@ export interface AsyncQueue<T> extends AsyncIterable<T> {
   put(element: T): Promise<void>;
 
   /**
-   * Removes and gives next element.
+   * This method removes the next element and gives it.
    * Waits for an element if queue is empty.
    */
   take(): Promise<T>;
@@ -291,63 +252,4 @@ export interface AsyncQueue<T> extends AsyncIterable<T> {
    * This value is true if queue is closed.
    */
   readonly isClosed: boolean;
-}
-
-/**
- * TransferQueue<T> - Queue where producers can wait for consumers.
- *
- * Mirrors java.util.concurrent.TransferQueue.
- * Useful for direct handoff between producer and consumer threads.
- */
-export interface TransferQueue<T> extends BlockingQueue<T> {
-  /**
-   * Transfers element to consumer, waiting if necessary.
-   * This method waits for a consumer to receive the element.
-   *
-   * @param element The element to transfer
-   * @returns Promise that resolves when element is received
-   */
-  transfer(element: T): Promise<void>;
-
-  /**
-   * This method tries to transfer element to waiting consumer.
-   * This method gives false immediately if no consumer is waiting.
-   *
-   * @param element The element to transfer
-   * @param timeoutMs Optional timeout in milliseconds
-   */
-  tryTransfer(element: T, timeoutMs?: number): Promise<boolean>;
-
-  /**
-   * This value is true if there are consumers waiting to receive elements.
-   */
-  readonly hasWaitingConsumer: boolean;
-
-  /**
-   * This value is an estimate of the number of consumers waiting to receive elements.
-   */
-  readonly waitingConsumerCount: number;
-}
-
-/**
- * DelayQueue<T> - Queue where elements become available after a delay.
- *
- * Mirrors java.util.concurrent.DelayQueue.
- * Elements can only be removed once their delay has expired.
- */
-export interface DelayQueue<T> extends BlockingQueue<T> {
-  /**
-   * This method adds element with specified delay.
-   *
-   * @param element The element to add
-   * @param delayMs Delay in milliseconds before element becomes available (defaults to 0)
-   */
-  offer(element: T, delayMs?: number): boolean;
-
-  /**
-   * This value is the delay (in ms) until next element becomes available.
-   * The delay is `0` when the element is available.
-   * This value is Infinity if queue is empty.
-   */
-  readonly nextDelay: number;
 }

@@ -338,7 +338,7 @@ export const hashNumber = (num: number): number => {
 };
 
 /**
- * Combine multiple hash values.
+ * This function combines hash values into one hash.
  * Useful for hashing objects with multiple fields.
  *
  * @example
@@ -355,7 +355,7 @@ export const combineHashes = (...hashes: number[]): number => {
 };
 
 /**
- * Make a hash function that hashes by a specific property.
+ * This function makes a hash function that hashes by a property.
  *
  * @example
  * const userHash = hashBy<User>((u) => u.id)
@@ -369,47 +369,100 @@ export const hashBy = <T>(accessor: (value: T) => any): Hash<T> => {
 // ============================================================================
 
 /**
- * Natural ordering comparison for primitives.
- * Numbers, strings, booleans, dates are compared naturally.
+ * This function gives the place of the type of a value in the order of `defaultCompare`.
+ * The order is `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values.
  */
-export const defaultCompare: Compare<any> = (a, b) => {
-  if (a === b) return 0;
-  if (a === null || a === undefined) return -1;
-  if (b === null || b === undefined) return 1;
-
-  // Handle dates
-  if (a instanceof Date && b instanceof Date) {
-    return a.getTime() - b.getTime();
+const typeRank = (value: unknown): number => {
+  if (value === null) return 0;
+  switch (typeof value) {
+    case "undefined":
+      return 1;
+    case "boolean":
+      return 2;
+    case "number":
+      return 3;
+    case "bigint":
+      return 4;
+    case "string":
+      return 5;
+    case "symbol":
+      return 7;
+    default:
+      return value instanceof Date ? 6 : 8;
   }
+};
 
-  // Handle numbers
-  if (typeof a === "number" && typeof b === "number") {
-    if (Number.isNaN(a)) return Number.isNaN(b) ? 0 : -1;
-    if (Number.isNaN(b)) return 1;
-    return a - b;
+/** This map gives each object, function and symbol a number in the order of its first comparison. */
+const identities = new WeakMap<WeakKey, number>();
+let nextIdentity = 0;
+
+/** This function gives the number of a value in `identities`, and adds the value at its first use. */
+const identityOf = (value: WeakKey): number => {
+  let identity = identities.get(value);
+  if (identity === undefined) {
+    identity = nextIdentity++;
+    identities.set(value, identity);
   }
+  return identity;
+};
 
-  // Handle strings
-  if (typeof a === "string" && typeof b === "string") {
-    return a.localeCompare(b);
+/** This function gives the text of a value with `String`. For a value that `String` refuses, for example an object with no prototype, it gives the tag of `Object.prototype.toString`. */
+const textOf = (value: unknown): string => {
+  try {
+    return String(value);
+  } catch {
+    return Object.prototype.toString.call(value);
   }
+};
 
-  // Handle booleans
-  if (typeof a === "boolean" && typeof b === "boolean") {
-    return a === b ? 0 : a ? 1 : -1;
-  }
-
-  // Fallback: convert to string and compare
-  return String(a).localeCompare(String(b));
+/** This function compares two different symbols, objects or functions of one rank: first by their text, then by their identity. */
+const compareByIdentity = (a: object | symbol, b: object | symbol): number => {
+  const text = textOf(a).localeCompare(textOf(b));
+  if (text !== 0) return Math.sign(text);
+  // Symbol.for gives a registered symbol, which is not a key of a WeakMap. Registered symbols come first.
+  const registeredA = typeof a === "symbol" && Symbol.keyFor(a) !== undefined;
+  const registeredB = typeof b === "symbol" && Symbol.keyFor(b) !== undefined;
+  if (registeredA !== registeredB) return registeredA ? -1 : 1;
+  return identityOf(a) < identityOf(b) ? -1 : 1;
 };
 
 /**
- * Numeric comparison (for numbers).
+ * This comparator gives a total order of all values: first by type, then by value.
+ * - The types come in this order: `null`, `undefined`, booleans, numbers, bigints, strings, dates, symbols, and then the other values.
+ * - Numbers and dates compare as `numberCompare` and `dateCompare` compare them.
+ * - Strings compare by `localeCompare`, and `false` comes before `true`.
+ * - Two different symbols, objects or functions compare by their text, with `String`. Two of them with the same text keep the order of their first comparison.
+ */
+export const defaultCompare: Compare<any> = (a, b) => {
+  if (a === b) return 0;
+  const rankA = typeRank(a);
+  const rankB = typeRank(b);
+  if (rankA !== rankB) return rankA < rankB ? -1 : 1;
+  switch (rankA) {
+    case 2:
+      return a ? 1 : -1;
+    case 3:
+      return numberCompare(a, b);
+    case 4:
+      return a < b ? -1 : 1;
+    case 5:
+      return Math.sign(a.localeCompare(b));
+    case 6:
+      return dateCompare(a, b);
+    default:
+      return compareByIdentity(a, b);
+  }
+};
+
+/**
+ * This comparator gives the order of numbers by value. It gives -1, 0 or 1.
+ * - `NaN` comes first, and two `NaN` values give 0.
+ * - Two equal infinities give 0, and 0 equals -0.
  */
 export const numberCompare: Compare<number> = (a, b) => {
   if (Number.isNaN(a)) return Number.isNaN(b) ? 0 : -1;
   if (Number.isNaN(b)) return 1;
-  return a - b;
+  return a < b ? -1 : a > b ? 1 : 0;
 };
 
 /**
@@ -424,10 +477,10 @@ export const stringCompareIgnoreCase: Compare<string> = (a, b) =>
   a.toLowerCase().localeCompare(b.toLowerCase());
 
 /**
- * Date comparison.
+ * This comparator gives the order of dates by time, with `numberCompare`. An invalid date has the time `NaN`, so it comes
+ * first, and two invalid dates give 0.
  */
-export const dateCompare: Compare<Date> = (a, b) =>
-  a.getTime() - b.getTime();
+export const dateCompare: Compare<Date> = (a, b) => numberCompare(a.getTime(), b.getTime());
 
 /**
  * Boolean comparison (false < true).

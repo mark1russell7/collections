@@ -21,27 +21,27 @@ import { none, some, toOptional, tryCatch, type Optional, type Result } from "@m
  */
 export interface SafeListOperations<T> {
   /**
-   * Get element at index, as an optional.
+   * This method gives the element at an index, as an optional.
    */
   get(index: number): Optional<T>;
 
   /**
-   * Set element at index, giving Result with old value or error.
+   * This method sets the element at an index. It gives a Result with the old value or an error.
    */
   set(index: number, element: T): Result<T, string>;
 
   /**
-   * Remove element at index, giving Result with removed value or error.
+   * This method removes the element at an index. It gives a Result with the removed value or an error.
    */
   removeAt(index: number): Result<T, string>;
 
   /**
-   * Get first element as an optional.
+   * This method gives the first element, as an optional.
    */
   first(): Optional<T>;
 
   /**
-   * Get last element as an optional.
+   * This method gives the last element, as an optional.
    */
   last(): Optional<T>;
 
@@ -61,17 +61,17 @@ export interface SafeListOperations<T> {
  */
 export interface SafeQueueOperations<T> {
   /**
-   * Peek at head element as an optional.
+   * This method gives the head element as an optional, and does not remove it.
    */
   peek(): Optional<T>;
 
   /**
-   * Poll element as an optional.
+   * This method removes the head element and gives it as an optional.
    */
   poll(): Optional<T>;
 
   /**
-   * Dequeue element as an optional.
+   * This method dequeues the head element and gives it as an optional.
    */
   dequeue(): Optional<T>;
 }
@@ -81,27 +81,27 @@ export interface SafeQueueOperations<T> {
  */
 export interface SafeDequeOperations<T> extends SafeQueueOperations<T> {
   /**
-   * Peek at first element as an optional.
+   * This method gives the first element as an optional, and does not remove it.
    */
   peekFirst(): Optional<T>;
 
   /**
-   * Peek at last element as an optional.
+   * This method gives the last element as an optional, and does not remove it.
    */
   peekLast(): Optional<T>;
 
   /**
-   * Poll first element as an optional.
+   * This method removes the first element and gives it as an optional.
    */
   pollFirst(): Optional<T>;
 
   /**
-   * Poll last element as an optional.
+   * This method removes the last element and gives it as an optional.
    */
   pollLast(): Optional<T>;
 
   /**
-   * Pop element as an optional.
+   * This method pops the top element and gives it as an optional.
    */
   pop(): Optional<T>;
 }
@@ -111,17 +111,17 @@ export interface SafeDequeOperations<T> extends SafeQueueOperations<T> {
  */
 export interface SafeMapOperations<K, V> {
   /**
-   * Get value for key as an optional.
+   * This method gives the value of a key, as an optional.
    */
   get(key: K): Optional<V>;
 
   /**
-   * Set value for key, giving Result with old value or success.
+   * This method sets the value of a key. It gives a Result with the old value or a success.
    */
   set(key: K, value: V): Result<V | undefined, string>;
 
   /**
-   * Delete key, giving Result with deleted value or error.
+   * This method deletes a key. It gives a Result with the deleted value or an error.
    */
   delete(key: K): Result<V | undefined, string>;
 }
@@ -293,12 +293,4 @@ export function safeMap<K, V>(): Middleware<
 
     return Object.assign(next, { safe });
   };
-}
-
-/**
- * Generic safe middleware that works with any collection.
- */
-export function safe<C extends object>(): Middleware<C> {
-  // Return as-is for now; specialized versions handle specific types
-  return (next: C): C => next;
 }

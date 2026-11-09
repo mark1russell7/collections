@@ -5,7 +5,7 @@
 import type { DAGNode } from "./types.js";
 
 /**
- * Filter DAG to only include nodes reachable from a root
+ * This function filters a DAG to the nodes that a root can reach.
  */
 export function filterDAGFromRoot<TNode extends DAGNode>(
   nodes: Map<string, TNode>,
@@ -33,7 +33,7 @@ export function filterDAGFromRoot<TNode extends DAGNode>(
 }
 
 /**
- * Get all ancestors of a node (nodes that this node depends on, transitively)
+ * This function gives all ancestors of a node: the nodes that this node depends on, transitively.
  */
 export function getAncestors<TNode extends DAGNode>(
   nodes: Map<string, TNode>,
@@ -62,7 +62,7 @@ export function getAncestors<TNode extends DAGNode>(
 }
 
 /**
- * Get all descendants of a node (nodes that depend on this node, transitively)
+ * This function gives all descendants of a node: the nodes that depend on this node, transitively.
  */
 export function getDescendants<TNode extends DAGNode>(
   nodes: Map<string, TNode>,
@@ -100,7 +100,7 @@ export function getDescendants<TNode extends DAGNode>(
 }
 
 /**
- * Make a DAG node from minimal input
+ * This function makes a DAG node from a minimal input.
  */
 export function createNode<TData = unknown>(
   id: string,
@@ -115,7 +115,7 @@ export function createNode<TData = unknown>(
 }
 
 /**
- * Build a Map of nodes from an array
+ * This function builds a Map of nodes from an array.
  */
 export function buildNodeMap<TNode extends DAGNode>(
   nodes: TNode[]

@@ -8,6 +8,7 @@
     "RELEASING.md",
     "CI.md",
     "packages/*/README.md",
+    "docs/**/*.md",
     "packages/*/src/**/*.{ts,tsx}",
     "packages/*/*.config.{ts,mts}"
   ],
@@ -20,8 +21,9 @@
     "**/*.spec.ts",
     "**/*.spec.tsx"
   ],
+  "rules": { "doc-subject": "error" },
   "technicalNouns": [],
-  "technicalVerbs": [],
+  "technicalVerbs": ["peek", "pop", "dequeue", "compact"],
   "properNouns": [
     "ASD",
     "ASD-STE100",

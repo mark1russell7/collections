@@ -6,7 +6,8 @@
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { compose, hashMap, lruMap, ttlMap, ttlCollection, TTLCache } from "./index.js";
+import { fakeClock } from "@mark1russell7/algebra/clock";
+import { arrayList, boundedList, boundedMap, compose, hashMap, lruMap, ttlCache, ttlMap, ttlCollection, TTLCache } from "./index.js";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -86,10 +87,11 @@ describe("lruMap over ttlMap", () => {
 });
 
 describe("TTL timers", () => {
+  // The default clock starts each check with setTimeout, and unrefs it
   function captureInterval(): { unref: ReturnType<typeof vi.fn> } {
     const timer = { unref: vi.fn() };
-    vi.spyOn(globalThis, "setInterval").mockReturnValue(timer as unknown as ReturnType<typeof setInterval>);
-    vi.spyOn(globalThis, "clearInterval").mockImplementation(() => undefined);
+    vi.spyOn(globalThis, "setTimeout").mockReturnValue(timer as unknown as ReturnType<typeof setTimeout>);
+    vi.spyOn(globalThis, "clearTimeout").mockImplementation(() => undefined);
     return timer;
   }
 
@@ -110,5 +112,150 @@ describe("TTL timers", () => {
     const timer = captureInterval();
     new TTLCache<string, number>(1000);
     expect(timer.unref).toHaveBeenCalled();
+  });
+});
+
+describe("the clock of the TTL behaviors (D5)", () => {
+  it("ttlMap expires an entry at the time of the clock, with no access", async () => {
+    const clock = fakeClock(1000);
+    const expired: Array<{ key: string; createdAt: number; expiredAt: number }> = [];
+    const base = hashMap<string, number>();
+    const map = ttlMap<string, number>({
+      ttl: 50,
+      checkInterval: 10,
+      clock,
+      onExpire: ({ key, createdAt, expiredAt }) => expired.push({ key, createdAt, expiredAt }),
+    })(base);
+
+    map.set("a", 1);
+    await clock.advance(49);
+    expect(base.has("a")).toBe(true);
+    expect(expired).toEqual([]);
+
+    // The check at 1050 finds the end of the time of "a"
+    await clock.advance(1);
+    expect(base.has("a")).toBe(false);
+    expect(expired).toEqual([{ key: "a", createdAt: 1000, expiredAt: 1050 }]);
+
+    map.dispose();
+    expect(clock.pending).toBe(0);
+  });
+
+  it("ttlMap checks again after an onExpire that throws", async () => {
+    const clock = fakeClock();
+    let first = true;
+    const base = hashMap<string, number>();
+    const map = ttlMap<string, number>({
+      ttl: 10,
+      checkInterval: 10,
+      clock,
+      onExpire: () => {
+        if (first) {
+          first = false;
+          throw new Error("the listener broke");
+        }
+      },
+    })(base);
+
+    map.set("a", 1);
+    map.set("b", 2);
+    await expect(clock.advance(10)).rejects.toThrow("the listener broke");
+    expect(base.has("a")).toBe(false);
+    expect(base.has("b")).toBe(true);
+    expect(clock.pending).toBe(1);
+
+    await clock.advance(10);
+    expect(base.has("b")).toBe(false);
+    map.dispose();
+  });
+
+  it("an interval less than 1 ms checks each millisecond", async () => {
+    const clock = fakeClock();
+    const base = hashMap<string, number>();
+    const map = ttlMap<string, number>({ ttl: 5, checkInterval: 0, clock })(base);
+
+    map.set("a", 1);
+    await clock.advance(5);
+    expect(base.has("a")).toBe(false);
+    map.dispose();
+    expect(clock.pending).toBe(0);
+  });
+
+  it("ttlCollection expires an element at the time of the clock", async () => {
+    const clock = fakeClock(200);
+    const expired: Array<{ element: string; createdAt: number; expiredAt: number }> = [];
+    const base = arrayList<string>();
+    const list = ttlCollection<string>({ ttl: 30, checkInterval: 10, clock, onExpire: (info) => expired.push(info) })(base);
+
+    list.add("x");
+    await clock.advance(29);
+    expect(base.contains("x")).toBe(true);
+    await clock.advance(1);
+    expect(base.contains("x")).toBe(false);
+    expect(expired).toEqual([{ element: "x", createdAt: 200, expiredAt: 230 }]);
+
+    list.dispose();
+    expect(clock.pending).toBe(0);
+  });
+
+  it("TTLCache and ttlCache read the time of the clock", async () => {
+    const clock = fakeClock();
+    const cache = ttlCache<string, number>(100, { checkInterval: 1000, clock });
+
+    cache.set("a", 1);
+    await clock.advance(60);
+    expect(cache.getTTL("a")).toBe(40);
+    expect(cache.touch("a")).toBe(true);
+    expect(cache.getTTL("a")).toBe(100);
+    await clock.advance(99);
+    expect(cache.get("a")).toBe(1);
+    await clock.advance(1);
+    expect(cache.get("a")).toBeUndefined();
+
+    const expired: string[] = [];
+    const direct = new TTLCache<string, number>(10, 5, (key) => expired.push(key), clock);
+    direct.set("b", 2);
+    await clock.advance(10);
+    expect(expired).toEqual(["b"]);
+
+    cache.dispose();
+    direct.dispose();
+    expect(clock.pending).toBe(0);
+  });
+});
+
+describe("the clock of the LRU and bounded behaviors (D5)", () => {
+  it("lruMap gives the last access time of the clock to onEvict", async () => {
+    const clock = fakeClock(100);
+    const evicted: Array<{ key: string; timestamp: number }> = [];
+    const map = lruMap<string, number>({ capacity: 2, clock, onEvict: ({ key, timestamp }) => evicted.push({ key, timestamp }) })(
+      hashMap<string, number>(),
+    );
+    map.set("a", 1);
+    await clock.advance(10);
+    map.set("b", 2);
+    await clock.advance(10);
+    map.get("a");
+    await clock.advance(10);
+    map.set("c", 3);
+    // "b" is the least recent entry, and the clock read 110 at its last access.
+    expect(evicted).toEqual([{ key: "b", timestamp: 110 }]);
+  });
+
+  it("boundedList and boundedMap give the time of the clock to onOverflow", async () => {
+    const clock = fakeClock(500);
+    const times: number[] = [];
+    const list = boundedList<number>({ capacity: 1, policy: "drop-newest", clock, onOverflow: ({ timestamp }) => void times.push(timestamp) })(
+      arrayList<number>(),
+    );
+    const map = boundedMap<string, number>({ capacity: 1, policy: "drop-newest", clock, onOverflow: ({ timestamp }) => void times.push(timestamp) })(
+      hashMap<string, number>(),
+    );
+    list.add(1);
+    map.set("a", 1);
+    await clock.advance(25);
+    list.add(2);
+    map.set("b", 2);
+    expect(times).toEqual([525, 525]);
   });
 });

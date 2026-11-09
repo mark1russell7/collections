@@ -1,7 +1,7 @@
 /**
  * TTL (Time-To-Live) expiration behavior.
  *
- * Automatically expires elements after a specified time period.
+ * The behavior removes each element when its time to live ends.
  * Perfect for temporary caches and time-limited data.
  *
  * @example
@@ -19,15 +19,24 @@ import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type ElementRemoval, type MapRemoval } from "../core/removals.js";
 import { elementEquality, keyIndex, mapEquality } from "../core/key-index.js";
 import type { Collection } from "../interfaces/collection.js";
+import { hasMembers } from "./members.js";
+import type { Cancel, Clock } from "@mark1russell7/algebra/clock";
+import { systemClock } from "../core/system-clock.js";
 
 /**
- * Start the background expiration checker without keeping a Node.js process alive.
- * (In a browser, setInterval gives a number and there is nothing to unref.)
+ * This function starts the background expiration checker on a clock, and gives the function that stops it.
+ * The checker starts again before each check, so a check that throws does not stop it. An interval
+ * less than 1 ms is 1 ms, as with `setInterval`.
  */
-function startExpirationTimer(check: () => void, interval: number): ReturnType<typeof setInterval> {
-  const timer = setInterval(check, interval);
-  (timer as unknown as { unref?: () => void }).unref?.();
-  return timer;
+function startExpirationTimer(clock: Clock, check: () => void, interval: number): Cancel {
+  const every = Math.max(1, interval);
+  let cancel: Cancel;
+  const tick = (): void => {
+    cancel = clock.after(every, tick);
+    check();
+  };
+  cancel = clock.after(every, tick);
+  return () => cancel();
 }
 
 /**
@@ -50,6 +59,13 @@ export interface TTLOptions {
    * Optional callback invoked when an element expires.
    */
   onExpire?: (info: { key: any; value: any; createdAt: number; expiredAt: number }) => void;
+
+  /**
+   * The clock of the times and of the background check. A test gives `fakeClock()` of
+   * `@mark1russell7/algebra/clock`, and the expiry times are then exact. The default clock reads `Date.now()`.
+   * A monotonic clock (`realClock`) keeps the order of expiry also when the wall clock goes back.
+   */
+  clock?: Clock;
 }
 
 /**
@@ -70,12 +86,12 @@ interface TTLEntry<V> {
  * A background interval also removes expired entries, so `onExpire` occurs with no access.
  *
  * The layer keeps the times in the order of expiry, so the removal before an access is amortized O(1).
- * This order needs a clock that does not go back. If `Date.now()` goes back, an entry can stay until the entries before it expire.
+ * This order needs a clock that does not go back. If the clock goes back, an entry can stay until the entries before it expire.
  */
 export function ttlMap<K, V>(
   options: TTLOptions
 ): Middleware<MapLike<K, V>, MapLike<K, V> & { readonly dispose: () => void }> {
-  const { ttl, checkInterval = 1000, onExpire } = options;
+  const { ttl, checkInterval = 1000, onExpire, clock = systemClock } = options;
 
   return (
     next: MapLike<K, V>
@@ -83,13 +99,12 @@ export function ttlMap<K, V>(
     // The times of the live keys, in the order of expiry: a set deletes its key before it adds it again.
     // The index finds a key with the equality of the base (C20).
     const metadata = keyIndex<K, TTLEntry<V>>(mapEquality(next));
-    let intervalId: ReturnType<typeof setInterval> | null = null;
     // A removal below (for example an eviction of lruMap) ends the time of its key, so it never expires
     const source = removalSource<MapRemoval<K, V>>(next, ({ key }) => void metadata.delete(key));
 
     // This function removes the expired entries from the front of the order, and stops at the first live entry
     const sweep = (): void => {
-      const now = Date.now();
+      const now = clock.now();
       for (const [key, entry] of metadata) {
         if (now < entry.expiresAt) return;
         metadata.delete(key);
@@ -99,16 +114,15 @@ export function ttlMap<K, V>(
       }
     };
 
-    intervalId = startExpirationTimer(sweep, checkInterval);
+    let stop: Cancel | null = startExpirationTimer(clock, sweep, checkInterval);
 
     const dispose = (): void => {
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
+      stop?.();
+      stop = null;
     };
 
     return new Proxy(next, {
+      has: hasMembers("dispose", removals),
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
@@ -136,7 +150,7 @@ export function ttlMap<K, V>(
             return function (key: K, val: V): V | undefined {
               sweep();
               const result = (value as Function).call(target, key, val);
-              const now = Date.now();
+              const now = clock.now();
               metadata.delete(key);
               metadata.set(key, { value: val, expiresAt: now + ttl, createdAt: now });
               return result;
@@ -207,17 +221,16 @@ export function ttlCollection<T>(
     onExpire?: (info: { element: T; createdAt: number; expiredAt: number }) => void;
   }
 ): Middleware<Collection<T>, Collection<T> & { readonly dispose: () => void }> {
-  const { ttl, checkInterval = 1000, onExpire } = options;
+  const { ttl, checkInterval = 1000, onExpire, clock = systemClock } = options;
 
   return (
     next: Collection<T>
   ): Collection<T> & { readonly dispose: () => void } => {
     const metadata = keyIndex<T, { expiresAt: number; createdAt: number }>(elementEquality(next));
-    let intervalId: ReturnType<typeof setInterval> | null = null;
     const source = removalSource<ElementRemoval<T>>(next, ({ value }) => void metadata.delete(value));
 
     const checkExpired = (): void => {
-      const now = Date.now();
+      const now = clock.now();
       const expired: T[] = [];
 
       for (const [element, entry] of metadata) {
@@ -244,16 +257,15 @@ export function ttlCollection<T>(
       }
     };
 
-    intervalId = startExpirationTimer(checkExpired, checkInterval);
+    let stop: Cancel | null = startExpirationTimer(clock, checkExpired, checkInterval);
 
     const dispose = (): void => {
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
+      stop?.();
+      stop = null;
     };
 
     return new Proxy(next, {
+      has: hasMembers("dispose", removals),
       get(target, prop, receiver) {
         if (prop === "dispose") {
           return dispose;
@@ -270,7 +282,7 @@ export function ttlCollection<T>(
               return function (element: T): boolean {
                 const result = (value as Function).call(target, element);
                 if (result) {
-                  const now = Date.now();
+                  const now = clock.now();
                   metadata.set(element, {
                     expiresAt: now + ttl,
                     createdAt: now,
@@ -316,13 +328,26 @@ export class TTLCache<K, V> {
   private readonly ttl: number;
   private readonly checkInterval: number;
   private readonly onExpire: ((key: K, value: V) => void) | undefined;
+  private readonly clock: Clock;
   private map = new Map<K, TTLEntry<V>>();
-  private intervalId: ReturnType<typeof setInterval> | null = null;
+  private stop: Cancel | null = null;
 
-  constructor(ttl: number, checkInterval: number = 1000, onExpire?: ((key: K, value: V) => void) | undefined) {
+  /**
+   * @param ttl - The time to live of an entry, in milliseconds.
+   * @param checkInterval - The time between two background checks, in milliseconds.
+   * @param onExpire - The function that gets each expired entry.
+   * @param clock - The clock of the times and of the background check. The default clock reads `Date.now()`.
+   */
+  constructor(
+    ttl: number,
+    checkInterval: number = 1000,
+    onExpire?: ((key: K, value: V) => void) | undefined,
+    clock: Clock = systemClock
+  ) {
     this.ttl = ttl;
     this.checkInterval = checkInterval;
     this.onExpire = onExpire;
+    this.clock = clock;
     this.startExpirationCheck();
   }
 
@@ -335,7 +360,7 @@ export class TTLCache<K, V> {
     const entry = this.map.get(key);
     if (!entry) return undefined;
 
-    if (Date.now() >= entry.expiresAt) {
+    if (this.clock.now() >= entry.expiresAt) {
       this.map.delete(key);
       if (this.onExpire) {
         this.onExpire(key, entry.value);
@@ -347,7 +372,7 @@ export class TTLCache<K, V> {
   }
 
   set(key: K, value: V, customTTL?: number): void {
-    const now = Date.now();
+    const now = this.clock.now();
     const ttlToUse = customTTL !== undefined ? customTTL : this.ttl;
 
     this.map.set(key, {
@@ -370,10 +395,10 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * Manually trigger cleanup of expired entries.
+   * This method removes the expired entries at once.
    */
   cleanup(): void {
-    const now = Date.now();
+    const now = this.clock.now();
     const expired: K[] = [];
 
     for (const [key, entry] of this.map) {
@@ -394,46 +419,44 @@ export class TTLCache<K, V> {
   }
 
   /**
-   * Get remaining TTL for a key in milliseconds.
+   * This method gives the remaining TTL of a key, in milliseconds.
    * This method gives undefined if key doesn't exist or is expired.
    */
   getTTL(key: K): number | undefined {
     const entry = this.map.get(key);
     if (!entry) return undefined;
 
-    const remaining = entry.expiresAt - Date.now();
+    const remaining = entry.expiresAt - this.clock.now();
     return remaining > 0 ? remaining : undefined;
   }
 
   /**
-   * Update TTL for an existing key.
+   * This method updates the TTL of a key that is in the map.
    */
   touch(key: K, customTTL?: number): boolean {
     const entry = this.map.get(key);
     if (!entry) return false;
 
-    if (Date.now() >= entry.expiresAt) {
+    if (this.clock.now() >= entry.expiresAt) {
       this.map.delete(key);
       return false;
     }
 
     const ttlToUse = customTTL !== undefined ? customTTL : this.ttl;
-    entry.expiresAt = Date.now() + ttlToUse;
+    entry.expiresAt = this.clock.now() + ttlToUse;
     return true;
   }
 
   private startExpirationCheck(): void {
-    this.intervalId = startExpirationTimer(() => this.cleanup(), this.checkInterval);
+    this.stop = startExpirationTimer(this.clock, () => this.cleanup(), this.checkInterval);
   }
 
   /**
-   * Stop the background expiration checker and clean up.
+   * This method stops the background expiration checker and cleans up.
    */
   dispose(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
+    this.stop?.();
+    this.stop = null;
   }
 
   *keys(): IterableIterator<K> {
@@ -464,11 +487,14 @@ export function ttlCache<K, V>(
   options?: {
     checkInterval?: number;
     onExpire?: (key: K, value: V) => void;
+    /** The clock of the times and of the background check. The default clock reads `Date.now()`. */
+    clock?: Clock;
   }
 ): TTLCache<K, V> {
   return new TTLCache(
     ttl,
     options?.checkInterval,
-    options?.onExpire
+    options?.onExpire,
+    options?.clock
   );
 }

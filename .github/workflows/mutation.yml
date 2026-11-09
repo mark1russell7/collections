@@ -1,0 +1,70 @@
+# The mutation tests of collections (reusable-mutation.yml, CI.md). The lane file mutation.json divides the package
+# into 6 parts, and each part has its own runner. The lane has no gate yet: the first full runs give the baseline.
+# A pull request that changes the lane or the test config starts a dry run: the tests of each part under Stryker, with
+# no mutant. A person starts a full run on a branch with: gh workflow run mutation.yml --ref <branch>
+#
+# The workflow starts on each pull request, so the summary check "Mutation OK" is always there for the ruleset. The job
+# "changes" decides if the dry run starts (CI.md, "A gate with paths").
+name: Mutation
+
+on:
+  schedule:
+    # Each scheduled heavy run of the fleet has its own minute.
+    - cron: "21 4 * * 1"
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Start only the tests of each part, with no mutant.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# A newer push cancels the dry run of a pull request. A full run is not cancelled.
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # The plan, one runner for each of the 6 parts, and the gate.
+  STATED_JOBS: 8
+  STATED_JOB_MINUTES: 240
+  STATED_REASON: one runner for each of the 6 parts of collections, at most 2 at one time
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      match: ${{ steps.changes.outputs.match }}
+    steps:
+      - id: changes
+        uses: mark1russell7/template/.github/actions/changes@c216644a252956d695bc2a785e80abccd98fa0d0 # main
+        with:
+          paths: |
+            mutation.json
+            mutation-disables.json
+            .github/workflows/mutation.yml
+            packages/collections/vitest.config.ts
+            packages/collections/vitest.mutation.config.ts
+
+  mutation:
+    needs: changes
+    if: needs.changes.outputs.match == 'true'
+    uses: mark1russell7/template/.github/workflows/reusable-mutation.yml@c216644a252956d695bc2a785e80abccd98fa0d0 # main
+    with:
+      dry-run: ${{ github.event_name == 'pull_request' || inputs.dry-run == true }}
+
+  mutation-ok:
+    name: Mutation OK
+    if: ${{ !cancelled() }}
+    needs: [changes, mutation]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: mark1russell7/template/.github/actions/gate-summary@c216644a252956d695bc2a785e80abccd98fa0d0 # main
+        with:
+          needs: ${{ toJSON(needs) }}

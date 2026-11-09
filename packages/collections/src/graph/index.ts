@@ -3,3 +3,4 @@
  */
 
 export { hubBreadthFirstOrder, type WeightedEdge } from "./hub-order.js";
+export { strongComponentsCompact, stronglyConnectedComponents, type StrongComponents } from "./strong-components.js";

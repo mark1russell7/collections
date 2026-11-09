@@ -3,11 +3,17 @@
  * A block checks its results with `node:assert`, so a doc that does not agree with the code fails here.
  */
 
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markdownExamples } from "@mark1russell7/rigor-testkit";
 import { describe, expect, it } from "vitest";
+import * as layers from "../core/layers.js";
+import * as dag from "../dag/index.js";
+import * as graph from "../graph/index.js";
+import * as rootEntry from "../index.js";
+import * as summaryTree from "../summary-tree/index.js";
+import * as testing from "../testing/index.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
 const guides = readdirSync(join(root, "docs/guides"))
@@ -35,4 +41,36 @@ describe("the examples of the docs", () => {
   });
 
   for (const example of cases) it(example.name, example.run);
+});
+
+/** The value names of each entry of the package. A type has no value, so a module namespace does not hold it. */
+const entries: Readonly<Record<string, object>> = {
+  ".": rootEntry,
+  "./dag": dag,
+  "./graph": graph,
+  "./layers": layers,
+  "./summary-tree": summaryTree,
+  "./testing": testing,
+};
+
+/**
+ * The values that no guide names, with the reason. The list is empty: each value has a guide. The test fails on a
+ * name that the package does not export, or that a guide names.
+ */
+const UNNAMED: Readonly<Record<string, readonly string[]>> = {};
+
+describe("the guides name each value of the package (C13)", () => {
+  const words = new Set(files.flatMap((file) => readFileSync(join(root, file), "utf8").match(/[A-Za-z_$][\w$]*/gu) ?? []));
+  const unnamed = new Set(Object.values(UNNAMED).flat());
+
+  for (const [entry, values] of Object.entries(entries)) {
+    it(`names each value of the entry ${entry} in the README or a guide`, () => {
+      expect(Object.keys(values).filter((name) => !words.has(name) && !unnamed.has(name))).toEqual([]);
+    });
+  }
+
+  it("keeps only exceptions that the package exports and that no guide names", () => {
+    const exported = new Set(Object.values(entries).flatMap((values) => Object.keys(values)));
+    expect([...unnamed].filter((name) => !exported.has(name) || words.has(name))).toEqual([]);
+  });
 });

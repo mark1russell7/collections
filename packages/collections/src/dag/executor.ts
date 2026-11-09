@@ -11,7 +11,7 @@ import type {
 } from "./types.js";
 
 /**
- * Start a batch of items with concurrency limit
+ * This function starts a batch of items with a limit of concurrency.
  */
 async function executeWithConcurrency<T, R>(
   items: T[],
@@ -45,7 +45,7 @@ async function executeWithConcurrency<T, R>(
 }
 
 /**
- * Call a listener. A listener that throws does not stop the run: the function gives a log
+ * This function calls a listener. A listener that throws does not stop the run: the function gives a log
  * line for its error (deep dive DATA-21).
  */
 function notify<T>(name: string, listener: ((arg: T) => void) | undefined, arg: T): string | undefined {
@@ -59,7 +59,7 @@ function notify<T>(name: string, listener: ((arg: T) => void) | undefined, arg: 
 }
 
 /**
- * Start DAG with level-based parallelization
+ * This function starts a DAG level by level, with the nodes of each level in parallel.
  *
  * - Levels are processed sequentially (level 0 first, then level 1, and so on)
  * - Within each level, nodes are processed in parallel up to concurrency limit
@@ -167,7 +167,7 @@ export async function executeDAG<TNode extends DAGNode>(
 }
 
 /**
- * Start DAG sequentially (no parallelization)
+ * This function starts a DAG one node at a time, with no nodes in parallel.
  */
 export async function executeDAGSequential<TNode extends DAGNode>(
   dag: DependencyDAG<TNode>,
@@ -178,7 +178,7 @@ export async function executeDAGSequential<TNode extends DAGNode>(
 }
 
 /**
- * Make a simple processor that wraps an async function
+ * This function makes a simple processor that wraps an async function.
  */
 export function createProcessor<TNode extends DAGNode>(
   fn: (node: TNode) => Promise<void>

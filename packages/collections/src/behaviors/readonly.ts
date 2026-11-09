@@ -1,5 +1,5 @@
 /**
- * Readonly behavior - Makes immutable views of collections.
+ * Readonly behavior: this module makes immutable views of collections.
  *
  * This module wraps collections to prevent modifications by throwing errors
  * on any mutation try. Mirrors Java's Collections.unmodifiable*() methods.
@@ -84,6 +84,36 @@ const MUTATING_METHODS = new Set([
   "compute",
   "merge",
   "putAll",
+
+  // Queue changes that give undefined on an empty queue (C27: a readonly view removed an element)
+  "pollOrUndefined",
+
+  // The removal by a test of LRUCache (C31: a readonly view of an LRU cache emptied it)
+  "deleteWhere",
+
+  // The internal changes of the structures of this package. TypeScript marks them private, but a call at run
+  // time reaches them. `readonly.test.ts` puts each method of each structure in the reads or in this list.
+  "ensureCapacity",
+  "trimToSize",
+  "grow",
+  "resize",
+  "removeAtOffset",
+  "unlinkNode",
+  "heapify",
+  "bubbleUp",
+  "bubbleDown",
+  "addToEnd",
+  "moveToEnd",
+  "removeFromBucket",
+  "removeFromList",
+  "deleteNode",
+  "fixAfterInsertion",
+  "fixAfterDeletion",
+  "rotateLeft",
+  "rotateRight",
+  "moveToHead",
+  "removeNode",
+  "evictLRU",
 ]);
 
 /** Methods that return a view of the collection: the view is readonly too. */
@@ -219,18 +249,3 @@ export function readonly<C extends object>(
   const errorMessage = options.errorMessage ?? "Cannot modify readonly collection";
   return createReadonly<C>(errorMessage);
 }
-
-/**
- * Alias for Java compatibility: unmodifiableList
- */
-export const unmodifiableList : typeof readonlyList = readonlyList;
-
-/**
- * Alias for Java compatibility: unmodifiableMap
- */
-export const unmodifiableMap : typeof readonlyMap = readonlyMap;
-
-/**
- * Alias for Java compatibility: unmodifiableCollection
- */
-export const unmodifiableCollection : typeof readonlyCollection = readonlyCollection;

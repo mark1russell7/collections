@@ -7,12 +7,14 @@
  * @example
  * const result = pipe(
  *   [1, 2, 3, 4, 5],
- *   map(x => x * 2),
- *   filter(x => x > 5),
- *   take(2),
+ *   (it) => map(it, x => x * 2),
+ *   (it) => filter(it, x => x > 5),
+ *   (it) => take(it, 2),
  *   toArray
  * ) // [6, 8]
  */
+
+import { runningMean, runningOf } from "@mark1russell7/rigor-statistics";
 
 // ============================================================================
 // Mapping and transformation
@@ -76,13 +78,14 @@ export function* flatten<T>(iterable: Iterable<Iterable<T>>): Generator<T> {
 // ============================================================================
 
 /**
- * This function takes the first n elements.
+ * This function takes the first n elements. It reads no element after the n-th one, and it reads nothing when n is 0.
  */
 export function* take<T>(iterable: Iterable<T>, n: number): Generator<T> {
+  if (n <= 0) return;
   let count = 0;
   for (const value of iterable) {
-    if (count++ >= n) break;
     yield value;
+    if (++count >= n) return;
   }
 }
 
@@ -465,18 +468,12 @@ export function sum(iterable: Iterable<number>): number {
 }
 
 /**
- * This function gives the average of elements.
+ * This function gives the mean of the numbers, or `undefined` for no number. It folds with `runningOf` of
+ * `@mark1russell7/rigor-statistics`, so a NaN throws a `RangeError`.
  */
 export function average(iterable: Iterable<number>): number | undefined {
-  let total = 0;
-  let count = 0;
-
-  for (const value of iterable) {
-    total += value;
-    count++;
-  }
-
-  return count === 0 ? undefined : total / count;
+  const s = runningOf(iterable);
+  return s.n === 0 ? undefined : runningMean(s);
 }
 
 // ============================================================================

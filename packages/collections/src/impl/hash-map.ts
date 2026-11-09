@@ -13,8 +13,8 @@
  *
  * // Custom equality for object keys
  * const userMap = hashMap<User, Data>({
- *   keyEq: (a, b) => a.id === b.id,
- *   keyHash: (u) => hashString(u.id)
+ *   eq: (a, b) => a.id === b.id,
+ *   hash: (u) => hashString(u.id)
  * })
  */
 
@@ -44,7 +44,7 @@ export interface HashMapOptions<K, V> {
   initialCapacity?: number;
 
   /**
-   * Load factor threshold for resizing (0-1).
+   * This option is the load factor threshold for a resize, from 0 to 1.
    * When size > capacity * loadFactor, the map resizes.
    * @default 0.75
    */
@@ -54,11 +54,23 @@ export interface HashMapOptions<K, V> {
    * Equality function for keys.
    * @default defaultEq (===)
    */
-  keyEq?: Eq<K>;
+  eq?: Eq<K>;
 
   /**
    * Hash function for keys.
    * @default defaultHash
+   */
+  hash?: Hash<K>;
+
+  /**
+   * This option is the old name of `eq`. When both are given, `eq` wins.
+   * @deprecated Use `eq`, the name that `linkedHashMap` and `hashSet` take. Version 0.11.0 removes `keyEq`.
+   */
+  keyEq?: Eq<K>;
+
+  /**
+   * This option is the old name of `hash`. When both are given, `hash` wins.
+   * @deprecated Use `hash`, the name that `linkedHashMap` and `hashSet` take. Version 0.11.0 removes `keyHash`.
    */
   keyHash?: Hash<K>;
 
@@ -73,7 +85,7 @@ export interface HashMapOptions<K, V> {
  * HashMap<K, V> - Hash table implementation with custom equality/hashing.
  *
  * This class uses separate chaining for collision resolution.
- * Automatically resizes when load factor is exceeded.
+ * The map resizes when its load factor is more than the threshold.
  *
  * Not thread-safe. Use synchronized() behavior for concurrent access.
  */
@@ -96,8 +108,6 @@ export class HashMap<K, V> implements MapLike<K, V> {
     const {
       initialCapacity = 16,
       loadFactor = 0.75,
-      keyEq = defaultEq,
-      keyHash = defaultHash,
       valueEq = defaultEq,
     } = options;
 
@@ -105,8 +115,8 @@ export class HashMap<K, V> implements MapLike<K, V> {
     this._buckets = new Array(capacity).fill(null);
     this._size = 0;
     this._loadFactor = loadFactor;
-    this._keyEq = keyEq;
-    this._keyHash = keyHash;
+    this._keyEq = options.eq ?? options.keyEq ?? defaultEq;
+    this._keyHash = options.hash ?? options.keyHash ?? defaultHash;
     this._valueEq = valueEq;
     this._threshold = Math.floor(capacity * loadFactor);
   }
@@ -597,8 +607,8 @@ export class HashMap<K, V> implements MapLike<K, V> {
  * @example
  * const map = hashMap<string, number>()
  * const mapWithOptions = hashMap<User, Data>({
- *   keyEq: (a, b) => a.id === b.id,
- *   keyHash: (u) => hashString(u.id)
+ *   eq: (a, b) => a.id === b.id,
+ *   hash: (u) => hashString(u.id)
  * })
  * const mapFromEntries = hashMap([['a', 1], ['b', 2]])
  */

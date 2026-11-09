@@ -13,6 +13,7 @@
 import { arrayList, type ArrayList } from "../impl/array-list.js";
 import { hashMap, type HashMap } from "../impl/hash-map.js";
 import { hashSet, type HashSet } from "../impl/hash-set.js";
+import { EMPTY_RUNNING, addToRunning, runningMean, type RunningSummary } from "@mark1russell7/rigor-statistics";
 
 // ============================================================================
 // Collector interface
@@ -149,7 +150,7 @@ export function groupingBy<T, K>(
 }
 
 /**
- * Groups and transforms with a downstream collector.
+ * This function groups the elements and transforms each group with a downstream collector.
  *
  * @example
  * const countByAge = collect(
@@ -225,19 +226,16 @@ export function summingNumber<T>(
 }
 
 /**
- * Averages numeric elements.
+ * This function gives a collector of the mean of the numbers of the elements. No element gives 0. The collector
+ * folds with `addToRunning` of `@mark1russell7/rigor-statistics`, so a NaN throws a `RangeError`.
  */
 export function averagingNumber<T>(
   mapper: (element: T) => number
-): Collector<T, { sum: number; count: number }, number> {
+): Collector<T, RunningSummary, number> {
   return {
-    supplier: () => ({ sum: 0, count: 0 }),
-    accumulator: (acc, element) => {
-      acc.sum += mapper(element);
-      acc.count++;
-      return acc;
-    },
-    finisher: (acc) => (acc.count === 0 ? 0 : acc.sum / acc.count),
+    supplier: () => EMPTY_RUNNING,
+    accumulator: (s, element) => addToRunning(s, mapper(element)),
+    finisher: (s) => (s.n === 0 ? 0 : runningMean(s)),
   };
 }
 
@@ -459,7 +457,10 @@ export function last<T>(): Collector<T, T | undefined, T | undefined> {
 }
 
 /**
- * This type makes summary statistics.
+ * This type is the result of `summarizingNumber`: the count, the sum, the extremes and the mean.
+ *
+ * @deprecated The home of the summary of a stream is `@mark1russell7/rigor-statistics`. Use its `RunningSummary`
+ * and `runningMean`. A later MINOR version removes this type.
  */
 export interface SummaryStatistics {
   count: number;
@@ -469,32 +470,17 @@ export interface SummaryStatistics {
   average: number;
 }
 
+/**
+ * This function gives a collector of the count, the sum, the extremes and the mean of the numbers of the elements.
+ * No element gives the count 0, the extremes `Infinity` and `-Infinity`, and the mean 0. The collector folds with
+ * `addToRunning` of `@mark1russell7/rigor-statistics`, so a NaN throws a `RangeError`.
+ */
 export function summarizingNumber<T>(
   mapper: (element: T) => number
-): Collector<T, Partial<SummaryStatistics>, SummaryStatistics> {
+): Collector<T, RunningSummary, SummaryStatistics> {
   return {
-    supplier: () => ({
-      count: 0,
-      sum: 0,
-      min: Infinity,
-      max: -Infinity,
-    }),
-    accumulator: (stats, element) => {
-      const value = mapper(element);
-      // The supplier sets every field. (Before, `stats.min || Infinity` treated a minimum of 0
-      // as missing: BUGS-2026-07 L16.)
-      stats.count = stats.count! + 1;
-      stats.sum = stats.sum! + value;
-      stats.min = Math.min(stats.min!, value);
-      stats.max = Math.max(stats.max!, value);
-      return stats;
-    },
-    finisher: (stats) => ({
-      count: stats.count!,
-      sum: stats.sum!,
-      min: stats.min!,
-      max: stats.max!,
-      average: stats.count! === 0 ? 0 : stats.sum! / stats.count!,
-    }),
+    supplier: () => EMPTY_RUNNING,
+    accumulator: (s, element) => addToRunning(s, mapper(element)),
+    finisher: (s) => ({ count: s.n, sum: s.sum, min: s.min, max: s.max, average: s.n === 0 ? 0 : runningMean(s) }),
   };
 }

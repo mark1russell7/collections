@@ -1,5 +1,5 @@
 /**
- * Synchronized behavior - Gives thread-safe access with mutex locking.
+ * Synchronized behavior: this module gives thread-safe access with mutex locking.
  *
  * This module wraps collections to serialize all operations using a mutex, making sure that
  * thread-safe access in concurrent environments. Mirrors Java's
@@ -130,64 +130,6 @@ export const synchronizedCollection : typeof synchronized = synchronized;
 export const synchronizedSet : typeof synchronized = synchronized;
 
 /**
- * Advanced synchronized middleware with reentrant locking.
- *
- * With this function, the same "thread" (async context) can acquire the lock multiple times.
- * Useful for methods that call other synchronized methods internally.
- *
- * Note: JavaScript has no true thread IDs. This function uses async context
- * tracking if available. If not, the behavior is non-reentrant.
- */
-export function reentrantSynchronized<C extends object>(): Middleware<C> {
-  return (next: C): C => {
-    const mutex = new Mutex();
-    let lockHolder: symbol | null = null;
-    let lockCount = 0;
-
-    return new Proxy(next, {
-      get(target, prop, receiver) {
-        const value = Reflect.get(target, prop, receiver);
-
-        if (typeof value !== "function") {
-          return value;
-        }
-
-        return async function (this: any, ...args: any[]) {
-          // Generate a unique ID for this call context
-          const callerId = Symbol("caller");
-
-          // If we already hold the lock, execute directly (reentrant)
-          if (lockHolder === callerId) {
-            lockCount++;
-            try {
-              const result = (value as Function).apply(target, args);
-              return result instanceof Promise ? await result : result;
-            } finally {
-              lockCount--;
-            }
-          }
-
-          // Otherwise, acquire the lock
-          return mutex.lock(async () => {
-            lockHolder = callerId;
-            lockCount = 1;
-            try {
-              const result = (value as Function).apply(target, args);
-              return result instanceof Promise ? await result : result;
-            } finally {
-              lockCount--;
-              if (lockCount === 0) {
-                lockHolder = null;
-              }
-            }
-          });
-        };
-      },
-    }) as C;
-  };
-}
-
-/**
  * Read-write lock implementation for collections.
  *
  * With this function, multiple concurrent readers can read, but a writer is exclusive.
@@ -277,7 +219,11 @@ export function readWriteLock<C extends object>(): Middleware<C> {
       "forEach",
       "getOrDefault",
       "getOrUndefined",
+      "descendingIterator",
     ]);
+
+    // The reads that give an iterator. The lock copies the elements before it releases the read (C32).
+    const ITERATOR_READS = new Set(["keys", "values", "entries", "descendingIterator"]);
 
     return new Proxy(next, {
       get(target, prop, receiver) {
@@ -287,15 +233,28 @@ export function readWriteLock<C extends object>(): Middleware<C> {
           return value;
         }
 
-        const isReadMethod = typeof prop === "string" && READ_METHODS.has(prop);
+        // A method with a symbol key, for example Symbol.iterator, stays synchronous, so `for of` works (C32).
+        // The loop reads at once with no lock, as a plain method of synchronized().
+        if (typeof prop === "symbol") {
+          return function (this: unknown, ...args: unknown[]) {
+            return (value as Function).apply(target, args);
+          };
+        }
+
+        const isReadMethod = READ_METHODS.has(prop);
+        const isIteratorRead = ITERATOR_READS.has(prop);
 
         return async function (this: any, ...args: any[]) {
           if (isReadMethod) {
             // Acquire read lock
             await acquireRead();
             try {
-              const result = (value as Function).apply(target, args);
-              return result instanceof Promise ? await result : result;
+              const raw = (value as Function).apply(target, args);
+              const result = raw instanceof Promise ? await raw : raw;
+              // Before C32, the iteration started after the release of the read, so a write could change the elements.
+              return isIteratorRead && result != null && typeof result[Symbol.iterator] === "function"
+                ? Array.from(result as Iterable<unknown>)[Symbol.iterator]()
+                : result;
             } finally {
               releaseRead();
             }

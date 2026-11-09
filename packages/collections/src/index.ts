@@ -1,7 +1,7 @@
 /**
  * `@mark1russell7/collections`: collections with no dependencies.
  *
- * This entry gives the lists, sets, maps, queues, the summary tree, the behaviors, the channels and the lazy
+ * This entry gives the lists, sets, maps, queues, the summary tree, the behaviors, the async queues and the lazy
  * operations. The entries `./dag` and `./graph` give the graph code. The entry `./testing` gives the checks.
  */
 
@@ -34,11 +34,8 @@ export type {
   ReadonlyQueue,
   Queue,
   Deque,
-  BlockingQueue,
   PriorityQueue as IPriorityQueue,
   AsyncQueue as IAsyncQueue,
-  TransferQueue,
-  DelayQueue,
 } from "./interfaces/queue.js";
 
 // ============================================================================
@@ -54,7 +51,16 @@ export * from "./impl/tree-set.js";
 export * from "./impl/linked-list.js";
 export * from "./impl/hash-set.js";
 export * from "./impl/priority-queue.js";
-export { SummaryTree, summaryTree, type SummaryLocation, type SummaryMonoid, type SummarySearch, type SummarySpec } from "./impl/summary-tree.js";
+export {
+  SummaryTree,
+  summaryTree,
+  type SummaryLocation,
+  type SummaryMonoid,
+  type SummaryNode,
+  type SummarySearch,
+  type SummarySpec,
+  type SummaryTreeRecord,
+} from "./impl/summary-tree.js";
 
 // ============================================================================
 // Behaviors
@@ -82,8 +88,8 @@ export * from "./behaviors/ttl.js";
 // ============================================================================
 
 export * from "./async/async-queue.js";
-export * from "./async/channels.js";
 export * from "./async/settled.js";
+export * from "./async/semaphore.js";
 
 // ============================================================================
 // Functional Operations
@@ -126,19 +132,7 @@ export { ttlMap, ttlCache, TTLCache, ttlCollection } from "./behaviors/ttl.js";
 // Async/Concurrent
 export { asyncQueue, AsyncQueue } from "./async/async-queue.js";
 export { asSettled, type Settled } from "./async/settled.js";
-export {
-  channel,
-  Channel,
-  select,
-  timeout,
-  ticker,
-  pipeline,
-  fanOut,
-  fanIn,
-  merge,
-  workerPool,
-} from "./async/channels.js";
-
+export { semaphore, type Semaphore } from "./async/semaphore.js";
 // Functional operations
 export {
   map,
@@ -215,8 +209,6 @@ export {
   mapOf,
   range,
   rangeTo,
-  toList,
   toMap,
   groupBy,
 } from "./utils/factories.js";
-

@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/package",
   "name": "@mark1russell7/collections",
   "version": "0.11.0",
-  "description": "Collections with no dependencies: lists, maps, queues, a summary tree, channels, lazy operations and dependency graphs.",
+  "description": "Collections for TypeScript: lists, maps, queues, a summary tree, async queues, lazy operations and dependency graphs.",
   "keywords": [
     "collections",
     "data-structures",
@@ -10,7 +10,6 @@
     "priority-queue",
     "lru",
     "summary-tree",
-    "channels",
     "dag",
     "topological-sort",
     "typescript"
@@ -35,6 +34,7 @@
     "./dag": "./src/dag/index.ts",
     "./graph": "./src/graph/index.ts",
     "./layers": "./src/core/layers.ts",
+    "./summary-tree": "./src/summary-tree/index.ts",
     "./testing": "./src/testing/index.ts",
     "./package.json": "./package.json"
   },
@@ -66,6 +66,10 @@
         "types": "./build/core/layers.d.ts",
         "default": "./build/core/layers.js"
       },
+      "./summary-tree": {
+        "types": "./build/summary-tree/index.d.ts",
+        "default": "./build/summary-tree/index.js"
+      },
       "./testing": {
         "types": "./build/testing/index.d.ts",
         "default": "./build/testing/index.js"
@@ -84,11 +88,13 @@
   },
   "devDependencies": {
     "@mark1russell7/cue": "^2.0.0",
-    "@mark1russell7/rigor-bench": "^0.2.5",
+    "@mark1russell7/rigor-bench": "^0.2.33",
     "@mark1russell7/rigor-generators": "^0.1.5",
-    "@mark1russell7/rigor-statistics": "^0.1.8",
     "@mark1russell7/rigor-testkit": "^0.1.0",
+    "@stryker-mutator/core": "^10.1.1",
+    "@stryker-mutator/vitest-runner": "^10.1.1",
     "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.1.0",
     "esbuild": "^0.28.2",
     "fast-check": "^4.10.2",
     "tsdown": "^0.23.1",
@@ -96,6 +102,8 @@
     "vitest": "^5.0.3"
   },
   "dependencies": {
-    "@mark1russell7/optional": "^1.2.0"
+    "@mark1russell7/algebra": "^0.8.3",
+    "@mark1russell7/optional": "^1.2.0",
+    "@mark1russell7/rigor-statistics": "^0.1.25"
   }
 }

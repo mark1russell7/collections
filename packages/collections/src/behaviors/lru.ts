@@ -20,6 +20,9 @@ import type { MapLike } from "../interfaces/map.js";
 import { compositeMapMethod } from "./composite.js";
 import { removals, removalSource, type MapRemoval } from "../core/removals.js";
 import { keyIndex, mapEquality } from "../core/key-index.js";
+import { hasMembers } from "./members.js";
+import type { Clock } from "@mark1russell7/algebra/clock";
+import { systemClock } from "../core/system-clock.js";
 
 /**
  * Options for LRU behavior.
@@ -35,17 +38,29 @@ export interface LRUOptions {
    * Optional callback invoked when an item is evicted.
    */
   onEvict?: (info: { key: any; value: any; timestamp: number }) => void;
+
+  /**
+   * The clock of the access times. The `timestamp` of `onEvict` is the last access time of the entry. A test gives
+   * `fakeClock()` of `@mark1russell7/algebra/clock`. The default clock reads `Date.now()`.
+   */
+  clock?: Clock;
 }
 
 /**
- * Metadata for tracking LRU access.
+ * This type is a node of the list of the access order. The most recent entry is at the head.
  */
 interface LRUNode<K, V> {
   key: K;
   value: V;
+  prev: this | null;
+  next: this | null;
+}
+
+/**
+ * This type is a node of `lruMap`. It keeps the last access time of its entry for `onEvict`.
+ */
+interface TimedNode<K, V> extends LRUNode<K, V> {
   lastAccessed: number;
-  prev: LRUNode<K, V> | null;
-  next: LRUNode<K, V> | null;
 }
 
 /**
@@ -61,16 +76,17 @@ export function lruMap<K, V>(
   options: LRUOptions
 ): Middleware<MapLike<K, V>, MapLike<K, V> & { readonly isFull: boolean }> {
   const { onEvict } = options;
+  const clock = options.clock ?? systemClock;
   const capacity = checkCapacity(options.capacity, "lruMap");
 
   return (next: MapLike<K, V>): MapLike<K, V> & { readonly isFull: boolean } => {
     // Doubly-linked list for LRU tracking
-    let head: LRUNode<K, V> | null = null;
-    let tail: LRUNode<K, V> | null = null;
+    let head: TimedNode<K, V> | null = null;
+    let tail: TimedNode<K, V> | null = null;
     // The nodes, found with the equality of the base (C20)
-    const nodeMap = keyIndex<K, LRUNode<K, V>>(mapEquality(next));
+    const nodeMap = keyIndex<K, TimedNode<K, V>>(mapEquality(next));
 
-    const moveToHead = (node: LRUNode<K, V>): void => {
+    const moveToHead = (node: TimedNode<K, V>): void => {
       // Remove from current position
       if (node.prev) {
         node.prev.next = node.next;
@@ -96,14 +112,14 @@ export function lruMap<K, V>(
         tail = node;
       }
 
-      node.lastAccessed = Date.now();
+      node.lastAccessed = clock.now();
     };
 
     const addNode = (key: K, value: V): void => {
-      const node: LRUNode<K, V> = {
+      const node: TimedNode<K, V> = {
         key,
         value,
-        lastAccessed: Date.now(),
+        lastAccessed: clock.now(),
         prev: null,
         next: head,
       };
@@ -120,7 +136,7 @@ export function lruMap<K, V>(
       nodeMap.set(key, node);
     };
 
-    const removeNode = (node: LRUNode<K, V>): void => {
+    const removeNode = (node: TimedNode<K, V>): void => {
       if (node.prev) {
         node.prev.next = node.next;
       } else {
@@ -176,6 +192,7 @@ export function lruMap<K, V>(
     };
 
     return new Proxy(next, {
+      has: hasMembers(removals, "isFull"),
       get(target, prop, receiver) {
         if (prop === removals) {
           return source.channel;
@@ -338,7 +355,6 @@ export class LRUCache<K, V> {
       const node: LRUNode<K, V> = {
         key,
         value,
-        lastAccessed: Date.now(),
         prev: null,
         next: this.head,
       };
@@ -421,8 +437,6 @@ export class LRUCache<K, V> {
       this.head.prev = node;
     }
     this.head = node;
-
-    node.lastAccessed = Date.now();
   }
 
   private removeNode(node: LRUNode<K, V>): void {

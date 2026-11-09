@@ -103,3 +103,10 @@ temp/
 *.bak
 *.orig
 bench-out/
+
+# The reports of the coverage of each package (the input coverage of the shared CI)
+coverage/
+
+# The mutation lane (mutation.json): the copies of Stryker and the reports of each package
+.stryker-tmp/
+reports/mutation/

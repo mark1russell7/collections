@@ -12,7 +12,7 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 23 |
 | remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. Version 0.10.0 removes them (D3, C28, C29). | 72 |
 | move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |
-| ask | The map had no home for the area. The strategist named the homes on 2026-11-07 (S1 and S2). | 0 |
+| ask | The map had no home for the area. The maintainer named the homes on 2026-11-07 (S1 and S2). | 0 |
 
 The counts are of the 360 names of `main`. The eight names of the removals have their own table at the end.
 
@@ -62,7 +62,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | `compose`, `bundle`, `Middleware`, `Evented`, `Async`, `BoundedCollection` | keep | The behaviors and the layers guide use them. The root `compose` gives a collection, and `compose` of `./layers` gives a function. |
 | `hasCapability`, `interceptMethods`, `blockMethods`, `delegate`, `enhanceMethod` | keep | The guide to write a layer (C13) teaches them, and a layer of your own uses them. The review gave "remove" before the guide existed. |
 | `SafeCollection`, `ElementType`, `Asyncify`, `WithCapability`, `CollectionBuilder` | remove | No other file uses these helpers. |
-| `Emitter`, `createEmitter`, `Listener`, `Unsubscribe`, `EventMap` | keep | `evented` uses the emitter. The strategist made collections its home (S1): collections is the bottom layer, so each package can use it with no new dependency. |
+| `Emitter`, `createEmitter`, `Listener`, `Unsubscribe`, `EventMap` | keep | `evented` uses the emitter. The maintainer made collections its home (S1): collections is the bottom layer, so each package can use it with no new dependency. |
 | `EventBatcher`, `AsyncEmitter`, `forwardEvent`, `onWhen` | remove | No file uses them. |
 | `StorageListeners`, `reportListenerError`, `ListenerErrorHandler` | keep | The memory storage of `@procedures/collections` uses them. |
 
@@ -165,7 +165,7 @@ Version 0.9.3 adds the entry `./summary-tree` and two types of the root entry.
 
 | Names | Verdict | Reason |
 |---|---|---|
-| `semaphore`, `Semaphore` | keep | `@procedures/client` bounds the calls that run at the same time with it. The strategist placed it here on 2026-11-07. |
+| `semaphore`, `Semaphore` | keep | `@procedures/client` bounds the calls that run at the same time with it. The maintainer placed it here on 2026-11-07. |
 
 ## The decisions for Mark
 
@@ -178,7 +178,7 @@ Each decision changes the API. Before 1.0, a change of the API raises the MINOR 
 - **D5. A clock for the TTL behaviors.** `TTLCache` takes a clock as an option. The default is the clock of the system, so the change is backward compatible. Version 0.10.0 does this: the option `clock` of `ttlMap`, `ttlCollection`, `TTLCache` and `ttlCache` takes a `Clock` of `@mark1russell7/algebra/clock`. The options of `lruMap` and of the `bounded` layers take the same `clock`, for the `timestamp` of `onEvict` and `onOverflow`.
 - **D6. The iterable functions.** The iterator helpers of the language work on an iterator, but not on each iterable. The recommendation is to keep the functions, and to tell in the doc when to use the language helpers. Version 0.10.0 keeps the functions. The iterables guide tells when to use the language helpers.
 
-## The answers of the strategist
+## The answers of the maintainer
 
 - **S1. A home for events.** `Emitter` and `createEmitter` are a set of listeners for each key. The emitter stays in collections, with the verdict "keep".
 - **S2. A home for concurrency.** The channels, `select`, `ticker`, `timeout`, `workerPool` and the pipeline functions go to `@mark1russell7/service`, on its clock. The pull request systems#384 adds them as `@mark1russell7/service/channel`. Service then depends on collections for `asyncQueue`, so collections keeps no re-export. It marks the names `@deprecated` in place for one MINOR version, and removes them in the next.

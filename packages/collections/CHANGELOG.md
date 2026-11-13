@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.1
+
+The build tool `tsdown` 0.23.7 makes the files of the package. The API does not change. PATCH: a dependency update that changes the shipped files.
+
+### Changed
+
+- `tsdown` 0.23.7 and `vite` 8.3.7 replace 0.23.5 and 8.3.6. The JavaScript files and the type declarations of `build/` change. Their API is the same.
+
 ## 0.10.0
 
 The breaking changes of the API review ship in one version, with the drop end of each front insert of `boundedList` (C21). MINOR: before 1.0.0 a breaking change raises MINOR.

@@ -6,8 +6,10 @@ export { minimumHittingSet, type HittingSet, type HittingSetChoice, type Hitting
 export { hubBreadthFirstOrder, type WeightedEdge } from "./hub-order.js";
 export {
   NUMBER_RING,
+  pathSetReliability,
   twoTerminalReliability,
   type OrderedRing,
+  type PathSetReliability,
   type ReliabilityEdge,
   type ReliabilityOptions,
   type ReliabilityPath,

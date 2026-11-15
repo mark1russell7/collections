@@ -287,6 +287,7 @@ type HittingSetChoice: build/graph/index.d.ts#HittingSetChoice
 type HittingSetOptions: build/graph/index.d.ts#HittingSetOptions
 NUMBER_RING: build/graph/index.d.ts#NUMBER_RING
 type OrderedRing: build/graph/index.d.ts#OrderedRing
+type PathSetReliability: build/graph/index.d.ts#PathSetReliability
 type ReliabilityEdge: build/graph/index.d.ts#ReliabilityEdge
 type ReliabilityOptions: build/graph/index.d.ts#ReliabilityOptions
 type ReliabilityPath: build/graph/index.d.ts#ReliabilityPath
@@ -295,6 +296,7 @@ type TwoTerminalReliability: build/graph/index.d.ts#TwoTerminalReliability
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 minimumHittingSet: build/graph/index.d.ts#minimumHittingSet
+pathSetReliability: build/graph/index.d.ts#pathSetReliability
 strongComponentsCompact: build/graph/index.d.ts#strongComponentsCompact
 stronglyConnectedComponents: build/graph/index.d.ts#stronglyConnectedComponents
 twoTerminalReliability: build/graph/index.d.ts#twoTerminalReliability
@@ -579,6 +581,17 @@ interface OrderedRing<N> {
   readonly compare: (a: N, b: N) => number;
 }
 
+### build/graph/index.d.ts#PathSetReliability
+type PathSetReliability<N> = {
+  readonly kind: "exact";
+  readonly value: N;
+  readonly importance: readonly N[];
+  readonly steps: number;
+} | {
+  readonly kind: "budget";
+  readonly steps: number;
+};
+
 ### build/graph/index.d.ts#ReliabilityEdge
 interface ReliabilityEdge<Node, N> {
   readonly from: Node;
@@ -638,6 +651,11 @@ export declare function hubBreadthFirstOrder(n: number, edges?: readonly Weighte
 
 ### build/graph/index.d.ts#minimumHittingSet
 export declare function minimumHittingSet<T>(sets: Iterable<Iterable<T>>, options?: HittingSetOptions<T>): HittingSet<T>;
+
+### build/graph/index.d.ts#pathSetReliability
+export declare function pathSetReliability<N>(paths: readonly (readonly number[])[], chances: readonly N[], ring: OrderedRing<N>, options?: {
+  readonly maxSteps?: number | undefined;
+}): PathSetReliability<N>;
 
 ### build/graph/index.d.ts#strongComponentsCompact
 export declare function strongComponentsCompact(n: number, start: ArrayLike<number>, targets: ArrayLike<number>): StrongComponents;

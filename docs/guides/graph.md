@@ -171,12 +171,15 @@ Each edge of a directed graph works or fails alone, with its chance. The two-ter
 - `best` is the chance of the best path. `noisyOr` is one minus the product of the chances that each path fails. The value is between them.
 - The result is `bounds` when the expansion passes `maxSteps`. It is `partial` when the path search passes `maxSteps`.
 - The paths come from the largest chance to the smallest.
+- A step is one edge of the path search, one state of the expansion, or one comparison of two paths in a state. Thus `maxSteps` holds the time.
+
+`pathSetReliability(paths, chances, ring)` gives the chance that one path or more of a given set works. A path is a list of edge indices. Use it for the chance of the paths that an alert shows, alone.
 
 A use is the chance that an outage gets to a person through the services of the person. Two paths that share an edge are not independent, so `noisyOr` is too high.
 
 ```ts
 import assert from "node:assert/strict";
-import { NUMBER_RING, twoTerminalReliability } from "@mark1russell7/collections/graph";
+import { NUMBER_RING, pathSetReliability, twoTerminalReliability } from "@mark1russell7/collections/graph";
 
 // Two services use one DNS provider, and the person uses each service.
 const edges = [
@@ -196,6 +199,10 @@ if (result.kind === "exact") {
   assert.deepEqual(result.importance, [0.75, 0.25, 0.25, 0.125, 0.125]);
   assert.deepEqual(result.paths.map((path) => path.edges), [[0, 1, 3], [0, 2, 4]]);
 }
+
+// The first path alone explains two thirds of the value.
+const shown = pathSetReliability([[0, 1, 3]], edges.map((edge) => edge.chance), NUMBER_RING);
+assert.equal(shown.kind === "exact" && shown.value, 0.25);
 
 // Each path has 3 edges. With the hop cap 2, no path counts.
 const short = twoTerminalReliability(edges, "event", "person", NUMBER_RING, { hopCap: 2 });

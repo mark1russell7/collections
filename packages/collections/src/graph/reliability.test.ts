@@ -1,6 +1,14 @@
 import { random, seedsFrom, type Random } from "@mark1russell7/rigor-generators";
 import { describe, expect, it } from "vitest";
-import { NUMBER_RING, twoTerminalReliability, type OrderedRing, type ReliabilityEdge, type TwoTerminalReliability } from "./index.js";
+import {
+  NUMBER_RING,
+  pathSetReliability,
+  twoTerminalReliability,
+  type OrderedRing,
+  type PathSetReliability,
+  type ReliabilityEdge,
+  type TwoTerminalReliability,
+} from "./index.js";
 
 const SEEDS = seedsFrom(process.env["SEED"], [1, 2, 3, 4, 5, 6, 7, 8]);
 
@@ -42,6 +50,23 @@ function randomGraph(r: Random): { edges: Edge[]; source: number; target: number
   const n = r.int(1, 6);
   const edges = Array.from({ length: r.int(0, 10) }, () => ({ from: r.int(0, n - 1), to: r.int(0, n - 1), chance: r.int(0, 16) / 16 }));
   return { edges, source: 0, target: r.chance(0.1) ? 0 : n - 1, hopCap: r.chance(0.3) ? Number.POSITIVE_INFINITY : r.int(0, 5) };
+}
+
+/** This function gives the chance that each edge of one path or more works, by a sum over each state of the edges. */
+function bruteForcePaths(paths: readonly (readonly number[])[], chances: readonly number[]): number {
+  let total = 0;
+  for (let mask = 0; mask < 1 << chances.length; mask += 1) {
+    if (!paths.some((list) => list.every((index) => (mask & (1 << index)) !== 0))) continue;
+    let chance = 1;
+    for (const [index, p] of chances.entries()) chance *= (mask & (1 << index)) !== 0 ? p : 1 - p;
+    total += chance;
+  }
+  return total;
+}
+
+function exactSet<N>(result: PathSetReliability<N>): Extract<PathSetReliability<N>, { kind: "exact" }> {
+  if (result.kind !== "exact") throw new Error(`The result is ${result.kind}, not exact.`);
+  return result;
 }
 
 function exact<N>(result: TwoTerminalReliability<N>): Extract<TwoTerminalReliability<N>, { kind: "exact" }> {
@@ -149,6 +174,16 @@ describe("twoTerminalReliability", () => {
     }
   });
 
+  it("holds the work of a complete graph of 10 nodes to maxSteps", () => {
+    // 109601 simple paths share each edge. Each comparison of two paths in a state is a step, so the budget ends the run.
+    const edges: Edge[] = [];
+    for (let from = 0; from < 10; from += 1) for (let to = 0; to < 10; to += 1) if (from !== to) edges.push({ from, to, chance: 0.5 });
+    const result = twoTerminalReliability(edges, 0, 9, NUMBER_RING);
+    expect(result.kind).not.toBe("exact");
+    expect(result.steps).toBe(1_000_000);
+    expect(result.best).toBe(0.5);
+  });
+
   it("does not change its arguments, and gives the same result two times", () => {
     const edges = SHARED.map((edge) => ({ ...edge }));
     const before = structuredClone(edges);
@@ -205,6 +240,86 @@ describe("twoTerminalReliability", () => {
         expect(result.value.a).toBe(plain.value);
         expect(result.value.b).toBe(plain.importance[index]);
       }
+    }
+  });
+});
+
+describe("pathSetReliability", () => {
+  it("counts a shared edge one time", () => {
+    // The paths of SHARED: the edge 0 is in both.
+    expect(pathSetReliability([[0, 1, 3], [0, 2, 4]], [0.5, 0.5, 0.5, 1, 1], NUMBER_RING)).toEqual({
+      kind: "exact",
+      value: 0.375,
+      importance: [0.75, 0.25, 0.25, 0.125, 0.125],
+      // 7 states, and 2 comparisons in each of the 4 states with two paths
+      steps: 15,
+    });
+  });
+
+  it("gives 0 with no paths and 1 with an empty path", () => {
+    expect(exactSet(pathSetReliability([], [0.5], NUMBER_RING))).toMatchObject({ value: 0, importance: [0] });
+    expect(exactSet(pathSetReliability([[0], []], [0.5], NUMBER_RING))).toMatchObject({ value: 1, importance: [0] });
+  });
+
+  it("ignores the order of the paths and of their edges, and an edge two times in a path", () => {
+    const chances = [0.5, 0.25, 0.75, 0.5];
+    const first = pathSetReliability([[0, 1], [2, 3], [1, 3]], chances, NUMBER_RING);
+    expect(pathSetReliability([[3, 1], [1, 0, 1], [3, 2]], chances, NUMBER_RING)).toEqual(first);
+  });
+
+  it("gives the budget result when the expansion passes maxSteps, with each comparison as a step", () => {
+    // The root has 1 state and 2 comparisons, so 3 steps are enough for the root and 2 are not.
+    const paths = [
+      [0, 1],
+      [2, 3],
+    ];
+    expect(pathSetReliability(paths, [0.5, 0.5, 0.5, 0.5], NUMBER_RING, { maxSteps: 2 })).toEqual({ kind: "budget", steps: 2 });
+    expect(pathSetReliability(paths, [0.5, 0.5, 0.5, 0.5], NUMBER_RING, { maxSteps: 3 }).kind).toBe("budget");
+    expect(exactSet(pathSetReliability(paths, [0.5, 0.5, 0.5, 0.5], NUMBER_RING)).value).toBe(0.4375);
+  });
+
+  it("drops a path that holds another path", () => {
+    expect(exactSet(pathSetReliability([[0, 1], [0]], [0.5, 0.5], NUMBER_RING))).toMatchObject({ value: 0.5, importance: [1, 0] });
+  });
+
+  it("refuses a bad index, a bad count or a chance out of range", () => {
+    for (const index of [-1, 2, 0.5, Number.NaN]) {
+      expect(() => pathSetReliability([[index]], [0.5, 0.5], NUMBER_RING), String(index)).toThrow(RangeError);
+    }
+    expect(() => pathSetReliability([[0]], [0.5], NUMBER_RING, { maxSteps: -1 })).toThrow(RangeError);
+    expect(() => pathSetReliability([[0]], [1.5], NUMBER_RING)).toThrow(RangeError);
+  });
+
+  it.each(SEEDS)("agrees with a brute force over random path sets (seed %i)", (seed) => {
+    const r = random(seed);
+    for (let round = 0; round < 60; round += 1) {
+      const chances = Array.from({ length: r.int(1, 10) }, () => r.int(0, 16) / 16);
+      const paths = Array.from({ length: r.int(0, 6) }, () => Array.from({ length: r.int(0, 4) }, () => r.int(0, chances.length - 1)));
+      const label = `seed ${seed} round ${round}: ${JSON.stringify({ paths, chances })}`;
+      const result = exactSet(pathSetReliability(paths, chances, NUMBER_RING));
+      expect(result.value, label).toBe(bruteForcePaths(paths, chances));
+      for (const index of chances.keys()) {
+        const on = bruteForcePaths(paths, chances.map((p, i) => (i === index ? 1 : p)));
+        const off = bruteForcePaths(paths, chances.map((p, i) => (i === index ? 0 : p)));
+        expect(result.importance[index], `${label} edge ${index}`).toBe(on - off);
+      }
+    }
+  });
+
+  it.each(SEEDS)("gives the value of twoTerminalReliability for the paths that it found (seed %i)", (seed) => {
+    const r = random(seed);
+    for (let round = 0; round < 60; round += 1) {
+      const { edges, source, target, hopCap } = randomGraph(r);
+      const full = exact(twoTerminalReliability(edges, source, target, NUMBER_RING, { hopCap }));
+      const set = exactSet(
+        pathSetReliability(
+          full.paths.map((path) => path.edges),
+          edges.map((edge) => edge.chance),
+          NUMBER_RING,
+        ),
+      );
+      expect(set.value).toBe(full.value);
+      expect(set.importance).toEqual(full.importance);
     }
   });
 });

@@ -37,7 +37,10 @@ export interface ReliabilityEdge<Node, N> {
 export interface ReliabilityOptions {
   /** The most edges of a path. A longer path does not count. A whole number from 0, or `Infinity`, the default. */
   readonly hopCap?: number | undefined;
-  /** The largest count of steps. A step is one edge of the path search, or one state of the expansion. The default is 1000000. */
+  /**
+   * The largest count of steps. A step is one edge of the path search, one state of the expansion, or one comparison of
+   * two paths in a state. Each step is a bounded amount of work. The default is 1000000.
+   */
   readonly maxSteps?: number | undefined;
 }
 
@@ -82,6 +85,52 @@ export type TwoTerminalReliability<N> =
   | { readonly kind: "partial"; readonly best: N; readonly paths: readonly ReliabilityPath<N>[]; readonly steps: number };
 
 /**
+ * The result of `pathSetReliability`.
+ *
+ * - `exact`: `value` is the chance that each edge of one path or more works. `importance` gives the Birnbaum
+ *   importance of each edge, by index. `steps` counts the states of the expansion and the comparisons of two paths.
+ * - `budget`: the expansion passed `maxSteps`, and the result has no value.
+ */
+export type PathSetReliability<N> =
+  | { readonly kind: "exact"; readonly value: N; readonly importance: readonly N[]; readonly steps: number }
+  | { readonly kind: "budget"; readonly steps: number };
+
+/**
+ * This function gives the chance that each edge of one path or more of `paths` works. Each edge works or fails alone,
+ * with its chance in `chances`. A path is a list of the indices of its edges, in any order.
+ *
+ * - The value is exact in the arithmetic of `ring`. The Shannon expansion is the same as in `twoTerminalReliability`.
+ * - The same paths and chances give the same result, bit for bit. The order of the paths and of their edges has no effect.
+ * - An edge two times in one path counts one time. A path with no edges always works, so the value is 1.
+ * - With no paths, the value is 0.
+ * - An index that is not a whole number from 0 to the last index of `chances` throws a `RangeError`. A bad
+ *   `maxSteps` or a chance out of the range from zero to one also throws a `RangeError`.
+ *
+ * Use it for the chance of a set of paths alone, for example the paths that an alert shows. The function is pure.
+ */
+export function pathSetReliability<N>(
+  paths: readonly (readonly number[])[],
+  chances: readonly N[],
+  ring: OrderedRing<N>,
+  options: { readonly maxSteps?: number | undefined } = {},
+): PathSetReliability<N> {
+  const maxSteps = options.maxSteps ?? 1_000_000;
+  checkCount("maxSteps", maxSteps);
+  checkChances(chances, ring);
+  const lists = paths.map((list, at) => {
+    for (const index of list) {
+      if (!Number.isInteger(index) || index < 0 || index >= chances.length) {
+        throw new RangeError(`The path ${at} has the edge ${index}, out of the indices of the chances.`);
+      }
+    }
+    return [...new Set(list)];
+  });
+  const diagram = expand(lists, maxSteps, false);
+  if (diagram === undefined) return { kind: "budget", steps: maxSteps };
+  return { kind: "exact", ...evaluate(diagram, chances, ring), steps: diagram.steps };
+}
+
+/**
  * This function gives the chance that the target gets a signal from the source. Each edge works or fails alone, with
  * its chance. The signal goes along a path of `hopCap` edges or fewer, with each edge of the path working. A path
  * goes through no node two times.
@@ -108,14 +157,11 @@ export function twoTerminalReliability<Node, N>(
   const maxSteps = options.maxSteps ?? 1_000_000;
   checkCount("hopCap", hopCap);
   checkCount("maxSteps", maxSteps);
-  for (const [index, edge] of edges.entries()) {
-    if (!(ring.compare(ring.zero, edge.chance) <= 0 && ring.compare(edge.chance, ring.one) <= 0)) {
-      throw new RangeError(`The chance of the edge ${index} is from zero to one of the ring.`);
-    }
-  }
+  const chances = edges.map((edge) => edge.chance);
+  checkChances(chances, ring);
 
   const search = findPaths(edges, source, target, hopCap, maxSteps);
-  const paths = search.found.map((list) => ({ edges: list, chance: chanceOf(ring, edges, list) })).sort((a, b) => {
+  const paths = search.found.map((list) => ({ edges: list, chance: chanceOf(ring, chances, list) })).sort((a, b) => {
     const order = ring.compare(b.chance, a.chance);
     return order !== 0 ? order : compareLists(a.edges, b.edges);
   });
@@ -126,10 +172,15 @@ export function twoTerminalReliability<Node, N>(
   for (const path of paths) fail = ring.mul(fail, ring.sub(ring.one, path.chance));
   const noisyOr = ring.sub(ring.one, fail);
 
-  const diagram = expand(paths, maxSteps - search.steps);
+  // Two different simple paths from the source to the target never hold the edges of each other, so the root keeps each path.
+  const diagram = expand(
+    paths.map((path) => path.edges),
+    maxSteps - search.steps,
+    true,
+  );
   if (diagram === undefined) return { kind: "bounds", best, noisyOr, paths, steps: maxSteps };
-  const { value, importance } = evaluate(diagram, edges, ring);
-  return { kind: "exact", value, best, noisyOr, importance, paths, steps: search.steps + diagram.nodes.length };
+  const { value, importance } = evaluate(diagram, chances, ring);
+  return { kind: "exact", value, best, noisyOr, importance, paths, steps: search.steps + diagram.steps };
 }
 
 function checkCount(name: string, count: number): void {
@@ -138,14 +189,22 @@ function checkCount(name: string, count: number): void {
   }
 }
 
+function checkChances<N>(chances: readonly N[], ring: OrderedRing<N>): void {
+  for (const [index, chance] of chances.entries()) {
+    if (!(ring.compare(ring.zero, chance) <= 0 && ring.compare(chance, ring.one) <= 0)) {
+      throw new RangeError(`The chance of the edge ${index} is from zero to one of the ring.`);
+    }
+  }
+}
+
 /** The rule of `Map`: `NaN` equals `NaN`, and 0 equals -0. */
 function same<T>(a: T, b: T): boolean {
   return a === b || (a !== a && b !== b);
 }
 
-function chanceOf<Node, N>(ring: OrderedRing<N>, edges: readonly ReliabilityEdge<Node, N>[], list: readonly number[]): N {
+function chanceOf<N>(ring: OrderedRing<N>, chances: readonly N[], list: readonly number[]): N {
   let chance = ring.one;
-  for (const index of list) chance = ring.mul(chance, edges[index]!.chance);
+  for (const index of list) chance = ring.mul(chance, chances[index]!);
   return chance;
 }
 
@@ -217,6 +276,8 @@ interface Branch {
 interface Diagram {
   readonly root: number;
   readonly nodes: readonly Branch[];
+  /** The count of the states and of the comparisons of two paths. */
+  readonly steps: number;
 }
 
 /** A path of a state: the index of the path, and the position of its first edge that has no state yet. */
@@ -227,8 +288,9 @@ interface Member {
 
 // The Shannon expansion. Each state holds the paths that can still work, with the edges that have no state yet.
 // The edges of each path are in the order of their indices, so the next edge of the expansion is the first edge of a path.
-function expand<N>(paths: readonly ReliabilityPath<N>[], budget: number): Diagram | undefined {
-  const sorted = paths.map((path) => [...path.edges].sort((a, b) => a - b));
+// Each new state and each comparison of two paths is one step. When `minimal` is true, no path of the root holds another.
+function expand(paths: readonly (readonly number[])[], budget: number, minimal: boolean): Diagram | undefined {
+  const sorted = paths.map((edges) => [...edges].sort((a, b) => a - b));
   // Equal rests of two paths get one id. The ids make the key of a state short.
   const ids = new Map<string, number>();
   const rest = sorted.map((edges) => {
@@ -263,45 +325,69 @@ function expand<N>(paths: readonly ReliabilityPath<N>[], budget: number): Diagra
 
   const states: Member[][] = [];
   const memo = new Map<string, number>();
+  let steps = 0;
   let over = false;
-  const intern = (members: readonly Member[]): number => {
+  const step = (): boolean => {
+    steps += 1;
+    if (steps > budget) over = true;
+    return over;
+  };
+  const intern = (members: readonly Member[], absorb: boolean): number => {
     if (members.length === 0) return ZERO;
     if (members.some((member) => member.at === sorted[member.path]!.length)) return ONE;
     const unique = new Map<number, Member>();
     for (const member of members) if (!unique.has(restId(member))) unique.set(restId(member), member);
     // A path whose rest holds the rest of another path adds nothing, so the state drops it.
     const list = [...unique.values()];
-    const kept = list.filter((member) => !list.some((other) => other !== member && within(other, member)));
+    const kept: Member[] = [];
+    for (const member of list) {
+      let held = false;
+      for (const other of absorb ? list : []) {
+        if (other === member) continue;
+        if (step()) return ZERO;
+        if (within(other, member)) {
+          held = true;
+          break;
+        }
+      }
+      if (!held) kept.push(member);
+    }
     kept.sort((a, b) => restId(a) - restId(b));
     const key = kept.map(restId).join(",");
     const known = memo.get(key);
     if (known !== undefined) return known;
-    if (states.length >= budget) {
-      over = true;
-      return ZERO;
-    }
+    if (step()) return ZERO;
     memo.set(key, states.length);
     states.push(kept);
     return states.length - 1;
   };
 
-  const root = intern(sorted.map((_, path) => ({ path, at: 0 })));
+  const root = intern(
+    sorted.map((_, path) => ({ path, at: 0 })),
+    !minimal,
+  );
   const nodes: Branch[] = [];
   for (let index = 0; index < states.length && !over; index += 1) {
     const members = states[index]!;
     let edge = Number.POSITIVE_INFINITY;
     for (const member of members) edge = Math.min(edge, first(member));
-    const up = intern(members.map((member) => (first(member) === edge ? { path: member.path, at: member.at + 1 } : member)));
-    const down = intern(members.filter((member) => first(member) !== edge));
+    const up = intern(
+      members.map((member) => (first(member) === edge ? { path: member.path, at: member.at + 1 } : member)),
+      true,
+    );
+    const down = intern(
+      members.filter((member) => first(member) !== edge),
+      true,
+    );
     nodes.push({ edge, up, down });
   }
-  return over ? undefined : { root, nodes };
+  return over ? undefined : { root, nodes, steps };
 }
 
 // The value of each state, from the last edge to the first, then the chance to reach each state, from the first edge
 // to the last. The importance of an edge is the sum over its states of the chance to reach the state, times the
 // value when the edge works minus the value when it fails.
-function evaluate<Node, N>(diagram: Diagram, edges: readonly ReliabilityEdge<Node, N>[], ring: OrderedRing<N>): { value: N; importance: N[] } {
+function evaluate<N>(diagram: Diagram, chances: readonly N[], ring: OrderedRing<N>): { value: N; importance: N[] } {
   const { root, nodes } = diagram;
   const order = nodes.map((_, index) => index).sort((a, b) => nodes[a]!.edge - nodes[b]!.edge || a - b);
   const values = new Array<N>(nodes.length);
@@ -309,15 +395,15 @@ function evaluate<Node, N>(diagram: Diagram, edges: readonly ReliabilityEdge<Nod
   for (let i = order.length - 1; i >= 0; i -= 1) {
     const index = order[i]!;
     const { edge, up, down } = nodes[index]!;
-    const chance = edges[edge]!.chance;
+    const chance = chances[edge]!;
     values[index] = ring.add(ring.mul(chance, valueOf(up)), ring.mul(ring.sub(ring.one, chance), valueOf(down)));
   }
-  const importance = edges.map(() => ring.zero);
+  const importance = chances.map(() => ring.zero);
   const reach = nodes.map(() => ring.zero);
   if (root >= 0) reach[root] = ring.one;
   for (const index of order) {
     const { edge, up, down } = nodes[index]!;
-    const chance = edges[edge]!.chance;
+    const chance = chances[edge]!;
     const here = reach[index]!;
     if (up >= 0) reach[up] = ring.add(reach[up]!, ring.mul(here, chance));
     if (down >= 0) reach[down] = ring.add(reach[down]!, ring.mul(here, ring.sub(ring.one, chance)));

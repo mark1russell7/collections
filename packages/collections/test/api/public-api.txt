@@ -285,12 +285,19 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 type HittingSet: build/graph/index.d.ts#HittingSet
 type HittingSetChoice: build/graph/index.d.ts#HittingSetChoice
 type HittingSetOptions: build/graph/index.d.ts#HittingSetOptions
+NUMBER_RING: build/graph/index.d.ts#NUMBER_RING
+type OrderedRing: build/graph/index.d.ts#OrderedRing
+type ReliabilityEdge: build/graph/index.d.ts#ReliabilityEdge
+type ReliabilityOptions: build/graph/index.d.ts#ReliabilityOptions
+type ReliabilityPath: build/graph/index.d.ts#ReliabilityPath
 type StrongComponents: build/graph/index.d.ts#StrongComponents
+type TwoTerminalReliability: build/graph/index.d.ts#TwoTerminalReliability
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 minimumHittingSet: build/graph/index.d.ts#minimumHittingSet
 strongComponentsCompact: build/graph/index.d.ts#strongComponentsCompact
 stronglyConnectedComponents: build/graph/index.d.ts#stronglyConnectedComponents
+twoTerminalReliability: build/graph/index.d.ts#twoTerminalReliability
 
 ## ./layers (build/core/layers.d.ts): names
 
@@ -559,11 +566,65 @@ interface HittingSetOptions<T> {
   readonly maxSteps?: number | undefined;
 }
 
+### build/graph/index.d.ts#NUMBER_RING
+export declare const NUMBER_RING: OrderedRing<number>;
+
+### build/graph/index.d.ts#OrderedRing
+interface OrderedRing<N> {
+  readonly zero: N;
+  readonly one: N;
+  readonly add: (a: N, b: N) => N;
+  readonly sub: (a: N, b: N) => N;
+  readonly mul: (a: N, b: N) => N;
+  readonly compare: (a: N, b: N) => number;
+}
+
+### build/graph/index.d.ts#ReliabilityEdge
+interface ReliabilityEdge<Node, N> {
+  readonly from: Node;
+  readonly to: Node;
+  readonly chance: N;
+}
+
+### build/graph/index.d.ts#ReliabilityOptions
+interface ReliabilityOptions {
+  readonly hopCap?: number | undefined;
+  readonly maxSteps?: number | undefined;
+}
+
+### build/graph/index.d.ts#ReliabilityPath
+interface ReliabilityPath<N> {
+  readonly edges: readonly number[];
+  readonly chance: N;
+}
+
 ### build/graph/index.d.ts#StrongComponents
 interface StrongComponents {
   readonly of: Int32Array;
   readonly list: readonly (readonly number[])[];
 }
+
+### build/graph/index.d.ts#TwoTerminalReliability
+type TwoTerminalReliability<N> = {
+  readonly kind: "exact";
+  readonly value: N;
+  readonly best: N;
+  readonly noisyOr: N;
+  readonly importance: readonly N[];
+  readonly paths: readonly ReliabilityPath<N>[];
+  readonly steps: number;
+} | {
+  readonly kind: "bounds";
+  readonly best: N;
+  readonly noisyOr: N;
+  readonly paths: readonly ReliabilityPath<N>[];
+  readonly steps: number;
+} | {
+  readonly kind: "partial";
+  readonly best: N;
+  readonly paths: readonly ReliabilityPath<N>[];
+  readonly steps: number;
+};
 
 ### build/graph/index.d.ts#WeightedEdge
 interface WeightedEdge {
@@ -583,6 +644,9 @@ export declare function strongComponentsCompact(n: number, start: ArrayLike<numb
 
 ### build/graph/index.d.ts#stronglyConnectedComponents
 export declare function stronglyConnectedComponents<Id>(nodes: Iterable<Id>, successors: (node: Id) => Iterable<Id>): Id[][];
+
+### build/graph/index.d.ts#twoTerminalReliability
+export declare function twoTerminalReliability<Node, N>(edges: readonly ReliabilityEdge<Node, N>[], source: Node, target: Node, ring: OrderedRing<N>, options?: ReliabilityOptions): TwoTerminalReliability<N>;
 
 ### build/index.d.ts#ArrayDeque
 export declare class ArrayDeque<T> implements Deque<T> {

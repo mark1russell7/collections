@@ -1,6 +1,6 @@
 # Graph orders
 
-The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components and a search of the minimum hitting set.
+The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability.
 
 ## The order from the hubs
 
@@ -155,4 +155,50 @@ assert.deepEqual(costly.kind === "exact" ? costly.elements : [], ["b", "c"]);
 
 assert.deepEqual(minimumHittingSet([["a"], []]), { kind: "none", empty: 1 });
 assert.throws(() => minimumHittingSet([["a"]], { weight: () => 0 }), RangeError);
+```
+
+## The two-terminal reliability
+
+Each edge of a directed graph works or fails alone, with its chance. The two-terminal reliability is the chance that the target gets a signal from the source. The signal goes along a path of working edges, through no node two times.
+
+`twoTerminalReliability(edges, source, target, ring, options)` gives this chance.
+
+- The option `hopCap` gives the most edges of a path. A longer path does not count. The default is `Infinity`.
+- The argument `ring` gives the arithmetic. `NUMBER_RING` uses floats. A ring of exact fractions gives an exact value.
+- A Shannon expansion takes the edges in the order of their indices. It merges two states with the same paths left.
+- The result `exact` has the `value`, two bounds and the Birnbaum importance of each edge.
+- The importance of an edge is the value when the edge works, minus the value when it fails.
+- `best` is the chance of the best path. `noisyOr` is one minus the product of the chances that each path fails. The value is between them.
+- The result is `bounds` when the expansion passes `maxSteps`. It is `partial` when the path search passes `maxSteps`.
+- The paths come from the largest chance to the smallest.
+
+A use is the chance that an outage gets to a person through the services of the person. Two paths that share an edge are not independent, so `noisyOr` is too high.
+
+```ts
+import assert from "node:assert/strict";
+import { NUMBER_RING, twoTerminalReliability } from "@mark1russell7/collections/graph";
+
+// Two services use one DNS provider, and the person uses each service.
+const edges = [
+  { from: "event", to: "dns", chance: 0.5 },
+  { from: "dns", to: "service:a", chance: 0.5 },
+  { from: "dns", to: "service:b", chance: 0.5 },
+  { from: "service:a", to: "person", chance: 1 },
+  { from: "service:b", to: "person", chance: 1 },
+];
+const result = twoTerminalReliability(edges, "event", "person", NUMBER_RING, { hopCap: 4 });
+assert.equal(result.kind, "exact");
+if (result.kind === "exact") {
+  assert.equal(result.value, 0.375);
+  assert.equal(result.best, 0.25);
+  assert.equal(result.noisyOr, 0.4375);
+  // The DNS edge is in each path, so its importance is the largest.
+  assert.deepEqual(result.importance, [0.75, 0.25, 0.25, 0.125, 0.125]);
+  assert.deepEqual(result.paths.map((path) => path.edges), [[0, 1, 3], [0, 2, 4]]);
+}
+
+// Each path has 3 edges. With the hop cap 2, no path counts.
+const short = twoTerminalReliability(edges, "event", "person", NUMBER_RING, { hopCap: 2 });
+assert.equal(short.kind === "exact" && short.value, 0);
+assert.throws(() => twoTerminalReliability([{ from: 0, to: 1, chance: 2 }], 0, 1, NUMBER_RING), RangeError);
 ```

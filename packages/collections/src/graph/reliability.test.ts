@@ -184,6 +184,13 @@ describe("twoTerminalReliability", () => {
     expect(result.best).toBe(0.5);
   });
 
+  it("counts each edge back to a node of the path as a step", () => {
+    // 1000 edges from the hub go back to the source. The target has no edge in, so the search reads each edge.
+    const edges: Edge[] = [{ from: 0, to: 1, chance: 0.5 }, ...Array.from({ length: 1000 }, () => ({ from: 1, to: 0, chance: 0.5 }))];
+    expect(twoTerminalReliability(edges, 0, 2, NUMBER_RING, { maxSteps: 100 })).toEqual({ kind: "partial", best: 0, paths: [], steps: 100 });
+    expect(twoTerminalReliability(edges, 0, 2, NUMBER_RING)).toMatchObject({ kind: "exact", value: 0, steps: 1001 });
+  });
+
   it("does not change its arguments, and gives the same result two times", () => {
     const edges = SHARED.map((edge) => ({ ...edge }));
     const before = structuredClone(edges);
@@ -288,6 +295,29 @@ describe("pathSetReliability", () => {
     }
     expect(() => pathSetReliability([[0]], [0.5], NUMBER_RING, { maxSteps: -1 })).toThrow(RangeError);
     expect(() => pathSetReliability([[0]], [1.5], NUMBER_RING)).toThrow(RangeError);
+  });
+
+  it.each(SEEDS)("gives the same result and steps for each order of the paths and of their edges (seed %i)", (seed) => {
+    const r = random(seed);
+    for (let round = 0; round < 200; round += 1) {
+      const chances = Array.from({ length: r.int(1, 8) }, () => r.int(0, 16) / 16);
+      const paths = Array.from({ length: r.int(0, 6) }, () => Array.from({ length: r.int(0, 4) }, () => r.int(0, chances.length - 1)));
+      const shuffled = r.shuffle(paths).map((list) => r.shuffle(list));
+      const label = `seed ${seed} round ${round}: ${JSON.stringify({ paths, shuffled })}`;
+      const first = pathSetReliability(paths, chances, NUMBER_RING);
+      expect(pathSetReliability(shuffled, chances, NUMBER_RING), label).toEqual(first);
+      // Near the budget, the kind also stays the same.
+      const steps = first.steps;
+      for (const maxSteps of [steps - 1, steps].filter((count) => count >= 0)) {
+        expect(pathSetReliability(shuffled, chances, NUMBER_RING, { maxSteps }), `${label} maxSteps ${maxSteps}`).toEqual(pathSetReliability(paths, chances, NUMBER_RING, { maxSteps }));
+      }
+    }
+  });
+
+  it("gives the same steps for the example of the review in each order", () => {
+    const paths = [[5, 5, 0, 5], [0], [4, 7], [5, 4], [1, 1, 7, 3]];
+    const chances = Array.from({ length: 8 }, () => 0.5);
+    expect(pathSetReliability([...paths].reverse(), chances, NUMBER_RING)).toEqual(pathSetReliability(paths, chances, NUMBER_RING));
   });
 
   it.each(SEEDS)("agrees with a brute force over random path sets (seed %i)", (seed) => {

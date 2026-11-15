@@ -246,10 +246,11 @@ function findPaths<Node, N>(edges: readonly ReliabilityEdge<Node, N>[], source: 
     }
     const index = list[frame.next]!;
     frame.next += 1;
-    const to = edges[index]!.to;
-    if (onPath.has(to)) continue;
+    // Each edge that the search reads is a step, also an edge back to a node of the path.
     if (steps >= maxSteps) return { found, steps, complete: false };
     steps += 1;
+    const to = edges[index]!.to;
+    if (onPath.has(to)) continue;
     if (same(to, target)) {
       found.push([...trail, index]);
       continue;
@@ -290,7 +291,8 @@ interface Member {
 // The edges of each path are in the order of their indices, so the next edge of the expansion is the first edge of a path.
 // Each new state and each comparison of two paths is one step. When `minimal` is true, no path of the root holds another.
 function expand(paths: readonly (readonly number[])[], budget: number, minimal: boolean): Diagram | undefined {
-  const sorted = paths.map((edges) => [...edges].sort((a, b) => a - b));
+  // A fixed order of the paths makes the order of the comparisons, and thus the steps, the same for each order of the input.
+  const sorted = paths.map((edges) => [...edges].sort((a, b) => a - b)).sort(compareLists);
   // Equal rests of two paths get one id. The ids make the key of a state short.
   const ids = new Map<string, number>();
   const rest = sorted.map((edges) => {

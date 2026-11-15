@@ -278,9 +278,13 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 
 ## ./graph (build/graph/index.d.ts): names
 
+type HittingSet: build/graph/index.d.ts#HittingSet
+type HittingSetChoice: build/graph/index.d.ts#HittingSetChoice
+type HittingSetOptions: build/graph/index.d.ts#HittingSetOptions
 type StrongComponents: build/graph/index.d.ts#StrongComponents
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
+minimumHittingSet: build/graph/index.d.ts#minimumHittingSet
 strongComponentsCompact: build/graph/index.d.ts#strongComponentsCompact
 stronglyConnectedComponents: build/graph/index.d.ts#stronglyConnectedComponents
 
@@ -526,6 +530,31 @@ declare function summaryOf<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>
 ### build/functions.d.ts#toArray
 declare function toArray<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Leaf[];
 
+### build/graph/index.d.ts#HittingSet
+type HittingSet<T> = (HittingSetChoice<T> & {
+  readonly kind: "exact";
+  readonly steps: number;
+}) | {
+  readonly kind: "budget";
+  readonly best: HittingSetChoice<T>;
+  readonly steps: number;
+} | {
+  readonly kind: "none";
+  readonly empty: number;
+};
+
+### build/graph/index.d.ts#HittingSetChoice
+interface HittingSetChoice<T> {
+  readonly elements: readonly T[];
+  readonly weight: number;
+}
+
+### build/graph/index.d.ts#HittingSetOptions
+interface HittingSetOptions<T> {
+  readonly weight?: ((element: T) => number) | undefined;
+  readonly maxSteps?: number | undefined;
+}
+
 ### build/graph/index.d.ts#StrongComponents
 interface StrongComponents {
   readonly of: Int32Array;
@@ -541,6 +570,9 @@ interface WeightedEdge {
 
 ### build/graph/index.d.ts#hubBreadthFirstOrder
 export declare function hubBreadthFirstOrder(n: number, edges?: readonly WeightedEdge[], compare?: (i: number, j: number) => number): number[];
+
+### build/graph/index.d.ts#minimumHittingSet
+export declare function minimumHittingSet<T>(sets: Iterable<Iterable<T>>, options?: HittingSetOptions<T>): HittingSet<T>;
 
 ### build/graph/index.d.ts#strongComponentsCompact
 export declare function strongComponentsCompact(n: number, start: ArrayLike<number>, targets: ArrayLike<number>): StrongComponents;

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.0
+
+The release train changes the range of `@mark1russell7/rigor-statistics` to a version outside the old range. The public types name @mark1russell7/rigor-statistics, so its new version outside the old range can change them.
+
+### Breaking
+
+- The range `^0.1.25` of `@mark1russell7/rigor-statistics` in `dependencies` does not hold `0.2.0`, so it changes.
+
 ## 0.10.2
 
 The entry `./graph` gets `minimumHittingSet`, an exact search of the lightest hitting set of a family of sets. PATCH: before 1.0.0 a new export raises PATCH.

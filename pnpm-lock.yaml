@@ -271,8 +271,8 @@ importers:
         specifier: ^2.0.0
         version: 2.1.4
       '@mark1russell7/site-pages':
-        specifier: ^0.4.1
-        version: 0.4.8
+        specifier: ^0.5.0
+        version: 0.5.0
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.6
@@ -906,10 +906,6 @@ packages:
       esbuild:
         optional: true
 
-  '@mark1russell7/rigor-generators@0.1.15':
-    resolution: {integrity: sha512-0r+5JbxvSk6H0rTGqhzmlnE5UAHAImOH7R1CbOjQARLil2zOYkvvJzWvnwC5txLCw71eyVCvpT7rb09oKRcGxQ==}
-    engines: {node: '>=22'}
-
   '@mark1russell7/rigor-generators@0.1.16':
     resolution: {integrity: sha512-C94Q4C31aZ8UXx1R0JSBV7DiQFl5tVpbFxHxHzHaSqr3dTgmCkEvLrvlUV8/0/GZqPhQYG9cbX6GOlqfRj/h4g==}
     engines: {node: '>=22'}
@@ -918,10 +914,6 @@ packages:
     resolution: {integrity: sha512-jXIz5HWFEBOzJNIwaijPK4e0mOQIm8KR8WcGMcW0YIE1vPyJdOcUBZjOqgHU8/R7BcHdlCGTfN5GXvRfi7Lb2A==}
     engines: {node: '>=22'}
     hasBin: true
-
-  '@mark1russell7/rigor-statistics@0.1.29':
-    resolution: {integrity: sha512-Wh91NJIwxIRN3+a5V2bqUkMhdPcjHI+gVZBCnohf12ZegdSTNqGlpqS2WXYmrRVjasF9EBgm1lC8GQNYpBSg7Q==}
-    engines: {node: '>=22'}
 
   '@mark1russell7/rigor-statistics@0.2.4':
     resolution: {integrity: sha512-0L075rT+toD6edxEwDdZHiFzHP4+dJrI64Pw5gh9V33VwCfNRUMQY90AooDpMgVcC9cuxHNXegDLSOYU9ZMIlA==}
@@ -951,8 +943,8 @@ packages:
       fast-check:
         optional: true
 
-  '@mark1russell7/site-pages@0.4.8':
-    resolution: {integrity: sha512-uN7SV7VxrsMyH7/cPOUClFOnJhw24S2+qVaMIoNK+7AtJe3FB4l5qN2NowKAYvYgLcDpY4gUBlw9meJ6/Gq2pQ==}
+  '@mark1russell7/site-pages@0.5.0':
+    resolution: {integrity: sha512-sGDFRCr2fIRarRV4FCoDvfYBSOln134N9ApuwNMKXYtiiXpPv8LMeUUB/19QQU7fJDKWGZgqPSAJZ/+RA7p63A==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3034,18 +3026,12 @@ snapshots:
     optionalDependencies:
       esbuild: 0.28.2
 
-  '@mark1russell7/rigor-generators@0.1.15': {}
-
   '@mark1russell7/rigor-generators@0.1.16': {}
 
   '@mark1russell7/rigor-mutation@0.2.10':
     dependencies:
       '@mark1russell7/rigor-statistics': 0.2.4
       '@mark1russell7/text': 0.0.6
-
-  '@mark1russell7/rigor-statistics@0.1.29':
-    dependencies:
-      '@mark1russell7/rigor-generators': 0.1.15
 
   '@mark1russell7/rigor-statistics@0.2.4':
     dependencies:
@@ -3055,9 +3041,9 @@ snapshots:
     optionalDependencies:
       fast-check: 4.10.2
 
-  '@mark1russell7/site-pages@0.4.8':
+  '@mark1russell7/site-pages@0.5.0':
     dependencies:
-      '@mark1russell7/rigor-statistics': 0.1.29
+      '@mark1russell7/rigor-statistics': 0.2.4
 
   '@mark1russell7/ste-lint@0.3.2':
     dependencies:

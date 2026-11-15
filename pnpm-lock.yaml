@@ -183,7 +183,7 @@ importers:
         version: 2.1.4
       '@mark1russell7/rigor-mutation':
         specifier: ^0.2.1
-        version: 0.2.9
+        version: 0.2.10
       '@mark1russell7/ste-lint':
         specifier: ^0.3.0
         version: 0.3.2
@@ -219,20 +219,20 @@ importers:
         version: 1.2.0
       '@mark1russell7/rigor-statistics':
         specifier: ^0.2.0
-        version: 0.2.0
+        version: 0.2.4
     devDependencies:
       '@mark1russell7/cue':
         specifier: ^2.0.0
         version: 2.1.4
       '@mark1russell7/rigor-bench':
         specifier: ^0.2.33
-        version: 0.2.38(esbuild@0.28.2)
+        version: 0.2.46(esbuild@0.28.2)
       '@mark1russell7/rigor-generators':
         specifier: ^0.1.5
         version: 0.1.16
       '@mark1russell7/rigor-testkit':
         specifier: ^0.1.0
-        version: 0.1.7(fast-check@4.10.2)
+        version: 0.1.8(fast-check@4.10.2)
       '@stryker-mutator/core':
         specifier: ^10.1.1
         version: 10.1.1(@types/node@26.6.6)
@@ -896,8 +896,8 @@ packages:
     resolution: {integrity: sha512-hn2C5jjOFCGKJqFQPHt57C/Cn1l9Lb9MltVNtL71KSu+nRrfPOmg8ujYB5n3oDFFWNdNA4bE/8LLT4tG3lmrGA==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/rigor-bench@0.2.38':
-    resolution: {integrity: sha512-sWALcWvRDZ+menHYaMC5dmTeZjS5gTkm/qZEG0KLEmmPJ52HNpdhL5hhYd2Bhm6MVAQvbZLo/V7YcfZDD9DQWA==}
+  '@mark1russell7/rigor-bench@0.2.46':
+    resolution: {integrity: sha512-mAiHobMKqMyPFX3ro/X6uX4Pg9aKMYm6a6YmgZJmlTODCTBklpbkgt5nV31kZ4lZmyUHSzH/TWaqnwyiYG9XhA==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -914,8 +914,8 @@ packages:
     resolution: {integrity: sha512-C94Q4C31aZ8UXx1R0JSBV7DiQFl5tVpbFxHxHzHaSqr3dTgmCkEvLrvlUV8/0/GZqPhQYG9cbX6GOlqfRj/h4g==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/rigor-mutation@0.2.9':
-    resolution: {integrity: sha512-w0H9Fsk2kXihjwYK1Hm0lItYZYZ2VC8NET2kTQIWehYmCncNapdKeB6BLlBGQst71mf9d6mDy/NLH7fHSZ1dNA==}
+  '@mark1russell7/rigor-mutation@0.2.10':
+    resolution: {integrity: sha512-jXIz5HWFEBOzJNIwaijPK4e0mOQIm8KR8WcGMcW0YIE1vPyJdOcUBZjOqgHU8/R7BcHdlCGTfN5GXvRfi7Lb2A==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -923,12 +923,12 @@ packages:
     resolution: {integrity: sha512-Wh91NJIwxIRN3+a5V2bqUkMhdPcjHI+gVZBCnohf12ZegdSTNqGlpqS2WXYmrRVjasF9EBgm1lC8GQNYpBSg7Q==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/rigor-statistics@0.2.0':
-    resolution: {integrity: sha512-Gzi1Uy2/EdXXKGtqF+ZUpNrVQELEDAoG8ufrUvo0oXYlYXWyWxk3HXhLPKSq4MmRn/EiUr0Uebc05n3IjpvkGQ==}
+  '@mark1russell7/rigor-statistics@0.2.4':
+    resolution: {integrity: sha512-0L075rT+toD6edxEwDdZHiFzHP4+dJrI64Pw5gh9V33VwCfNRUMQY90AooDpMgVcC9cuxHNXegDLSOYU9ZMIlA==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/rigor-testkit@0.1.7':
-    resolution: {integrity: sha512-/Xz+efOov3xH4o7xOZmbdWWgyeMy/nt1XSh15WrPk292vl0cS6d8rdIqHIMM/goFKv3UdeqxVET7jZC/wZkQ0g==}
+  '@mark1russell7/rigor-testkit@0.1.8':
+    resolution: {integrity: sha512-ooiuN7e8SqJAYAEVQ5RAa80HqkQKKno1Gw5Me09g5dN2Th7iK1YGiFhCMByCkY1SOqEoU8OmnH+l1g0vs27bKQ==}
     engines: {node: '>=22'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
@@ -966,8 +966,8 @@ packages:
     engines: {node: '>=22.12'}
     hasBin: true
 
-  '@mark1russell7/text@0.0.5':
-    resolution: {integrity: sha512-Ql1eBET3PgEBL5DWZHZ20GRZmorkq6mWdnfj21cqXfLvZdikO+GlvSAfbv1ld7YCnEqxOa7eg6ESfl+jzPGe9w==}
+  '@mark1russell7/text@0.0.6':
+    resolution: {integrity: sha512-IwKQHx9U+k5AbEzZ8q4CxImQCuYXSFhvzMOSgy5UGYrZRIBO9RES7SYrXDrKqQFtMl5qD2QbibffevUPsrUW+A==}
     engines: {node: '>=22.12'}
 
   '@napi-rs/wasm-runtime@1.2.6':
@@ -3026,11 +3026,11 @@ snapshots:
 
   '@mark1russell7/rational@0.1.2': {}
 
-  '@mark1russell7/rigor-bench@0.2.38(esbuild@0.28.2)':
+  '@mark1russell7/rigor-bench@0.2.46(esbuild@0.28.2)':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.16
-      '@mark1russell7/rigor-statistics': 0.2.0
-      '@mark1russell7/text': 0.0.5
+      '@mark1russell7/rigor-statistics': 0.2.4
+      '@mark1russell7/text': 0.0.6
     optionalDependencies:
       esbuild: 0.28.2
 
@@ -3038,20 +3038,20 @@ snapshots:
 
   '@mark1russell7/rigor-generators@0.1.16': {}
 
-  '@mark1russell7/rigor-mutation@0.2.9':
+  '@mark1russell7/rigor-mutation@0.2.10':
     dependencies:
-      '@mark1russell7/rigor-statistics': 0.2.0
-      '@mark1russell7/text': 0.0.5
+      '@mark1russell7/rigor-statistics': 0.2.4
+      '@mark1russell7/text': 0.0.6
 
   '@mark1russell7/rigor-statistics@0.1.29':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.15
 
-  '@mark1russell7/rigor-statistics@0.2.0':
+  '@mark1russell7/rigor-statistics@0.2.4':
     dependencies:
       '@mark1russell7/rigor-generators': 0.1.16
 
-  '@mark1russell7/rigor-testkit@0.1.7(fast-check@4.10.2)':
+  '@mark1russell7/rigor-testkit@0.1.8(fast-check@4.10.2)':
     optionalDependencies:
       fast-check: 4.10.2
 
@@ -3067,7 +3067,7 @@ snapshots:
     dependencies:
       '@clack/prompts': 1.8.1
 
-  '@mark1russell7/text@0.0.5': {}
+  '@mark1russell7/text@0.0.6': {}
 
   '@napi-rs/wasm-runtime@1.2.6(@emnapi/core@2.0.0-beta.2)(@emnapi/runtime@2.0.0-beta.2)':
     dependencies:

@@ -33,7 +33,7 @@ describe("minimumHittingSet", () => {
   it("gives the lightest element of a single set", () => {
     expect(exact(minimumHittingSet([["a", "b", "c"]]))).toMatchObject({ elements: ["a"], weight: 1 });
     const weights: Record<string, number> = { a: 3, b: 1, c: 2 };
-    expect(exact(minimumHittingSet([["a", "b", "c"]], { weight: (e) => weights[e]! }))).toMatchObject({ elements: ["b"], weight: 1 });
+    expect(exact(minimumHittingSet([["a", "b", "c"]], { weight: (e: string) => weights[e]! }))).toMatchObject({ elements: ["b"], weight: 1 });
   });
 
   it("gives none for a family with an empty set", () => {
@@ -93,7 +93,7 @@ describe("minimumHittingSet", () => {
       const m = r.int(1, 10);
       const family = randomFamily(r, m);
       const weights = Array.from({ length: m }, () => (r.chance(0.5) ? 1 : r.int(1, 6)));
-      const result = exact(minimumHittingSet(family, { weight: (e) => weights[e]! }));
+      const result = exact(minimumHittingSet(family, { weight: (e: number) => weights[e]! }));
       const label = `seed ${seed} round ${round}: ${JSON.stringify({ family, weights })}`;
       expect(result.weight, label).toBe(bruteForce(m, family, (e) => weights[e]!));
       // The result hits each set, has no repeated element, and its weight is the sum of its elements.
@@ -101,7 +101,7 @@ describe("minimumHittingSet", () => {
       expect(new Set(result.elements).size).toBe(result.elements.length);
       expect(result.elements.reduce((sum, e) => sum + weights[e]!, 0)).toBe(result.weight);
       // The same family gives the same result.
-      expect(minimumHittingSet(family, { weight: (e) => weights[e]! })).toEqual(result);
+      expect(minimumHittingSet(family, { weight: (e: number) => weights[e]! })).toEqual(result);
     }
   });
 
@@ -112,7 +112,7 @@ describe("minimumHittingSet", () => {
       const m = r.int(1, 10);
       const family = randomFamily(r, m);
       const weights = Array.from({ length: m }, () => fractions[r.int(0, fractions.length - 1)]!);
-      const result = exact(minimumHittingSet(family, { weight: (e) => weights[e]! }));
+      const result = exact(minimumHittingSet(family, { weight: (e: number) => weights[e]! }));
       const label = `seed ${seed} round ${round}: ${JSON.stringify({ family, weights })}`;
       expect(result.weight, label).toBeCloseTo(bruteForce(m, family, (e) => weights[e]!), 9);
       expect(family.every((set) => set.some((e) => result.elements.includes(e))), label).toBe(true);

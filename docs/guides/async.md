@@ -1,11 +1,12 @@
 # Async queues and tasks
 
-The root entry has three tools for work that waits on promises:
+The root entry has four tools for work that waits on promises:
 
 | Name | What it does |
 | --- | --- |
 | `asyncQueue` | a queue that a consumer waits on with `await`, with a capacity that makes a producer wait |
 | `semaphore` | a bound on the tasks that are in progress at the same time |
+| `rwLock` | a lock with shared holds that go together, and exclusive holds that go alone |
 | `asSettled` | the result of each promise, in the order that the promises settle |
 
 For a queue with no wait, use `arrayDeque` (refer to [Queues](queues.md)). The channels are in `@mark1russell7/service/channel`. Version 0.10.0 of collections removed them.
@@ -237,6 +238,69 @@ assert.equal(lock.available, 1);
 // The permits are a whole number of 1 or more, or Infinity
 assert.throws(() => semaphore(0), RangeError);
 ```
+
+## Shared and exclusive holds: rwLock
+
+`rwLock()` makes a readers-writer lock. More than one `shared` hold can be in progress at the same time. An `exclusive` hold is alone. `run` starts a task with a hold, and it ends the hold when the task ends or throws.
+
+The requests get the lock in the order that they came. A shared request that comes after an exclusive request waits behind it. Thus a stream of reads cannot block a write forever.
+
+```ts
+import assert from "node:assert/strict";
+import { rwLock } from "@mark1russell7/collections";
+
+const lock = rwLock();
+let open!: () => void;
+const gate = new Promise<void>((resolve) => {
+  open = resolve;
+});
+
+// The two reads hold the lock at the same time
+const reads = [lock.run("shared", () => gate), lock.run("shared", () => gate)];
+assert.equal(lock.shared, 2);
+
+// The write waits for the reads. The late read waits behind the write
+const order: string[] = [];
+const write = lock.run("exclusive", () => order.push("write"));
+const lateRead = lock.run("shared", () => order.push("late read"));
+assert.equal(lock.waiting, 2);
+
+open();
+await Promise.all([...reads, write, lateRead]);
+assert.deepEqual(order, ["write", "late read"]);
+assert.equal(lock.exclusive, false);
+```
+
+When the first requests of the queue are shared, the lock gives a hold to each of them, up to the first exclusive request.
+
+`acquire` gives a hold, and its result is the release of the hold. A second call of a release does nothing. The option `signal` cancels a request while it waits. The request leaves the queue, and its promise rejects with `signal.reason`. A signal that is already aborted rejects at once. For a time limit, give `AbortSignal.timeout(ms)`.
+
+```ts
+import assert from "node:assert/strict";
+import { rwLock } from "@mark1russell7/collections";
+
+const lock = rwLock();
+const releaseRead = await lock.acquire("shared");
+
+// The write waits for the read, and the second read waits behind the write
+const controller = new AbortController();
+const write = lock.acquire("exclusive", { signal: controller.signal });
+const read = lock.acquire("shared");
+assert.equal(lock.waiting, 2);
+
+// The abort removes the write from the queue, so the read behind it gets the lock at once
+controller.abort(new Error("no write"));
+await assert.rejects(write, /no write/);
+assert.equal(lock.waiting, 0);
+assert.equal(lock.shared, 2);
+
+releaseRead();
+releaseRead(); // This call does nothing
+(await read)();
+assert.equal(lock.shared, 0);
+```
+
+The behavior `readWriteLock` puts a lock on the methods of a collection (refer to [Behaviors](behaviors.md)).
 
 ## Results in settle order: asSettled
 

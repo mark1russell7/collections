@@ -168,6 +168,14 @@ Version 0.9.3 adds the entry `./summary-tree` and two types of the root entry.
 |---|---|---|
 | `semaphore`, `Semaphore` | keep | `@procedures/client` bounds the calls that run at the same time with it. The maintainer placed it here on 2026-11-07. |
 
+## The readers-writer lock (0.11.1)
+
+Version 0.11.1 adds these names to the root entry.
+
+| Names | Verdict | Reason |
+|---|---|---|
+| `rwLock`, `RwLock`, `LockMode`, `LockOptions` | keep | A lock with shared and exclusive holds is an async tool, next to `semaphore`. The behavior `readWriteLock` can use it later. |
+
 ## The decisions for Mark
 
 Each decision changes the API. Before 1.0, a change of the API raises the MINOR version.

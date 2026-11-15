@@ -47,6 +47,8 @@ List: build/index.d.ts#List
 ListEvents: build/index.d.ts#ListEvents
 Listener: build/index.d.ts#Listener
 type ListenerErrorHandler: build/index.d.ts#ListenerErrorHandler
+LockMode: build/index.d.ts#LockMode
+LockOptions: build/index.d.ts#LockOptions
 MapEvents: build/index.d.ts#MapEvents
 MapLike: build/index.d.ts#MapLike
 MapRemoval: build/index.d.ts#MapRemoval
@@ -72,6 +74,7 @@ ReadonlySet: build/index.d.ts#ReadonlySet
 RemovalChannel: build/index.d.ts#RemovalChannel
 RemovalReason: build/index.d.ts#RemovalReason
 RemovalSource: build/index.d.ts#RemovalSource
+RwLock: build/index.d.ts#RwLock
 SafeDequeOperations: build/index.d.ts#SafeDequeOperations
 SafeListOperations: build/index.d.ts#SafeListOperations
 SafeMapOperations: build/index.d.ts#SafeMapOperations
@@ -215,6 +218,7 @@ removalsOf: build/index.d.ts#removalsOf
 reportListenerError: build/index.d.ts#reportListenerError
 reverse: build/index.d.ts#reverse
 reversed: build/index.d.ts#reversed
+rwLock: build/index.d.ts#rwLock
 safeDeque: build/index.d.ts#safeDeque
 safeList: build/index.d.ts#safeList
 safeMap: build/index.d.ts#safeMap
@@ -1140,6 +1144,14 @@ export type Listener<P> = (payload: P) => void;
 ### build/index.d.ts#ListenerErrorHandler
 type ListenerErrorHandler = (error: unknown) => void;
 
+### build/index.d.ts#LockMode
+export type LockMode = "shared" | "exclusive";
+
+### build/index.d.ts#LockOptions
+export interface LockOptions {
+  readonly signal?: AbortSignal | undefined;
+}
+
 ### build/index.d.ts#MapEvents
 export interface MapEvents<K, V> {
   set: {
@@ -1375,6 +1387,15 @@ export type RemovalReason = "drop" | "evict" | "expire";
 export interface RemovalSource<R> {
   readonly channel: RemovalChannel<R>;
   emit(removal: R): void;
+}
+
+### build/index.d.ts#RwLock
+export interface RwLock {
+  readonly shared: number;
+  readonly exclusive: boolean;
+  readonly waiting: number;
+  acquire(mode: LockMode, options?: LockOptions): Promise<() => void>;
+  run<R>(mode: LockMode, task: () => R | PromiseLike<R>, options?: LockOptions): Promise<R>;
 }
 
 ### build/index.d.ts#SafeDequeOperations
@@ -2010,6 +2031,9 @@ export declare function reverse<T>(iterable: Iterable<T>): Generator<T>;
 
 ### build/index.d.ts#reversed
 export declare const reversed: <T>(compare: Compare<T>) => Compare<T>;
+
+### build/index.d.ts#rwLock
+export declare function rwLock(): RwLock;
 
 ### build/index.d.ts#safeDeque
 export declare function safeDeque<T>(): Middleware<Deque<T>, Deque<T> & {

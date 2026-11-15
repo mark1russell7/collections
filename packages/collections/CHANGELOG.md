@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.1
+
+A new export gives a readers-writer lock. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `rwLock()` and the types `RwLock`, `LockMode` and `LockOptions`. More than one `shared` hold can be in progress at the same time. An `exclusive` hold is alone.
+- The requests get the lock in the order that they came. A shared request waits behind an exclusive request that came first. Thus shared requests cannot block an exclusive request forever.
+- When the first requests of the queue are shared, the lock gives a hold to each of them, up to the first exclusive request.
+- `acquire(mode, { signal })` gives the release of the hold. A second call of the release does nothing. `run(mode, task, { signal })` ends the hold when the task ends or throws.
+- When the signal aborts while a request waits, the request leaves the queue, and its promise rejects with `signal.reason`. A signal that is already aborted rejects at once.
+
 ## 0.11.0
 
 The release train changes the range of `@mark1russell7/rigor-statistics` to a version outside the old range. The public types name @mark1russell7/rigor-statistics, so its new version outside the old range can change them.

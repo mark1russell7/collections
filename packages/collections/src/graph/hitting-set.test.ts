@@ -70,6 +70,9 @@ describe("minimumHittingSet", () => {
   });
 
   it("throws a RangeError for a bad weight or a bad maxSteps", () => {
+    // A family with an empty set gives none before the function reads a weight.
+    expect(minimumHittingSet([["a"], []], { weight: () => 0 })).toEqual({ kind: "none", empty: 1 });
+    expect(() => minimumHittingSet([[]], { maxSteps: -1 })).toThrow(RangeError);
     for (const bad of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
       expect(() => minimumHittingSet([["a"]], { weight: () => bad })).toThrow(RangeError);
     }
@@ -99,6 +102,21 @@ describe("minimumHittingSet", () => {
       expect(result.elements.reduce((sum, e) => sum + weights[e]!, 0)).toBe(result.weight);
       // The same family gives the same result.
       expect(minimumHittingSet(family, { weight: (e) => weights[e]! })).toEqual(result);
+    }
+  });
+
+  it.each(SEEDS)("agrees with a brute force with weights that are not whole numbers (seed %i)", (seed) => {
+    const r = random(seed);
+    const fractions = [0.1, 0.2, 0.3, 0.7, 1.1, 2.05];
+    for (let round = 0; round < 200; round += 1) {
+      const m = r.int(1, 10);
+      const family = randomFamily(r, m);
+      const weights = Array.from({ length: m }, () => fractions[r.int(0, fractions.length - 1)]!);
+      const result = exact(minimumHittingSet(family, { weight: (e) => weights[e]! }));
+      const label = `seed ${seed} round ${round}: ${JSON.stringify({ family, weights })}`;
+      expect(result.weight, label).toBeCloseTo(bruteForce(m, family, (e) => weights[e]!), 9);
+      expect(family.every((set) => set.some((e) => result.elements.includes(e))), label).toBe(true);
+      expect(result.elements.reduce((sum, e) => sum + weights[e]!, 0)).toBe(result.weight);
     }
   });
 

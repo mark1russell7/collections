@@ -34,7 +34,9 @@ export type HittingSet<T> =
  * - A greedy pass gives the first bound, so the result `budget` always has a hitting set.
  * - Two equal elements are one element, by the rule of `Map`. Each set can repeat an element.
  * - The same family in the same order gives the same result. An empty family gives the empty set.
- * - A weight that is not a finite number above 0, or a bad `maxSteps`, throws a `RangeError`.
+ * - A bad `maxSteps` throws a `RangeError`. Then a family with an empty set gives `none` before the function reads
+ *   a weight. Else a weight that is not a finite number above 0 throws a `RangeError`.
+ * - A sum of weights that are not whole numbers has rounding errors. The search is then exact to that rounding.
  *
  * The function is pure. It keeps no state, and it does not change its arguments.
  */
@@ -73,6 +75,8 @@ interface Frame {
   readonly options: readonly number[];
   next: number;
   picked: number;
+  // The cost before the choice of picked. The undo restores it, so the cost carries no rounding of a subtraction.
+  cost: number;
   readonly banned: number[];
 }
 
@@ -133,6 +137,7 @@ class Search {
     }
     this.record();
     for (const e of picked) this.unchoose(e);
+    this.cost = 0;
   }
 
   // The branch and bound, with its own stack. It gives false when it passes maxSteps.
@@ -144,6 +149,7 @@ class Search {
       const frame = stack.at(-1)!;
       if (frame.picked >= 0) {
         this.unchoose(frame.picked);
+        this.cost = frame.cost;
         this.banned[frame.picked] = 1;
         frame.banned.push(frame.picked);
         frame.picked = -1;
@@ -160,6 +166,7 @@ class Search {
         return false;
       }
       this.steps += 1;
+      frame.cost = this.cost;
       this.choose(e);
       frame.picked = e;
       const next = this.frame();
@@ -184,7 +191,7 @@ class Search {
       if (smallest === undefined || free.length < smallest.length) smallest = free;
     }
     const options = smallest!.sort((a, b) => this.newHits(b) / this.weights[b]! - this.newHits(a) / this.weights[a]! || a - b);
-    return { options, next: 0, picked: -1, banned: [] };
+    return { options, next: 0, picked: -1, cost: this.cost, banned: [] };
   }
 
   // A packing of sets that are not hit and share no free element. Each one needs its own element, so the sum of
@@ -233,13 +240,14 @@ class Search {
     for (const s of this.setsOf[e]!) this.hits[s] = this.hits[s]! + 1;
   }
 
+  // The caller restores the cost.
   private unchoose(e: number): void {
     this.chosen[e] = 0;
-    this.cost -= this.weights[e]!;
     for (const s of this.setsOf[e]!) this.hits[s] = this.hits[s]! - 1;
   }
 
-  // The running cost carries the rounding of each add and remove, so the weight of a record is a new sum.
+  // The cost is a sum in the order of the choices. The weight of a record is a sum in the order of the result, so
+  // the weight of the result is the sum of its elements.
   private record(): void {
     this.best = [];
     let weight = 0;

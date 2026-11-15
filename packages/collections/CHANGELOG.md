@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.2
+
+The entry `./graph` gets `minimumHittingSet`, an exact search of the lightest hitting set of a family of sets. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `minimumHittingSet(sets, { weight, maxSteps })` gives the hitting set with the smallest sum of weights. It is the vertex cover of a hypergraph.
+- The result is `exact`, or `budget` with the best hitting set when the search passes `maxSteps`, or `none` when a set is empty.
+- The types `HittingSet`, `HittingSetChoice` and `HittingSetOptions`.
+
 ## 0.10.1
 
 The build tool `tsdown` 0.23.7 makes the files of the package. The API does not change. PATCH: a dependency update that changes the shipped files.

@@ -1,6 +1,6 @@
 # Graph orders
 
-The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder` and a search of the strongly connected components.
+The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components and a search of the minimum hitting set.
 
 ## The order from the hubs
 
@@ -117,4 +117,42 @@ const { of, list } = strongComponentsCompact(3, [0, 1, 3, 3], [1, 0, 2]);
 assert.deepEqual(list, [[2], [0, 1]]);
 assert.deepEqual([...of], [1, 1, 0]);
 assert.throws(() => strongComponentsCompact(2, [0, 1, 1], [2]), RangeError);
+```
+
+## The minimum hitting set
+
+A hitting set of a family of sets has one or more elements of each set. It is the vertex cover of a hypergraph: each set is an edge.
+
+`minimumHittingSet(sets, options)` gives the hitting set with the smallest sum of weights. The search is exact.
+
+- The option `weight` gives the weight of an element: a finite number above 0. The default weight is 1.
+- The elements of the result are in the order of their first occurrence in the family.
+- The result is `exact` when the search ends. It is `budget` when the search passes `maxSteps`, with the best hitting set that it found. A smaller one can exist.
+- A family with an empty set has no hitting set. The result is then `none`, with the index of that set.
+
+A use is the count of the faults that stop a group of services. Each set is the failure domains of one service.
+
+```ts
+import assert from "node:assert/strict";
+import { minimumHittingSet } from "@mark1russell7/collections/graph";
+
+// Two services use one CDN, and the third service uses no CDN.
+const domains = [
+  ["provider:a", "cdn:x"],
+  ["provider:b", "cdn:x"],
+  ["provider:c", "dns:y"],
+];
+const result = minimumHittingSet(domains);
+assert.equal(result.kind, "exact");
+if (result.kind === "exact") {
+  assert.deepEqual(result.elements, ["cdn:x", "provider:c"]);
+  assert.equal(result.weight, 2);
+}
+
+// A heavy weight makes the search choose other elements.
+const costly = minimumHittingSet([["a", "b"], ["a", "c"]], { weight: (e) => (e === "a" ? 5 : 1) });
+assert.deepEqual(costly.kind === "exact" ? costly.elements : [], ["b", "c"]);
+
+assert.deepEqual(minimumHittingSet([["a"], []]), { kind: "none", empty: 1 });
+assert.throws(() => minimumHittingSet([["a"]], { weight: () => 0 }), RangeError);
 ```

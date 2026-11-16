@@ -189,7 +189,7 @@ importers:
         version: 0.3.2
       '@mark1russell7/template-cli':
         specifier: ^0.1.4
-        version: 0.1.7
+        version: 0.1.8
       '@swc/core':
         specifier: ^1.15.0
         version: 1.16.22
@@ -271,8 +271,8 @@ importers:
         specifier: ^2.0.0
         version: 2.1.4
       '@mark1russell7/site-pages':
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.6.0
+        version: 0.6.0
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.6
@@ -943,8 +943,8 @@ packages:
       fast-check:
         optional: true
 
-  '@mark1russell7/site-pages@0.5.0':
-    resolution: {integrity: sha512-sGDFRCr2fIRarRV4FCoDvfYBSOln134N9ApuwNMKXYtiiXpPv8LMeUUB/19QQU7fJDKWGZgqPSAJZ/+RA7p63A==}
+  '@mark1russell7/site-pages@0.6.0':
+    resolution: {integrity: sha512-fj4r31yTJVhuZkTFdfg/n1cQSu+vuUf5eRxWpkUMXp2EsAYpdnbfanCNCC3kPen6C69lNwkkbyUs5YIR7bVFNw==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -953,8 +953,8 @@ packages:
     engines: {node: '>=22'}
     hasBin: true
 
-  '@mark1russell7/template-cli@0.1.7':
-    resolution: {integrity: sha512-Wy4xa6OgNXyMunSyXOArxmrspLSCuyw1pf1P5X45Uiwe1aWHzn0LJptUYVGUSwT3GTp9FGVDhFMeOnKlapD3Xw==}
+  '@mark1russell7/template-cli@0.1.8':
+    resolution: {integrity: sha512-uGzXp++PCRl+jTwVPZHGm9PkH4jmRx//xbphjE/KP2JA/WyWJ9XTyjRRQvWcVzoUN/hTDnfMNaGBFlT8wdwhUg==}
     engines: {node: '>=22.12'}
     hasBin: true
 
@@ -3041,7 +3041,7 @@ snapshots:
     optionalDependencies:
       fast-check: 4.10.2
 
-  '@mark1russell7/site-pages@0.5.0':
+  '@mark1russell7/site-pages@0.6.0':
     dependencies:
       '@mark1russell7/rigor-statistics': 0.2.4
 
@@ -3049,7 +3049,7 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  '@mark1russell7/template-cli@0.1.7':
+  '@mark1russell7/template-cli@0.1.8':
     dependencies:
       '@clack/prompts': 1.8.1
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.2
+
+The entry `./graph` gets `twoTerminalReliability`, the exact chance that a signal gets from a source to a target. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `twoTerminalReliability(edges, source, target, ring, { hopCap, maxSteps })` gives the chance that a path of `hopCap` edges or fewer works. Each edge works alone, with its chance.
+- The arithmetic is a parameter: an `OrderedRing` with `zero`, `one`, `add`, `sub`, `mul` and `compare`. `NUMBER_RING` uses floats. A ring of exact fractions gives an exact value.
+- The result `exact` has the value, the best path and noisy-OR as bounds, the Birnbaum importance of each edge and the paths. The result is `bounds` or `partial` when the work passes `maxSteps`.
+- `pathSetReliability(paths, chances, ring, { maxSteps })` gives the chance that one path or more of a given set works, with the importance of each edge.
+- A step is one edge of the path search, one state of the expansion, or one comparison of two paths. Thus `maxSteps` holds the time.
+
 ## 0.11.1
 
 A new export gives a readers-writer lock. PATCH: before 1.0.0 a new export raises PATCH.

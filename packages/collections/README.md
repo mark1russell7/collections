@@ -106,7 +106,7 @@ Each guide has examples, and a test runs each example:
 - [Equality, hashes and order](https://github.com/mark1russell7/collections/blob/main/docs/guides/equality-and-order.md): `deepEq`, `defaultHash`, the comparators and their rules
 - [Async queues and tasks](https://github.com/mark1russell7/collections/blob/main/docs/guides/async.md): `asyncQueue`, `semaphore`, `rwLock` and `asSettled`
 - [Dependency graphs](https://github.com/mark1russell7/collections/blob/main/docs/guides/dag.md): levels, the topological order, and a run with `executeDAG`
-- [Graph orders](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md): `hubBreadthFirstOrder`, the strongly connected components, the minimum hitting set and `twoTerminalReliability`
+- [Graph orders](https://github.com/mark1russell7/collections/blob/main/docs/guides/graph.md): `hubBreadthFirstOrder`, the strongly connected components, the minimum hitting set, `twoTerminalReliability` and the schedules `criticalPath`, `listSchedule` and `periodSchedule`
 - [Layers](https://github.com/mark1russell7/collections/blob/main/docs/guides/layers.md): `compose`, its types and its laws, and behaviors on a collection
 - [Behaviors](https://github.com/mark1russell7/collections/blob/main/docs/guides/behaviors.md): readonly views, safe reads and the locks
 - [Events and caches](https://github.com/mark1russell7/collections/blob/main/docs/guides/caches.md): `eventedMap`, `eventedList`, `lruMap`, `ttlMap` and their stacks
@@ -116,6 +116,7 @@ Each guide has examples, and a test runs each example:
 - [Factories](https://github.com/mark1russell7/collections/blob/main/docs/guides/factories.md): `listOf`, `mapOf`, `range`, `toMap`, `groupBy` and the empty and readonly collections
 - [Rank keys](https://github.com/mark1russell7/collections/blob/main/docs/guides/rank-keys.md): the keys of a list that a user can reorder, and the writes of a move
 - [Summary trees](https://github.com/mark1russell7/collections/blob/main/docs/guides/summary-tree.md): the spec, a search by a summary, positions in a text, the edits and `merge`
+- [Contract checks](https://github.com/mark1russell7/collections/blob/main/docs/guides/testing.md): `holds`, `same`, `rejects`, `deepEqual` and a suite for each implementation
 
 ## Contract checks
 
@@ -127,7 +128,7 @@ The entry `./testing` gives the small checks of a contract suite: `holds`, `same
 | --- | --- |
 | `@mark1russell7/collections` | Lists, sets, maps, queues, the summary tree, behaviors, async queues, lazy operations, `keyBetween` and the other functions of ranks |
 | `@mark1russell7/collections/dag` | Levels, topological order, a run with a limit of concurrency, filters |
-| `@mark1russell7/collections/graph` | `hubBreadthFirstOrder`, the strongly connected components, the minimum hitting set and `twoTerminalReliability` |
+| `@mark1russell7/collections/graph` | `hubBreadthFirstOrder`, the strongly connected components, the minimum hitting set, `twoTerminalReliability` and the schedules `criticalPath`, `listSchedule` and `periodSchedule` |
 | `@mark1russell7/collections/summary-tree` | The summary tree as plain functions over a plain record |
 | `@mark1russell7/collections/testing` | The checks of a contract suite |
 | `@mark1russell7/collections/layers` | `compose` and the types of a stack of layers, in one file with no imports |

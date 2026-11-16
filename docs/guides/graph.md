@@ -1,6 +1,6 @@
 # Graph orders
 
-The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability.
+The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability. It also has three schedules of tasks with dependencies.
 
 ## The order from the hubs
 
@@ -208,4 +208,64 @@ assert.equal(shown.kind === "exact" && shown.value, 0.25);
 const short = twoTerminalReliability(edges, "event", "person", NUMBER_RING, { hopCap: 2 });
 assert.equal(short.kind === "exact" && short.value, 0);
 assert.throws(() => twoTerminalReliability([{ from: 0, to: 1, chance: 2 }], 0, 1, NUMBER_RING), RangeError);
+```
+
+## Schedules
+
+A task has an id, a duration and the ids of the tasks that end before it starts (`after`). Three functions give a schedule of the tasks.
+
+- `criticalPath(tasks)` gives the earliest and the latest times of each task, its slack, and one critical path. It has no limit of resources.
+- `listSchedule(tasks, options)` puts each task on a resource with a count of units. At each time, a free unit starts the ready task with the highest priority.
+- `periodSchedule(tasks, options)` puts the tasks into periods, for example days. Each resource has a capacity in each period, for example a count of items that a drawn number gives.
+
+The rules:
+
+- The default priority is the tail of a task: its duration plus the longest chain after it. Thus the longest chain goes first.
+- A tie in the priority goes to the first task in the input order. Thus equal inputs give equal schedules.
+- With an infinite capacity, `listSchedule` gives the earliest start of `criticalPath` to each task.
+- In `periodSchedule`, the capacity of a resource goes first to its started tasks, and then to its ready tasks by priority.
+- In `periodSchedule`, a task is ready `gap` periods after the end of its last dependency. The default `gap` is 1.
+- `periodSchedule` calls `capacity` for each period and each resource in a fixed order. Thus a seeded stream of draws gives the same schedule each time.
+- Two tasks with one id, a dependency that is not a task, or a cycle, give a problem in place of a result.
+
+A use is a roadmap model. Each role ends a count of items a day, drawn from its history. A run of `periodSchedule` with each seed gives a distribution of the end dates.
+
+```ts
+import assert from "node:assert/strict";
+import { criticalPath, listSchedule, periodSchedule } from "@mark1russell7/collections/graph";
+
+const tasks = [
+  { id: "design", duration: 2 },
+  { id: "build", duration: 5, after: ["design"] },
+  { id: "docs", duration: 1, after: ["design"] },
+  { id: "release", duration: 1, after: ["build", "docs"] },
+];
+
+const plan = criticalPath(tasks);
+assert.equal(plan.kind, "ok");
+if (plan.kind === "ok") {
+  assert.equal(plan.length, 8);
+  assert.deepEqual(plan.path, ["design", "build", "release"]);
+  assert.equal(plan.times.get("docs")?.slack, 4);
+}
+
+// One person does one task at a time, the longest tail first. Two people do the docs next to the build.
+const one = listSchedule(tasks);
+assert.equal(one.kind === "ok" && one.makespan, 9);
+const two = listSchedule(tasks, { capacity: () => 2 });
+assert.equal(two.kind === "ok" && two.makespan, 8);
+
+// Each task is one item. The team ends 1, 0, 2 and 1 items on the days 0 to 3.
+const items = tasks.map((task) => ({ ...task, duration: 1 }));
+const perDay = [1, 0, 2, 1];
+const days = periodSchedule(items, { capacity: (_team, day) => perDay[day] ?? 1 });
+assert.equal(days.kind, "ok");
+if (days.kind === "ok") {
+  assert.equal(days.periods, 4);
+  assert.deepEqual(days.byId.get("build"), { id: "build", resource: undefined, start: 2, end: 2, wait: 1 });
+}
+
+// Each task of a cycle comes after the task before it.
+const loop = criticalPath([{ id: "a", duration: 1, after: ["b"] }, { id: "b", duration: 1, after: ["a"] }]);
+assert.deepEqual(loop, { kind: "cycle", cycle: ["b", "a"] });
 ```

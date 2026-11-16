@@ -116,6 +116,7 @@ Each guide has examples, and a test runs each example:
 - [Factories](https://github.com/mark1russell7/collections/blob/main/docs/guides/factories.md): `listOf`, `mapOf`, `range`, `toMap`, `groupBy` and the empty and readonly collections
 - [Rank keys](https://github.com/mark1russell7/collections/blob/main/docs/guides/rank-keys.md): the keys of a list that a user can reorder, and the writes of a move
 - [Summary trees](https://github.com/mark1russell7/collections/blob/main/docs/guides/summary-tree.md): the spec, a search by a summary, positions in a text, the edits and `merge`
+- [Contract checks](https://github.com/mark1russell7/collections/blob/main/docs/guides/testing.md): `holds`, `same`, `rejects`, `deepEqual` and a suite for each implementation
 
 ## Contract checks
 

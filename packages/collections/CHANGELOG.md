@@ -11,6 +11,10 @@ The entry `./graph` gets three schedules of tasks with dependencies. PATCH: befo
 - `periodSchedule(tasks, { resource, capacity, priority, release, gap, horizon })` gives a schedule by periods, with a capacity for each resource and period. It calls `capacity` in a fixed order, so a seeded stream of draws gives the same schedule each time.
 - Two tasks with one id, a dependency that is not a task, or a cycle, give a problem (`duplicate`, `missing` or `cycle`) in place of a result.
 
+### Docs
+
+- A guide for the entry `./testing`: the contract checks, a rejected promise, `deepEqual` and `deepEq`, and a suite for each implementation. Its examples run as tests.
+
 ### Changed
 
 - The test of the entry `./graph` follows each relative import, and it refuses a module that imports another package. The scheduler uses the heap of this package, `PriorityQueue`.

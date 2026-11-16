@@ -1,5 +1,6 @@
 /**
- * The entry `@mark1russell7/collections/graph` holds pure graph functions. It imports no other package.
+ * The entry `@mark1russell7/collections/graph` holds pure graph functions. It imports no other package: the scheduler uses the
+ * heap of this package, `PriorityQueue`.
  */
 
 export { minimumHittingSet, type HittingSet, type HittingSetChoice, type HittingSetOptions } from "./hitting-set.js";
@@ -16,3 +17,18 @@ export {
   type TwoTerminalReliability,
 } from "./reliability.js";
 export { strongComponentsCompact, stronglyConnectedComponents, type StrongComponents } from "./strong-components.js";
+export {
+  criticalPath,
+  listSchedule,
+  periodSchedule,
+  type CriticalPath,
+  type ListSchedule,
+  type ListScheduleOptions,
+  type PeriodSchedule,
+  type PeriodScheduleOptions,
+  type PeriodTask,
+  type ScheduledTask,
+  type ScheduleProblem,
+  type ScheduleTask,
+  type TaskTimes,
+} from "./schedule.js";

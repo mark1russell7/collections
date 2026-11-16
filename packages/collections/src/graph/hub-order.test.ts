@@ -71,12 +71,26 @@ describe("hubBreadthFirstOrder", () => {
 });
 
 describe("the entry ./graph", () => {
-  it("imports no other package", () => {
+  it("imports no other package, also through the modules of the package that it imports", () => {
     const folder = new URL("./", import.meta.url);
-    for (const file of readdirSync(folder).filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts"))) {
-      const text = readFileSync(new URL(file, folder), "utf8");
-      const imports = [...text.matchAll(/from "([^"]+)"/g)].map((match) => match[1]!);
-      expect(imports.filter((path) => !path.startsWith("./")), file).toEqual([]);
+    const queue = readdirSync(folder)
+      .filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts"))
+      .map((name) => new URL(name, folder));
+    const seen = new Set<string>();
+    const outside: string[] = [];
+    while (queue.length > 0) {
+      const file = queue.pop()!;
+      if (seen.has(file.href)) continue;
+      seen.add(file.href);
+      const text = readFileSync(file, "utf8");
+      for (const match of text.matchAll(/from "([^"]+)"/g)) {
+        const specifier = match[1]!;
+        if (specifier.startsWith(".")) queue.push(new URL(specifier.replace(/.js$/, ".ts"), file));
+        else outside.push(`${file.pathname.split("/src/")[1]}: ${specifier}`);
+      }
     }
+    expect(outside).toEqual([]);
+    // The walk reads the modules of the package that the entry uses, for example the heap of the scheduler.
+    expect([...seen].some((href) => href.endsWith("/impl/priority-queue.ts"))).toBe(true);
   });
 });

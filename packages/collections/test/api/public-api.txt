@@ -282,21 +282,34 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 
 ## ./graph (build/graph/index.d.ts): names
 
+type CriticalPath: build/graph/index.d.ts#CriticalPath
 type HittingSet: build/graph/index.d.ts#HittingSet
 type HittingSetChoice: build/graph/index.d.ts#HittingSetChoice
 type HittingSetOptions: build/graph/index.d.ts#HittingSetOptions
+type ListSchedule: build/graph/index.d.ts#ListSchedule
+type ListScheduleOptions: build/graph/index.d.ts#ListScheduleOptions
 NUMBER_RING: build/graph/index.d.ts#NUMBER_RING
 type OrderedRing: build/graph/index.d.ts#OrderedRing
 type PathSetReliability: build/graph/index.d.ts#PathSetReliability
+type PeriodSchedule: build/graph/index.d.ts#PeriodSchedule
+type PeriodScheduleOptions: build/graph/index.d.ts#PeriodScheduleOptions
+type PeriodTask: build/graph/index.d.ts#PeriodTask
 type ReliabilityEdge: build/graph/index.d.ts#ReliabilityEdge
 type ReliabilityOptions: build/graph/index.d.ts#ReliabilityOptions
 type ReliabilityPath: build/graph/index.d.ts#ReliabilityPath
+type ScheduleProblem: build/graph/index.d.ts#ScheduleProblem
+type ScheduleTask: build/graph/index.d.ts#ScheduleTask
+type ScheduledTask: build/graph/index.d.ts#ScheduledTask
 type StrongComponents: build/graph/index.d.ts#StrongComponents
+type TaskTimes: build/graph/index.d.ts#TaskTimes
 type TwoTerminalReliability: build/graph/index.d.ts#TwoTerminalReliability
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
+criticalPath: build/graph/index.d.ts#criticalPath
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
+listSchedule: build/graph/index.d.ts#listSchedule
 minimumHittingSet: build/graph/index.d.ts#minimumHittingSet
 pathSetReliability: build/graph/index.d.ts#pathSetReliability
+periodSchedule: build/graph/index.d.ts#periodSchedule
 strongComponentsCompact: build/graph/index.d.ts#strongComponentsCompact
 stronglyConnectedComponents: build/graph/index.d.ts#stronglyConnectedComponents
 twoTerminalReliability: build/graph/index.d.ts#twoTerminalReliability
@@ -543,6 +556,15 @@ declare function summaryOf<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>
 ### build/functions.d.ts#toArray
 declare function toArray<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Leaf[];
 
+### build/graph/index.d.ts#CriticalPath
+type CriticalPath<K> = {
+  readonly kind: "ok";
+  readonly length: number;
+  readonly order: readonly K[];
+  readonly times: ReadonlyMap<K, TaskTimes>;
+  readonly path: readonly K[];
+} | ScheduleProblem<K>;
+
 ### build/graph/index.d.ts#HittingSet
 type HittingSet<T> = (HittingSetChoice<T> & {
   readonly kind: "exact";
@@ -566,6 +588,22 @@ interface HittingSetChoice<T> {
 interface HittingSetOptions<T> {
   readonly weight?: ((element: T) => number) | undefined;
   readonly maxSteps?: number | undefined;
+}
+
+### build/graph/index.d.ts#ListSchedule
+type ListSchedule<K, R> = {
+  readonly kind: "ok";
+  readonly makespan: number;
+  readonly tasks: readonly ScheduledTask<K, R>[];
+  readonly byId: ReadonlyMap<K, ScheduledTask<K, R>>;
+} | ScheduleProblem<K>;
+
+### build/graph/index.d.ts#ListScheduleOptions
+interface ListScheduleOptions<K, R> {
+  readonly resource?: ((task: K) => R) | undefined;
+  readonly capacity?: ((resource: R) => number) | undefined;
+  readonly priority?: ((task: K) => number) | undefined;
+  readonly release?: ((task: K) => number) | undefined;
 }
 
 ### build/graph/index.d.ts#NUMBER_RING
@@ -592,6 +630,34 @@ type PathSetReliability<N> = {
   readonly steps: number;
 };
 
+### build/graph/index.d.ts#PeriodSchedule
+type PeriodSchedule<K, R> = {
+  readonly kind: "ok";
+  readonly periods: number;
+  readonly tasks: readonly PeriodTask<K, R>[];
+  readonly byId: ReadonlyMap<K, PeriodTask<K, R>>;
+  readonly unfinished: readonly K[];
+} | ScheduleProblem<K>;
+
+### build/graph/index.d.ts#PeriodScheduleOptions
+interface PeriodScheduleOptions<K, R> {
+  readonly resource?: ((task: K) => R) | undefined;
+  readonly capacity?: ((resource: R, period: number) => number) | undefined;
+  readonly priority?: ((task: K) => number) | undefined;
+  readonly release?: ((task: K) => number) | undefined;
+  readonly gap?: number | undefined;
+  readonly horizon?: number | undefined;
+}
+
+### build/graph/index.d.ts#PeriodTask
+interface PeriodTask<K, R> {
+  readonly id: K;
+  readonly resource: R;
+  readonly start: number;
+  readonly end: number;
+  readonly wait: number;
+}
+
 ### build/graph/index.d.ts#ReliabilityEdge
 interface ReliabilityEdge<Node, N> {
   readonly from: Node;
@@ -611,10 +677,50 @@ interface ReliabilityPath<N> {
   readonly chance: N;
 }
 
+### build/graph/index.d.ts#ScheduleProblem
+type ScheduleProblem<K> = {
+  readonly kind: "duplicate";
+  readonly task: K;
+} | {
+  readonly kind: "missing";
+  readonly task: K;
+  readonly dependency: K;
+} | {
+  readonly kind: "cycle";
+  readonly cycle: readonly K[];
+};
+
+### build/graph/index.d.ts#ScheduleTask
+interface ScheduleTask<K> {
+  readonly id: K;
+  readonly duration: number;
+  readonly after?: Iterable<K> | undefined;
+}
+
+### build/graph/index.d.ts#ScheduledTask
+interface ScheduledTask<K, R> {
+  readonly id: K;
+  readonly resource: R;
+  readonly unit: number;
+  readonly start: number;
+  readonly end: number;
+  readonly wait: number;
+}
+
 ### build/graph/index.d.ts#StrongComponents
 interface StrongComponents {
   readonly of: Int32Array;
   readonly list: readonly (readonly number[])[];
+}
+
+### build/graph/index.d.ts#TaskTimes
+interface TaskTimes {
+  readonly earliestStart: number;
+  readonly earliestEnd: number;
+  readonly latestStart: number;
+  readonly latestEnd: number;
+  readonly slack: number;
+  readonly tail: number;
 }
 
 ### build/graph/index.d.ts#TwoTerminalReliability
@@ -646,8 +752,14 @@ interface WeightedEdge {
   readonly weight?: number | undefined;
 }
 
+### build/graph/index.d.ts#criticalPath
+export declare function criticalPath<K>(tasks: Iterable<ScheduleTask<K>>): CriticalPath<K>;
+
 ### build/graph/index.d.ts#hubBreadthFirstOrder
 export declare function hubBreadthFirstOrder(n: number, edges?: readonly WeightedEdge[], compare?: (i: number, j: number) => number): number[];
+
+### build/graph/index.d.ts#listSchedule
+export declare function listSchedule<K, R = undefined>(tasks: Iterable<ScheduleTask<K>>, options?: ListScheduleOptions<K, R>): ListSchedule<K, R>;
 
 ### build/graph/index.d.ts#minimumHittingSet
 export declare function minimumHittingSet<T>(sets: Iterable<Iterable<T>>, options?: HittingSetOptions<T>): HittingSet<T>;
@@ -656,6 +768,9 @@ export declare function minimumHittingSet<T>(sets: Iterable<Iterable<T>>, option
 export declare function pathSetReliability<N>(paths: readonly (readonly number[])[], chances: readonly N[], ring: OrderedRing<N>, options?: {
   readonly maxSteps?: number | undefined;
 }): PathSetReliability<N>;
+
+### build/graph/index.d.ts#periodSchedule
+export declare function periodSchedule<K, R = undefined>(tasks: Iterable<ScheduleTask<K>>, options?: PeriodScheduleOptions<K, R>): PeriodSchedule<K, R>;
 
 ### build/graph/index.d.ts#strongComponentsCompact
 export declare function strongComponentsCompact(n: number, start: ArrayLike<number>, targets: ArrayLike<number>): StrongComponents;

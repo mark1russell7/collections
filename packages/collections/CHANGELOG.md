@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.11.3
+
+The entry `./graph` gets three schedules of tasks with dependencies. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `criticalPath(tasks)` gives the earliest and the latest times of each task, its slack, a topological order and one critical path. The sum of the durations of the path is the length, with no rounding.
+- `listSchedule(tasks, { resource, capacity, priority, release })` gives a list schedule on resources with a count of units. The default priority is the tail of a task. The schedule holds the bound of Graham on identical units.
+- `periodSchedule(tasks, { resource, capacity, priority, release, gap, horizon })` gives a schedule by periods, with a capacity for each resource and period. It calls `capacity` in a fixed order, so a seeded stream of draws gives the same schedule each time.
+- Two tasks with one id, a dependency that is not a task, or a cycle, give a problem (`duplicate`, `missing` or `cycle`) in place of a result.
+
+### Changed
+
+- The test of the entry `./graph` follows each relative import, and it refuses a module that imports another package. The scheduler uses the heap of this package, `PriorityQueue`.
+
 ## 0.11.2
 
 The entry `./graph` gets `twoTerminalReliability`, the exact chance that a signal gets from a source to a target. PATCH: before 1.0.0 a new export raises PATCH.

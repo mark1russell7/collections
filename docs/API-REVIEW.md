@@ -131,7 +131,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | `stronglyConnectedComponents`, `strongComponentsCompact`, `StrongComponents` | keep | Version 0.9.11 adds them (C43). The search of the components of coeval moves to them. |
 | `minimumHittingSet`, `HittingSet`, `HittingSetChoice`, `HittingSetOptions` | keep | Version 0.10.2 adds them. The coverage of the alert system counts its independent failure domains with them. |
 | `twoTerminalReliability`, `pathSetReliability`, `NUMBER_RING`, `OrderedRing`, `PathSetReliability`, `ReliabilityEdge`, `ReliabilityOptions`, `ReliabilityPath`, `TwoTerminalReliability` | keep | Version 0.11.2 adds them. The relevance of the alert system is the reliability from an event to a person. |
-| `criticalPath`, `listSchedule`, `periodSchedule`, `CriticalPath`, `ListSchedule`, `ListScheduleOptions`, `PeriodSchedule`, `PeriodScheduleOptions`, `PeriodTask`, `ScheduledTask`, `ScheduleProblem`, `ScheduleTask`, `TaskTimes` | keep | Version 0.11.3 adds them. The roadmap model of the fleet draws the end dates of items with `periodSchedule`. |
+| `criticalPath`, `listSchedule`, `periodSchedule`, `CriticalPath`, `ListSchedule`, `ListScheduleOptions`, `PeriodSchedule`, `PeriodScheduleOptions`, `PeriodTask`, `ScheduledTask`, `ScheduleProblem`, `ScheduleTask`, `TaskTimes` | keep | Version 0.11.3 adds them. A roadmap model draws the end dates of its items with `periodSchedule`. |
 
 ## The entry `./layers`
 

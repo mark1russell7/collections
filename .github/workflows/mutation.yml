@@ -9,7 +9,7 @@ name: Mutation
 
 on:
   schedule:
-    # Each scheduled heavy run of the fleet has its own minute.
+    # Each scheduled heavy run of the account has its own minute.
     - cron: "21 4 * * 1"
   pull_request:
   workflow_dispatch:

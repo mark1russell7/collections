@@ -26,7 +26,7 @@ defaults:
 
 jobs:
   ci:
-    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@1702dade663a51743de475fcaae8ce77fd77f456 # main
+    uses: mark1russell7/template/.github/workflows/reusable-ci.yml@8384e885a3cb304498a858c531cd86641956480c # main
     with:
       # The tests of each package again, with coverage: a table in the summary and the artifact coverage (no floor yet).
       coverage: true
@@ -66,13 +66,20 @@ jobs:
       - run: pnpm --filter "@template/$PACKAGE" typecheck
       - run: pnpm --filter "@template/$PACKAGE" test
 
+  # The site of .github/site.json: the build, the site check and the probe, with no deploy (CI.md of the
+  # template, "The site config"). The Pages workflow deploys the same site from main.
+  site:
+    uses: mark1russell7/template/.github/workflows/reusable-pages-check.yml@8384e885a3cb304498a858c531cd86641956480c # main
+    permissions:
+      contents: read
+
   # The one check of the ruleset of main (CI.md, "The check of the ruleset"). It passes only when
   # each job of needs passed, or was skipped by its own if and ALLOW_SKIP names it. A new job of this
   # file goes in needs, so the ruleset never has to change, and gh pr merge --auto waits for the whole gate.
   ci-ok:
     name: CI OK
     if: ${{ !cancelled() }}
-    needs: [ci, presets]
+    needs: [ci, presets, site]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}

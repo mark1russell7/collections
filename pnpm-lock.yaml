@@ -216,7 +216,7 @@ importers:
         version: 0.8.10(zod@4.6.7)
       '@mark1russell7/optional':
         specifier: ^1.2.0
-        version: 1.3.0
+        version: 1.4.0
       '@mark1russell7/rigor-statistics':
         specifier: ^0.2.0
         version: 0.2.11
@@ -883,8 +883,8 @@ packages:
     resolution: {integrity: sha512-Pb978ZnvlAxzcdWtRtqTGb7mZFCvlNrdKnpZqhxQ7gafzeNGf1JqYFuB4RWiLbJzRuFUWjEoAVG5f2TndCIlSg==}
     engines: {node: '>=22'}
 
-  '@mark1russell7/optional@1.3.0':
-    resolution: {integrity: sha512-PCK0H/St2CorXD6SbvzXp389QPive2ahfFRIOapUWM50Pk60YvB7CibGbI6+y7jdeVLFzbuzfoXFmAFcOQAg6w==}
+  '@mark1russell7/optional@1.4.0':
+    resolution: {integrity: sha512-GkLNYn4iJL/ydaWh3Z8UeYaMo7UHY0kuKdqfdp2G/U6jkE0fm6KceQqhcqVPSSO0m5yRWkUUUDhAWqg2Qs5eOw==}
     engines: {node: '>=22.12'}
 
   '@mark1russell7/quantity@0.4.0':
@@ -3031,7 +3031,7 @@ snapshots:
 
   '@mark1russell7/files@0.0.4': {}
 
-  '@mark1russell7/optional@1.3.0': {}
+  '@mark1russell7/optional@1.4.0': {}
 
   '@mark1russell7/quantity@0.4.0(zod@4.6.7)':
     dependencies:

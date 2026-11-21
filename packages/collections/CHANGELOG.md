@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.4
+
+An automated dependency update changes the shipped files, so this PATCH ships them.
+
 ## 0.11.3
 
 The entry `./graph` gets three schedules of tasks with dependencies. PATCH: before 1.0.0 a new export raises PATCH.

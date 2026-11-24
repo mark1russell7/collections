@@ -16,6 +16,17 @@ export {
   type ReliabilityPath,
   type TwoTerminalReliability,
 } from "./reliability.js";
+export {
+  alternativePaths,
+  shortestPath,
+  type AlternativePath,
+  type AlternativePaths,
+  type AlternativePathsOptions,
+  type PathEdge,
+  type ShortestPath,
+  type ShortestPathOptions,
+  type WeightedPath,
+} from "./shortest-path.js";
 export { strongComponentsCompact, stronglyConnectedComponents, type StrongComponents } from "./strong-components.js";
 export {
   criticalPath,

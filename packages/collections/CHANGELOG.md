@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.4
+
+The entry `./graph` gets the shortest path and alternative paths on a weighted directed graph. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `shortestPath(edges, from, to, { heuristic })` gives the path with the smallest cost, by Dijkstra on `PriorityQueue`. The option `heuristic` makes the search A*. The result is `path` (the nodes, the edge indices and the cost) or `none`.
+- A weight that is not a finite number from 0 throws a `RangeError`. A tie keeps the path that the search found first, so the same edges always give the same path.
+- `alternativePaths(edges, from, to, { count, mode, penalty, maxOverlap, maxRounds })` gives the shortest path and different paths after it. The mode `penalty` multiplies the weights of each found path. The mode `disjoint` removes its edges.
+- Each alternative path has its true cost and its overlap with the first path.
+
 ## 0.11.3
 
 The entry `./graph` gets three schedules of tasks with dependencies. PATCH: before 1.0.0 a new export raises PATCH.

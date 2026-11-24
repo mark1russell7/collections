@@ -282,6 +282,9 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 
 ## ./graph (build/graph/index.d.ts): names
 
+type AlternativePath: build/graph/index.d.ts#AlternativePath
+type AlternativePaths: build/graph/index.d.ts#AlternativePaths
+type AlternativePathsOptions: build/graph/index.d.ts#AlternativePathsOptions
 type CriticalPath: build/graph/index.d.ts#CriticalPath
 type HittingSet: build/graph/index.d.ts#HittingSet
 type HittingSetChoice: build/graph/index.d.ts#HittingSetChoice
@@ -290,6 +293,7 @@ type ListSchedule: build/graph/index.d.ts#ListSchedule
 type ListScheduleOptions: build/graph/index.d.ts#ListScheduleOptions
 NUMBER_RING: build/graph/index.d.ts#NUMBER_RING
 type OrderedRing: build/graph/index.d.ts#OrderedRing
+type PathEdge: build/graph/index.d.ts#PathEdge
 type PathSetReliability: build/graph/index.d.ts#PathSetReliability
 type PeriodSchedule: build/graph/index.d.ts#PeriodSchedule
 type PeriodScheduleOptions: build/graph/index.d.ts#PeriodScheduleOptions
@@ -300,16 +304,21 @@ type ReliabilityPath: build/graph/index.d.ts#ReliabilityPath
 type ScheduleProblem: build/graph/index.d.ts#ScheduleProblem
 type ScheduleTask: build/graph/index.d.ts#ScheduleTask
 type ScheduledTask: build/graph/index.d.ts#ScheduledTask
+type ShortestPath: build/graph/index.d.ts#ShortestPath
+type ShortestPathOptions: build/graph/index.d.ts#ShortestPathOptions
 type StrongComponents: build/graph/index.d.ts#StrongComponents
 type TaskTimes: build/graph/index.d.ts#TaskTimes
 type TwoTerminalReliability: build/graph/index.d.ts#TwoTerminalReliability
 type WeightedEdge: build/graph/index.d.ts#WeightedEdge
+type WeightedPath: build/graph/index.d.ts#WeightedPath
+alternativePaths: build/graph/index.d.ts#alternativePaths
 criticalPath: build/graph/index.d.ts#criticalPath
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 listSchedule: build/graph/index.d.ts#listSchedule
 minimumHittingSet: build/graph/index.d.ts#minimumHittingSet
 pathSetReliability: build/graph/index.d.ts#pathSetReliability
 periodSchedule: build/graph/index.d.ts#periodSchedule
+shortestPath: build/graph/index.d.ts#shortestPath
 strongComponentsCompact: build/graph/index.d.ts#strongComponentsCompact
 stronglyConnectedComponents: build/graph/index.d.ts#stronglyConnectedComponents
 twoTerminalReliability: build/graph/index.d.ts#twoTerminalReliability
@@ -556,6 +565,26 @@ declare function summaryOf<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>
 ### build/functions.d.ts#toArray
 declare function toArray<Leaf, Summary>(tree: SummaryTreeRecord<Leaf, Summary>): Leaf[];
 
+### build/graph/index.d.ts#AlternativePath
+interface AlternativePath<Node> extends WeightedPath<Node> {
+  readonly overlap: number;
+}
+
+### build/graph/index.d.ts#AlternativePaths
+interface AlternativePaths<Node> {
+  readonly paths: readonly AlternativePath<Node>[];
+  readonly rounds: number;
+}
+
+### build/graph/index.d.ts#AlternativePathsOptions
+interface AlternativePathsOptions<Node> extends ShortestPathOptions<Node> {
+  readonly count?: number | undefined;
+  readonly mode?: "penalty" | "disjoint" | undefined;
+  readonly penalty?: number | undefined;
+  readonly maxOverlap?: number | undefined;
+  readonly maxRounds?: number | undefined;
+}
+
 ### build/graph/index.d.ts#CriticalPath
 type CriticalPath<K> = {
   readonly kind: "ok";
@@ -617,6 +646,13 @@ interface OrderedRing<N> {
   readonly sub: (a: N, b: N) => N;
   readonly mul: (a: N, b: N) => N;
   readonly compare: (a: N, b: N) => number;
+}
+
+### build/graph/index.d.ts#PathEdge
+interface PathEdge<Node> {
+  readonly from: Node;
+  readonly to: Node;
+  readonly weight: number;
 }
 
 ### build/graph/index.d.ts#PathSetReliability
@@ -707,6 +743,20 @@ interface ScheduledTask<K, R> {
   readonly wait: number;
 }
 
+### build/graph/index.d.ts#ShortestPath
+type ShortestPath<Node> = (WeightedPath<Node> & {
+  readonly kind: "path";
+  readonly steps: number;
+}) | {
+  readonly kind: "none";
+  readonly steps: number;
+};
+
+### build/graph/index.d.ts#ShortestPathOptions
+interface ShortestPathOptions<Node> {
+  readonly heuristic?: ((node: Node) => number) | undefined;
+}
+
 ### build/graph/index.d.ts#StrongComponents
 interface StrongComponents {
   readonly of: Int32Array;
@@ -752,6 +802,16 @@ interface WeightedEdge {
   readonly weight?: number | undefined;
 }
 
+### build/graph/index.d.ts#WeightedPath
+interface WeightedPath<Node> {
+  readonly nodes: readonly Node[];
+  readonly edges: readonly number[];
+  readonly cost: number;
+}
+
+### build/graph/index.d.ts#alternativePaths
+export declare function alternativePaths<Node>(edges: readonly PathEdge<Node>[], from: Node, to: Node, options?: AlternativePathsOptions<Node>): AlternativePaths<Node>;
+
 ### build/graph/index.d.ts#criticalPath
 export declare function criticalPath<K>(tasks: Iterable<ScheduleTask<K>>): CriticalPath<K>;
 
@@ -771,6 +831,9 @@ export declare function pathSetReliability<N>(paths: readonly (readonly number[]
 
 ### build/graph/index.d.ts#periodSchedule
 export declare function periodSchedule<K, R = undefined>(tasks: Iterable<ScheduleTask<K>>, options?: PeriodScheduleOptions<K, R>): PeriodSchedule<K, R>;
+
+### build/graph/index.d.ts#shortestPath
+export declare function shortestPath<Node>(edges: readonly PathEdge<Node>[], from: Node, to: Node, options?: ShortestPathOptions<Node>): ShortestPath<Node>;
 
 ### build/graph/index.d.ts#strongComponentsCompact
 export declare function strongComponentsCompact(n: number, start: ArrayLike<number>, targets: ArrayLike<number>): StrongComponents;

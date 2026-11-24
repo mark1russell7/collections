@@ -8,7 +8,7 @@ A test (`src/api-review.test.ts`) compares this file with `test/api/public-api.t
 
 | Verdict | What it means | Names |
 |---|---|---|
-| keep | The name stays as it is. | 272 |
+| keep | The name stays as it is. | 281 |
 | change | The name stays, but its API changes. Mark decides each change (D1 to D6). | 23 |
 | remove | The name leaves the public API. No other file, test or doc of the repository uses it. The code stays only where a kept name uses it. Version 0.10.0 removes them (D3, C28, C29). | 72 |
 | move | The name goes to its home in the map. Collections keeps the name with a deprecation for one MINOR version. | 22 |
@@ -132,6 +132,7 @@ The counts are of the 360 names of `main`. The eight names of the removals have 
 | `minimumHittingSet`, `HittingSet`, `HittingSetChoice`, `HittingSetOptions` | keep | Version 0.10.2 adds them. The coverage of the alert system counts its independent failure domains with them. |
 | `twoTerminalReliability`, `pathSetReliability`, `NUMBER_RING`, `OrderedRing`, `PathSetReliability`, `ReliabilityEdge`, `ReliabilityOptions`, `ReliabilityPath`, `TwoTerminalReliability` | keep | Version 0.11.2 adds them. The relevance of the alert system is the reliability from an event to a person. |
 | `criticalPath`, `listSchedule`, `periodSchedule`, `CriticalPath`, `ListSchedule`, `ListScheduleOptions`, `PeriodSchedule`, `PeriodScheduleOptions`, `PeriodTask`, `ScheduledTask`, `ScheduleProblem`, `ScheduleTask`, `TaskTimes` | keep | Version 0.11.3 adds them. A roadmap model draws the end dates of its items with `periodSchedule`. |
+| `shortestPath`, `alternativePaths`, `PathEdge`, `WeightedPath`, `ShortestPath`, `ShortestPathOptions`, `AlternativePath`, `AlternativePaths`, `AlternativePathsOptions` | keep | Version 0.11.4 adds them. A road graph gives its routes on the computer of its user, with no outside router. |
 
 ## The entry `./layers`
 

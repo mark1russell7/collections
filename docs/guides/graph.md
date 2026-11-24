@@ -1,6 +1,6 @@
 # Graph orders
 
-The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability. It also has three schedules of tasks with dependencies.
+The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability. It also has three schedules of tasks with dependencies, the shortest path and different alternative paths.
 
 ## The order from the hubs
 
@@ -268,4 +268,110 @@ if (days.kind === "ok") {
 // Each task of a cycle comes after the task before it.
 const loop = criticalPath([{ id: "a", duration: 1, after: ["b"] }, { id: "b", duration: 1, after: ["a"] }]);
 assert.deepEqual(loop, { kind: "cycle", cycle: ["b", "a"] });
+```
+
+## The shortest path
+
+`shortestPath(edges, from, to, { heuristic })` gives the path with the smallest cost, by the algorithm of Dijkstra on the binary heap of this package.
+
+- Each edge goes from the node `from` to the node `to`, with a `weight`: a finite number from 0. A negative, `NaN` or infinite weight throws a `RangeError`.
+- Each edge is directed. Model a one-way road with one edge, and a two-way road with two edges, one in each direction.
+- The result `path` has the nodes, the indices of the edges in the edge list, and the cost. The result `none` tells that no path goes to the target.
+- When `from` is `to`, the path has one node, no edges and the cost 0.
+- The option `heuristic` gives a lower bound of the cost from a node to the target. The search is then A*, and it gives the same cost with fewer steps.
+
+Ties: the search takes the edges of a node in the order of the edge list. A path of the same cost does not replace a path that the search found first. Thus the same edges in the same order always give the same path.
+
+```ts
+import assert from "node:assert/strict";
+import { shortestPath, type PathEdge } from "@mark1russell7/collections/graph";
+
+// A two-way road a - b - d, a one-way road a - c - d, and a direct road a - d that costs more.
+const two = (from: string, to: string, weight: number): PathEdge<string>[] => [
+  { from, to, weight },
+  { from: to, to: from, weight },
+];
+const oneWay: PathEdge<string>[] = [
+  { from: "a", to: "c", weight: 1 },
+  { from: "c", to: "d", weight: 1 },
+];
+const edges = [...two("a", "b", 2), ...two("b", "d", 2), ...oneWay, ...two("a", "d", 5)];
+
+const there = shortestPath(edges, "a", "d");
+assert.equal(there.kind, "path");
+if (there.kind === "path") {
+  assert.deepEqual(there.nodes, ["a", "c", "d"]);
+  assert.deepEqual(there.edges, [4, 5]);
+  assert.equal(there.cost, 2);
+}
+
+// The one-way road goes from a to d only, so the way back uses the two-way road.
+const back = shortestPath(edges, "d", "a");
+assert.equal(back.kind === "path" && back.nodes.join(" "), "d b a");
+
+assert.equal(shortestPath(edges, "a", "z").kind, "none");
+assert.throws(() => shortestPath([{ from: "a", to: "b", weight: -1 }], "a", "b"), RangeError);
+```
+
+A* with a lower bound gives the same cost as the search with no heuristic. A straight-line distance is a lower bound of a road distance.
+
+```ts
+import assert from "node:assert/strict";
+import { shortestPath, type PathEdge } from "@mark1russell7/collections/graph";
+
+// The points of a small made-up grid, in meters. Each road has its straight length.
+const at: Record<string, readonly [number, number]> = { a: [0, 0], b: [100, 0], c: [0, 100], d: [100, 100], e: [200, 100] };
+const length = (p: string, q: string): number => Math.hypot(at[p]![0] - at[q]![0], at[p]![1] - at[q]![1]);
+const pairs: readonly (readonly [string, string])[] = [["a", "b"], ["a", "c"], ["b", "d"], ["c", "d"], ["d", "e"]];
+const roads: PathEdge<string>[] = pairs.map(([p, q]) => ({ from: p, to: q, weight: length(p, q) }));
+
+const plain = shortestPath(roads, "a", "e");
+const guided = shortestPath(roads, "a", "e", { heuristic: (node) => length(node, "e") });
+assert.ok(plain.kind === "path" && guided.kind === "path");
+assert.equal(guided.cost, plain.cost);
+assert.equal(guided.cost, 300);
+assert.ok(guided.steps <= plain.steps);
+```
+
+## Alternative paths
+
+`alternativePaths(edges, from, to, options)` gives the shortest path, and then paths that differ from it. The searches stop at `count` paths (the default is 3), at `maxRounds` searches, or when no path is left.
+
+- The mode `penalty`, the default, multiplies the weight of each edge of the last path by `penalty` (the default is 2). Then it searches again. A later path avoids the earlier edges, but it can use some of them.
+- The mode `disjoint` removes the edges of each path before the next search. Thus no two paths share an edge. The order is greedy, so a graph can have more disjoint paths than the result.
+- Each path has its true `cost`, with the weights of the edge list. Its `overlap` is the share of its cost on edges of the first path.
+- A path with the same edges as an earlier path is not in the result again. The option `maxOverlap` keeps out a path with more overlap.
+- An edge with the weight 0 keeps the weight 0 in the mode `penalty`. Use the mode `disjoint` to avoid it.
+
+```ts
+import assert from "node:assert/strict";
+import { alternativePaths, type PathEdge } from "@mark1russell7/collections/graph";
+
+// Three roads from s to t, and a link from the middle road to the north road.
+const edges: PathEdge<string>[] = [
+  { from: "s", to: "m", weight: 1 },
+  { from: "m", to: "t", weight: 1 },
+  { from: "s", to: "n", weight: 2 },
+  { from: "n", to: "t", weight: 2 },
+  { from: "s", to: "q", weight: 3 },
+  { from: "q", to: "t", weight: 3 },
+  { from: "m", to: "n", weight: 1 },
+];
+
+const { paths } = alternativePaths(edges, "s", "t", { count: 3, penalty: 4 });
+assert.deepEqual(
+  paths.map((path) => [path.nodes.join(""), path.cost, path.overlap]),
+  [
+    ["smt", 2, 1],
+    ["snt", 4, 0],
+    ["sqt", 6, 0],
+  ],
+);
+
+// No two paths share an edge in the mode disjoint.
+const disjoint = alternativePaths(edges, "s", "t", { count: 5, mode: "disjoint" });
+assert.deepEqual(
+  disjoint.paths.map((path) => path.nodes.join("")),
+  ["smt", "snt", "sqt"],
+);
 ```

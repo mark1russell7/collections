@@ -281,7 +281,7 @@ importers:
         version: 2.1.4
       '@mark1russell7/site-pages':
         specifier: ^0.8.0
-        version: 0.8.4
+        version: 0.8.5
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.6
@@ -968,8 +968,8 @@ packages:
       ltx:
         optional: true
 
-  '@mark1russell7/site-pages@0.8.4':
-    resolution: {integrity: sha512-pC0qcQqIsfQg5jTg+peUP/DGBXb4d1PQYiu6TCeCE1ALc5X8nyGhj9vMYKBCdhK7uHm8Chtx7INLKPWPmxpK3w==}
+  '@mark1russell7/site-pages@0.8.5':
+    resolution: {integrity: sha512-acD/NkO5uc4uiBcAi4k6OYpOlSxJRqmzn8wi8XWQyWDJjOgSa+cBEmjueDWbGL7HMT3joId64GdaSTj3Krp2JQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3074,7 +3074,7 @@ snapshots:
       '@mark1russell7/rigor-generators': 0.2.0
       fast-check: 4.10.2
 
-  '@mark1russell7/site-pages@0.8.4':
+  '@mark1russell7/site-pages@0.8.5':
     dependencies:
       '@mark1russell7/rigor-statistics': 0.2.11
 

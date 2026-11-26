@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0
+
+The release train changes the range of `@mark1russell7/algebra` to a version outside the old range. The public types name @mark1russell7/algebra, so its new version outside the old range can change them.
+
+### Breaking
+
+- The range `^0.8.3` of `@mark1russell7/algebra` in `dependencies` does not hold `0.9.12`, so it changes.
+
 ## 0.11.6
 
 The TTL checker does not keep a Node process alive. PATCH: a bug fix.

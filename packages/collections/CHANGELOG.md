@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.5
+
+The entry `./graph` gets the antichain with the largest weight in a directed acyclic graph. PATCH: before 1.0.0 a new export raises PATCH.
+
+### Added
+
+- `maxWeightAntichain(nodes, successors, weight)` gives a set of nodes with no path between two of them and the largest sum of weights, and that sum. The default weight 1 gives the width of the graph.
+- The result is exact, by the weighted theorem of Dilworth: a minimum flow with lower bounds, by Dinic, and its minimum cut.
+- A weight that is not a whole number from 0 throws a `RangeError`. A cycle throws a `RangeError` that names its nodes.
+
 ## 0.11.4
 
 The entry `./graph` gets the shortest path and alternative paths on a weighted directed graph. PATCH: before 1.0.0 a new export raises PATCH.

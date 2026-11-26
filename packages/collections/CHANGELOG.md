@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.6
+
+The TTL checker does not keep a Node process alive. PATCH: a bug fix.
+
+### Fixed
+
+- `ttlMap`, `ttlCollection` and `TTLCache` unref the timer of their background checker again. Since algebra 0.9.0, the timers of `realClock` keep the process alive unless their owner unrefs them, so a cache that was not disposed stopped the exit of the process.
+
 ## 0.11.5
 
 The entry `./graph` gets the antichain with the largest weight in a directed acyclic graph. PATCH: before 1.0.0 a new export raises PATCH.

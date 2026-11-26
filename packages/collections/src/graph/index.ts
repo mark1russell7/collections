@@ -3,7 +3,8 @@
  * heap of this package, `PriorityQueue`.
  */
 
-export { minimumHittingSet, type HittingSet, type HittingSetChoice, type HittingSetOptions } from "./hitting-set.js";
+export { maxWeightAntichain, type Antichain } from "./antichain.js";
+export { minimumHittingSet,type HittingSet, type HittingSetChoice, type HittingSetOptions } from "./hitting-set.js";
 export { hubBreadthFirstOrder, type WeightedEdge } from "./hub-order.js";
 export {
   NUMBER_RING,

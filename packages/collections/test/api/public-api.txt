@@ -285,6 +285,7 @@ visualizeDAG: build/dag/index.d.ts#visualizeDAG
 type AlternativePath: build/graph/index.d.ts#AlternativePath
 type AlternativePaths: build/graph/index.d.ts#AlternativePaths
 type AlternativePathsOptions: build/graph/index.d.ts#AlternativePathsOptions
+type Antichain: build/graph/index.d.ts#Antichain
 type CriticalPath: build/graph/index.d.ts#CriticalPath
 type HittingSet: build/graph/index.d.ts#HittingSet
 type HittingSetChoice: build/graph/index.d.ts#HittingSetChoice
@@ -315,6 +316,7 @@ alternativePaths: build/graph/index.d.ts#alternativePaths
 criticalPath: build/graph/index.d.ts#criticalPath
 hubBreadthFirstOrder: build/graph/index.d.ts#hubBreadthFirstOrder
 listSchedule: build/graph/index.d.ts#listSchedule
+maxWeightAntichain: build/graph/index.d.ts#maxWeightAntichain
 minimumHittingSet: build/graph/index.d.ts#minimumHittingSet
 pathSetReliability: build/graph/index.d.ts#pathSetReliability
 periodSchedule: build/graph/index.d.ts#periodSchedule
@@ -585,6 +587,12 @@ interface AlternativePathsOptions<Node> extends ShortestPathOptions<Node> {
   readonly maxRounds?: number | undefined;
 }
 
+### build/graph/index.d.ts#Antichain
+interface Antichain<Id> {
+  readonly nodes: readonly Id[];
+  readonly weight: number;
+}
+
 ### build/graph/index.d.ts#CriticalPath
 type CriticalPath<K> = {
   readonly kind: "ok";
@@ -820,6 +828,9 @@ export declare function hubBreadthFirstOrder(n: number, edges?: readonly Weighte
 
 ### build/graph/index.d.ts#listSchedule
 export declare function listSchedule<K, R = undefined>(tasks: Iterable<ScheduleTask<K>>, options?: ListScheduleOptions<K, R>): ListSchedule<K, R>;
+
+### build/graph/index.d.ts#maxWeightAntichain
+export declare function maxWeightAntichain<Id>(nodes: Iterable<Id>, successors: (node: Id) => Iterable<Id>, weight?: (node: Id) => number): Antichain<Id>;
 
 ### build/graph/index.d.ts#minimumHittingSet
 export declare function minimumHittingSet<T>(sets: Iterable<Iterable<T>>, options?: HittingSetOptions<T>): HittingSet<T>;

@@ -1,6 +1,6 @@
 # Graph orders
 
-The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability. It also has three schedules of tasks with dependencies, the shortest path and different alternative paths.
+The entry `@mark1russell7/collections/graph` has pure functions on graphs. It imports no other package. It has `hubBreadthFirstOrder`, a search of the strongly connected components, a search of the minimum hitting set and the two-terminal reliability. It also has three schedules of tasks with dependencies, the shortest path, different alternative paths and the antichain with the largest weight.
 
 ## The order from the hubs
 
@@ -374,4 +374,35 @@ assert.deepEqual(
   disjoint.paths.map((path) => path.nodes.join("")),
   ["smt", "snt", "sqt"],
 );
+```
+
+## The antichain with the largest weight
+
+In a directed acyclic graph, a node `u` comes before a node `v` when a path goes from `u` to `v`. An antichain is a set of nodes with no path between two of them. Thus the nodes of an antichain can occur at the same time.
+
+`maxWeightAntichain(nodes, successors, weight)` gives an antichain with the largest sum of weights, and that sum. The result is exact.
+
+- The function `weight` gives the weight of a node: a whole number from 0. The default weight is 1. Then the result is the width of the graph.
+- The nodes of the result are in the order of `nodes`. A successor that is not in `nodes` is not an edge.
+- The method is the weighted theorem of Dilworth: the smallest flow that sends the weight of each node through that node. Its minimum cut gives the antichain.
+- A cycle, or a bad weight, throws a `RangeError`.
+
+A use is the peak count of runners of a workflow. The sum of the runners of each job is too high. A job that needs a different job does not start before that job ends.
+
+```ts
+import assert from "node:assert/strict";
+import { maxWeightAntichain } from "@mark1russell7/collections/graph";
+
+// The jobs of a workflow, the jobs that each job needs, and the runners of each job.
+const needs: Record<string, string[]> = { build: [], test: ["build"], lint: ["build"], deploy: ["test", "lint"] };
+const runners: Record<string, number> = { build: 1, test: 4, lint: 1, deploy: 1 };
+const after = (job: string) => Object.keys(needs).filter((other) => needs[other]!.includes(job));
+
+const peak = maxWeightAntichain(Object.keys(needs), after, (job) => runners[job]!);
+assert.deepEqual(peak, { nodes: ["test", "lint"], weight: 5 });
+
+// The default weight 1 gives the width of the graph.
+assert.equal(maxWeightAntichain(Object.keys(needs), after).weight, 2);
+
+assert.throws(() => maxWeightAntichain(["a", "b"], (node) => (node === "a" ? ["b"] : ["a"])), RangeError);
 ```

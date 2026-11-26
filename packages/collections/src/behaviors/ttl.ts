@@ -26,15 +26,23 @@ import { systemClock } from "../core/system-clock.js";
  * This function starts the background expiration checker on a clock, and gives the function that stops it.
  * The checker starts again before each check, so a check that throws does not stop it. An interval
  * less than 1 ms is 1 ms, as with `setInterval`.
+ *
+ * The checker is a helper timer: no caller awaits it. Thus each of its timers uses `unref` (when the
+ * clock gives it), and a cache that is not disposed does not keep a Node process alive. Since algebra
+ * 0.9.0, the timers of `realClock` keep the process alive unless their owner unrefs them.
  */
 function startExpirationTimer(clock: Clock, check: () => void, interval: number): Cancel {
   const every = Math.max(1, interval);
   let cancel: Cancel;
-  const tick = (): void => {
+  const arm = (): void => {
     cancel = clock.after(every, tick);
+    cancel.unref?.();
+  };
+  const tick = (): void => {
+    arm();
     check();
   };
-  cancel = clock.after(every, tick);
+  arm();
   return () => cancel();
 }
 

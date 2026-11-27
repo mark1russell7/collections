@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.1
+
+An automated dependency update changes the shipped files, so this PATCH ships them.
+
 ## 0.12.0
 
 The release train changes the range of `@mark1russell7/algebra` to a version outside the old range. The public types name @mark1russell7/algebra, so its new version outside the old range can change them.
